@@ -10,7 +10,7 @@ namespace wplug\bimeson_post;
  */
 
 
-require_once __DIR__ . '/bm-importer.php';
+require_once __DIR__ . '/importer.php';
 
 
 class Bimeson_Admin {

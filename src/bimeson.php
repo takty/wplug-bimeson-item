@@ -11,8 +11,8 @@ namespace wplug\bimeson_post;
 
 
 require_once __DIR__ . '/asset/util.php';
-require_once __DIR__ . '/bm-taxonomy.php';
-require_once __DIR__ . '/bm-admin.php';
+require_once __DIR__ . '/taxonomy.php';
+require_once __DIR__ . '/admin.php';
 
 
 class Bimeson {
@@ -196,8 +196,8 @@ class Bimeson {
 		if ( ! is_admin() ) {
 			if ( $url_to === false ) $url_to = get_file_uri( __DIR__ );
 			$url_to = untrailingslashit( $url_to );
-			wp_enqueue_style(  'bimeson', $url_to . '/asset/bm-filter.min.css' );
-			wp_enqueue_script( 'bimeson', $url_to . '/asset/bm-filter.min.js' );
+			wp_enqueue_style(  'bimeson-post-filter', $url_to . '/asset/filter.min.css' );
+			wp_enqueue_script( 'bimeson-post-filter', $url_to . '/asset/filter.min.js' );
 		}
 	}
 
