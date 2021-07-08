@@ -3,7 +3,7 @@
  * Publication List Filter (JS)
  *
  * @author Takuto Yanagida
- * @version 2018-03-07
+ * @version 2021-07-08
  *
  */
 

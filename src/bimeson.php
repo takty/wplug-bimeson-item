@@ -196,8 +196,8 @@ class Bimeson {
 		if ( ! is_admin() ) {
 			if ( $url_to === false ) $url_to = get_file_uri( __DIR__ );
 			$url_to = untrailingslashit( $url_to );
-			wp_enqueue_style(  'bimeson-post-filter', $url_to . '/asset/filter.min.css' );
-			wp_enqueue_script( 'bimeson-post-filter', $url_to . '/asset/filter.min.js' );
+			wp_enqueue_style(  'bimeson-post-filter', $url_to . '/asset/css/filter.min.css' );
+			wp_enqueue_script( 'bimeson-post-filter', $url_to . '/asset/js/filter.min.js' );
 		}
 	}
 

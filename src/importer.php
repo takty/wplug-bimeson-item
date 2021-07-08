@@ -47,8 +47,8 @@ class Bimeson_Importer extends \WP_Importer {
 
 	public function dispatch() {
 		$url_to = untrailingslashit( get_file_uri( __DIR__ ) );
-		wp_enqueue_script( 'bimeson-post-loader', $url_to . '/asset/loader.min.js' );
-		wp_enqueue_script( 'xlsx',                $url_to . '/asset/xlsx.full.min.js' );
+		wp_enqueue_script( 'bimeson-post-loader', $url_to . '/asset/js/loader.min.js' );
+		wp_enqueue_script( 'xlsx',                $url_to . '/asset/js/xlsx.full.min.js' );
 
 		$this->_header();
 
