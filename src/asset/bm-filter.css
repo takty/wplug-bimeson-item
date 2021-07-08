@@ -1,29 +1,30 @@
 /**
  *
- * Bimeson List Page Admin
+ * Publication List Filter (CSS)
  *
- * @author Takuto Yanagida @ Space-Time Inc.
- * @version 2018-10-23
+ * @author Takuto Yanagida
+ * @version 2018-03-14
  *
  */
 
 
-.bimeson-filter-key {
-	display: flex;
-	align-items: flex-start;
-	padding: 4px 0;
+.bm-list-filter-cat + * {
+	margin-top: 4rem;
 }
 
-.bimeson_admin_edit_row { text-align: right; }
-
-.bimeson-filter-cbs {
-	display: flex;
-	flex-wrap: wrap;
-	padding: 0.25em 0 0;
+.bm-list-filter-cat-inner {
+	display: inline-flex;
+	width: 100%;
+	align-items: center;
+	position: relative;
 }
 
-.bimeson-filter-cbs label {
+.bm-list-filter-cbs label {
+	display: inline-flex;
+	align-items: center;
 	padding: 8px;
+	line-height: 1;
+	font-feature-settings: 'pkna' 1;
 
 	user-select: none;
 	-ms-user-select: none;
@@ -31,11 +32,8 @@
 	-webkit-user-select: none;
 }
 
-.bimeson-filter-cat {
-	padding-top: 8px;
-	padding-bottom: 8px;
-	padding-right: 8px;
-	font-weight: bold;
+.bm-list-filter-cbs label input {
+	margin-right: 8px;
 }
 
 input[type=checkbox].tgl {
@@ -89,19 +87,17 @@ input[type=checkbox].tgl {
 }
 
 .tgl-light:checked + .tgl-btn {
-	background: #b3cefb;
+	background: #fa0;
 }
 
-.bimeson_admin > div:not(:first-child) {
-	margin-top: 16px;
+*[data-bm='on'] .bm-filtered > div {
+	opacity: 0.25;
+	max-height: 1.7rem;
+	overflow: hidden;
+	transition: all 0.5s ease;
 }
 
-.bimeson_admin_setting_row > *:not(:first-child) {
-	margin-left: 8px;
-}
-
-.bimeson_admin_filter_row {
-	padding: 6px;
-	border: 1px solid #eee;
-	border-radius: 4px;
+*[data-bm='on'] li > div {
+	max-height: 50vh;
+	transition: all 2s ease;
 }

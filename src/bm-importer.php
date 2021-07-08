@@ -1,12 +1,11 @@
 <?php
-namespace st;
-
+namespace wplug\bimeson_post;
 /**
  *
- * Bimeson Importer
+ * Bimeson (Importer)
  *
- * @author Takuto Yanagida @ Space-Time Inc.
- * @version 2018-03-06
+ * @author Takuto Yanagida
+ * @version 2021-07-08
  *
  */
 
@@ -87,6 +86,7 @@ class Bimeson_Importer extends \WP_Importer {
 
 	// Step 0 ------------------------------------------------------------------
 
+
 	private function _greet() {
 		echo '<div class="narrow">';
 		echo '<p>'.__( 'Howdy! Upload your Bimeson Excel (xlsx) file and we&#8217;ll import the publications into this site.', 'bimeson-importer' ).'</p>';
@@ -97,6 +97,7 @@ class Bimeson_Importer extends \WP_Importer {
 
 
 	// Step 1 ------------------------------------------------------------------
+
 
 	private function _handle_upload() {
 		$file = wp_import_handle_upload();
@@ -149,6 +150,7 @@ class Bimeson_Importer extends \WP_Importer {
 
 
 	// Step 2 ------------------------------------------------------------------
+
 
 	private function _import( $json ) {
 		add_filter( 'http_request_timeout', function ( $val ) { return 60; } );
@@ -242,16 +244,16 @@ class Bimeson_Importer extends \WP_Importer {
 			$body = ( ! empty( $item[Bimeson::FLD_BODY] ) ) ? trim( $item[Bimeson::FLD_BODY] ) : '';
 			if ( empty( $body ) ) continue;
 
-			$date       = ( ! empty( $item[Bimeson::FLD_DATE] ) )       ? \st\field\normalize_date( $item[Bimeson::FLD_DATE] ) : '';
+			$date       = ( ! empty( $item[Bimeson::FLD_DATE] ) )       ? normalize_date( $item[Bimeson::FLD_DATE] ) : '';
 			$date_num   = str_pad( str_replace( '-', '', $date ), 8, '9', STR_PAD_RIGHT );
 			$doi        = ( ! empty( $item[Bimeson::FLD_DOI] ) )        ? $item[Bimeson::FLD_DOI] : '';
 			$link_url   = ( ! empty( $item[Bimeson::FLD_LINK_URL] ) )   ? $item[Bimeson::FLD_LINK_URL] : '';
 			$link_title = ( ! empty( $item[Bimeson::FLD_LINK_TITLE] ) ) ? $item[Bimeson::FLD_LINK_TITLE] : '';
 
-			$a_bodeis = [];
+			$a_bodies = [];
 			foreach ( $this->_additional_langs as $al ) {
 				$b = ( ! empty( $item[ Bimeson::FLD_BODY . "_$al" ] ) ) ? $item[ Bimeson::FLD_BODY . "_$al" ] : '';
-				if ( ! empty( $b ) ) $a_bodeis[ $al ] = $b;
+				if ( ! empty( $b ) ) $a_bodies[ $al ] = $b;
 			}
 
 			$digest = $this->make_digest( $body );
@@ -285,7 +287,7 @@ class Bimeson_Importer extends \WP_Importer {
 			add_post_meta( $post_id, Bimeson::FLD_IMPORT_FROM, $this->_file_name );
 			add_post_meta( $post_id, Bimeson::FLD_DIGEST,      $digest );
 
-			foreach ( $a_bodeis as $l => $cont ) {
+			foreach ( $a_bodies as $l => $cont ) {
 				add_post_meta( $post_id, "_post_content_$l", wp_kses_post( $cont ) );
 			}
 			foreach ( $item as $key => $vals ) {

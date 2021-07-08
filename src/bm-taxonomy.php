@@ -1,12 +1,11 @@
 <?php
-namespace st;
-
+namespace wplug\bimeson_post;
 /**
  *
  * Bimeson (Taxonomy)
  *
- * @author Takuto Yanagida @ Space-Time Inc.
- * @version 2018-03-13
+ * @author Takuto Yanagida
+ * @version 2021-07-08
  *
  */
 
@@ -40,7 +39,7 @@ class Bimeson_Taxonomy {
 			'rewrite'            => false,
 		] );
 		register_taxonomy_for_object_type( $this->_tax_root, $this->_post_type );
-		\st\ordered_term\make_terms_ordered( [ $this->_tax_root ] );
+		// \st\ordered_term\make_terms_ordered( [ $this->_tax_root ] );
 		$this->_register_sub_tax_all();
 
 		add_action( "edit_terms",                [ $this, '_cb_edit_taxonomy' ], 10, 2 );
@@ -56,7 +55,7 @@ class Bimeson_Taxonomy {
 			$sub_taxes[] = $sub_tax;
 			$this->register_sub_tax( $sub_tax, $r->name );
 		}
-		\st\ordered_term\make_terms_ordered( $sub_taxes );
+		// \st\ordered_term\make_terms_ordered( $sub_taxes );
 	}
 
 	private function _get_query_var_name( $slug ) {
@@ -157,6 +156,7 @@ class Bimeson_Taxonomy {
 
 
 	// Callback Functions ------------------------------------------------------
+
 
 	public function _cb_edit_taxonomy( $term_id, $taxonomy ) {
 		if ( $taxonomy !== $this->_tax_root ) return;

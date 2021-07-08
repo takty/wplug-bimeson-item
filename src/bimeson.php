@@ -1,22 +1,16 @@
 <?php
-namespace st;
-
+namespace wplug\bimeson_post;
 /**
  *
  * Functions and Definitions for Bimeson
  *
- * @author Takuto Yanagida @ Space-Time Inc.
- * @version 2020-06-04
+ * @author Takuto Yanagida
+ * @version 2021-07-08
  *
  */
 
 
-require_once __DIR__ . '/../../stinc/admin/misc.php';
-require_once __DIR__ . '/../../stinc/admin/template-admin.php';
-require_once __DIR__ . '/../../stinc/system/ordered-term.php';
-require_once __DIR__ . '/../../stinc/system/field.php';
-require_once __DIR__ . '/../../stinc/tag/template-tag.php';
-require_once __DIR__ . '/../../stinc/util/url.php';
+require_once __DIR__ . '/asset/util.php';
 require_once __DIR__ . '/bm-taxonomy.php';
 require_once __DIR__ . '/bm-admin.php';
 
@@ -154,16 +148,16 @@ class Bimeson {
 			}
 			if ( ! isset( $mq['meta_date'] ) ) {
 				$mq['meta_date'] = [
-					'key'     => self::FLD_DATE_NUM,
-					'type'    => 'NUMERIC',
+					'key'  => self::FLD_DATE_NUM,
+					'type' => 'NUMERIC',
 				];
 			}
 			$ps = get_posts( [
-				'post_type' => self::PT_BIMESON,
+				'post_type'      => self::PT_BIMESON,
 				'posts_per_page' => intval( $atts['count'] ),
-				'tax_query' => $tq,
-				'meta_query' => $mq,
-				'orderby' => [ 'meta_date' => 'desc', 'date' => 'desc' ]
+				'tax_query'      => $tq,
+				'meta_query'     => $mq,
+				'orderby'        => [ 'meta_date' => 'desc', 'date' => 'desc' ]
 			] );
 			if ( count( $ps ) === 0 ) return '';
 
@@ -193,13 +187,14 @@ class Bimeson {
 
 	// -------------------------------------------------------------------------
 
+
 	public function get_sub_taxonomies() {
 		return $this->_tax->get_sub_taxonomies();
 	}
 
 	public function enqueue_script( $url_to = false ) {
 		if ( ! is_admin() ) {
-			if ( $url_to === false ) $url_to = \st\get_file_uri( __DIR__ );
+			if ( $url_to === false ) $url_to = get_file_uri( __DIR__ );
 			$url_to = untrailingslashit( $url_to );
 			wp_enqueue_style(  'bimeson', $url_to . '/asset/bm-filter.min.css' );
 			wp_enqueue_script( 'bimeson', $url_to . '/asset/bm-filter.min.js' );
@@ -229,7 +224,7 @@ class Bimeson {
 
 	private function _echo_list_item( $p, $al ) {
 		$body = '';
-		if ( ! empty( $al ) ) $body = \st\get_the_sub_content( "_post_content_$al", $p->ID );
+		if ( ! empty( $al ) ) $body = get_the_sub_content( "_post_content_$al", $p->ID );
 		if ( empty( $body ) ) $body = $p->post_content;
 
 		$doi    = get_post_meta( $p->ID, self::FLD_DOI,        true);
@@ -253,7 +248,7 @@ class Bimeson {
 		$_edit_tag = $this->_make_edit_tag( $p );
 
 		echo "<li class=\"$_cls\"><div>";
-		\st\echo_content( $body );
+		echo_content( $body );
 		echo "$_link$_doi $_edit_tag</div></li>\n";
 	}
 

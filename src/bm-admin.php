@@ -1,12 +1,11 @@
 <?php
-namespace st;
-
+namespace wplug\bimeson_post;
 /**
  *
  * Bimeson (Admin)
  *
- * @author Takuto Yanagida @ Space-Time Inc.
- * @version 2020-06-04
+ * @author Takuto Yanagida
+ * @version 2021-07-08
  *
  */
 
@@ -34,8 +33,8 @@ class Bimeson_Admin {
 		add_filter( 'wp_insert_post_data',              [ $this, '_cb_wp_insert_post_data' ], 10, 2 );
 		add_action( 'save_post_' . Bimeson::PT_BIMESON, [ $this, '_cb_save_post' ] );
 
-		if ( class_exists( '\st\Bimeson_Importer' ) ) {
-			\st\Bimeson_Importer::register( $this->_tax, [ 'additional_langs' => $this->_additional_langs ] );
+		if ( class_exists( '\wplug\bimeson_post\Bimeson_Importer' ) ) {
+			\wplug\bimeson_post\Bimeson_Importer::register( $this->_tax, [ 'additional_langs' => $this->_additional_langs ] );
 		}
 	}
 
@@ -47,13 +46,13 @@ class Bimeson_Admin {
 		}
 		$cs[] = 'date';
 		$cs[] = [ 'label' => 'インポート元', 'name' => Bimeson::FLD_IMPORT_FROM, 'width' => '10%', 'value' => 'esc_html' ];
-		\st\field\set_admin_columns( 'bimeson', $cs, [ Bimeson::FLD_DATE, Bimeson::FLD_IMPORT_FROM ] );
+		set_admin_columns( 'bimeson', $cs, [ Bimeson::FLD_DATE, Bimeson::FLD_IMPORT_FROM ] );
 	}
 
 	public function _cb_admin_menu() {
-		if ( \st\is_post_type( Bimeson::PT_BIMESON ) ) {
+		if ( is_post_type( Bimeson::PT_BIMESON ) ) {
 			foreach ( $this->_additional_langs as $al ) {
-				\st\field\add_rich_editor_meta_box( "_post_content_$al", "本文 [$al]", 'bimeson' );
+				add_rich_editor_meta_box( "_post_content_$al", "本文 [$al]", 'bimeson' );
 			}
 			add_meta_box( 'bimeson_mb', '業績情報', [ $this, '_cb_output_html' ], 'bimeson', 'side', 'high' );
 		}
@@ -82,10 +81,10 @@ class Bimeson_Admin {
 		$link_url   = get_post_meta( $post_id, Bimeson::FLD_LINK_URL,   true );
 		$link_title = get_post_meta( $post_id, Bimeson::FLD_LINK_TITLE, true );
 
-		\st\field\output_input_row( '公開日付', Bimeson::FLD_DATE, $date );
-		\st\field\output_input_row( 'DOI', Bimeson::FLD_DOI, $doi );
-		\st\field\output_input_row( 'リンクURL', Bimeson::FLD_LINK_URL, $link_url );
-		\st\field\output_input_row( 'リンク表題', Bimeson::FLD_LINK_TITLE, $link_title );
+		output_input_row( '公開日付', Bimeson::FLD_DATE, $date );
+		output_input_row( 'DOI', Bimeson::FLD_DOI, $doi );
+		output_input_row( 'リンクURL', Bimeson::FLD_LINK_URL, $link_url );
+		output_input_row( 'リンク表題', Bimeson::FLD_LINK_TITLE, $link_title );
 	}
 
 	public function _cb_wp_insert_post_data( $data, $postarr ) {
@@ -101,16 +100,16 @@ class Bimeson_Admin {
 		if ( ! current_user_can( 'edit_post', $post_id ) ) return;
 
 		foreach ( $this->_additional_langs as $al ) {
-			\st\field\save_rich_editor_meta_box( $post_id, "_post_content_$al" );
+			save_rich_editor_meta_box( $post_id, "_post_content_$al" );
 		}
 		$date = isset( $_POST[ Bimeson::FLD_DATE ] ) ? $_POST[ Bimeson::FLD_DATE ] : '';
-		$date_num = str_pad( str_replace( '-', '', \st\field\normalize_date( $date ) ), 8, '9', STR_PAD_RIGHT );
+		$date_num = str_pad( str_replace( '-', '', normalize_date( $date ) ), 8, '9', STR_PAD_RIGHT );
 		update_post_meta( $post_id, Bimeson::FLD_DATE_NUM, $date_num );
 
-		\st\field\save_post_meta( $post_id, Bimeson::FLD_DATE, '\\st\\field\\normalize_date' );
-		\st\field\save_post_meta( $post_id, Bimeson::FLD_DOI );
-		\st\field\save_post_meta( $post_id, Bimeson::FLD_LINK_URL );
-		\st\field\save_post_meta( $post_id, Bimeson::FLD_LINK_TITLE );
+		save_post_meta( $post_id, Bimeson::FLD_DATE, '\\wplug\\bimeson_post\\normalize_date' );
+		save_post_meta( $post_id, Bimeson::FLD_DOI );
+		save_post_meta( $post_id, Bimeson::FLD_LINK_URL );
+		save_post_meta( $post_id, Bimeson::FLD_LINK_TITLE );
 
 		if ( $this->_post_lang_tax !== false ) $this->_set_post_lang_terms( $post_id );
 	}
