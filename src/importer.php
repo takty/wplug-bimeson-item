@@ -1,14 +1,12 @@
 <?php
-namespace wplug\bimeson_post;
 /**
- *
  * Bimeson (Importer)
  *
  * @author Takuto Yanagida
  * @version 2021-07-08
- *
  */
 
+namespace wplug\bimeson_post;
 
 if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) return;
 

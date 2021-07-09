@@ -1,15 +1,12 @@
 <?php
-namespace wplug\bimeson_post;
 /**
- *
  * Bimeson (Taxonomy)
  *
  * @author Takuto Yanagida
  * @version 2021-07-08
- *
  */
 
-
+namespace wplug\bimeson_post;
 class Bimeson_Taxonomy {
 
 	const DEFAULT_TAXONOMY     = 'bm_cat';

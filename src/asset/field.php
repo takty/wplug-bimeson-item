@@ -1,14 +1,12 @@
 <?php
-namespace wplug\bimeson_post;
 /**
- *
  * Custom Field Utilities
  *
  * @author Takuto Yanagida
  * @version 2021-07-08
- *
  */
 
+namespace wplug\bimeson_post;
 
 add_action( 'admin_enqueue_scripts', function () {
 	$url_to = get_file_uri( __DIR__ );

@@ -1,14 +1,12 @@
 <?php
-namespace wplug\bimeson_post;
 /**
- *
  * Utilities for Bimeson Post
  *
  * @author Takuto Yanagida
  * @version 2021-07-08
- *
  */
 
+namespace wplug\bimeson_post;
 
 function get_the_sub_content( $meta_key, $post_id = false ) {
 	global $post;

@@ -1,17 +1,14 @@
 <?php
-namespace wplug\bimeson_post;
 /**
- *
  * Bimeson (Admin)
  *
  * @author Takuto Yanagida
  * @version 2021-07-08
- *
  */
 
+namespace wplug\bimeson_post;
 
 require_once __DIR__ . '/importer.php';
-
 
 class Bimeson_Admin {
 
