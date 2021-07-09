@@ -3,14 +3,14 @@
  * Custom Field Utilities
  *
  * @author Takuto Yanagida
- * @version 2021-07-08
+ * @version 2021-07-09
  */
 
 namespace wplug\bimeson_post;
 
 add_action( 'admin_enqueue_scripts', function () {
 	$url_to = get_file_uri( __DIR__ );
-	wp_register_style ( 'stinc-field', abs_url( $url_to, './asset/field.min.css' ) );
+	wp_register_style ( 'wplug-bimeson-post-field', abs_url( $url_to, './css/field.min.css' ) );
 } );
 
 
@@ -48,10 +48,10 @@ function save_post_meta_with_wp_filter( $post_id, $key, $filter_name = null, $de
 }
 
 function output_input_row( $label, $key, $val, $type = 'text' ) {
-	wp_enqueue_style( 'stinc-field' );
+	wp_enqueue_style( 'wplug-bimeson-post-field' );
 	$val = isset( $val ) ? esc_attr( $val ) : '';
 ?>
-	<div class="stinc-field-single">
+	<div class="wplug-bimeson-post-field-single">
 		<label>
 			<span><?php echo esc_html( $label ) ?></span>
 			<input <?php name_id( $key ) ?> type="<?php echo esc_attr( $type ) ?>" value="<?php echo $val ?>" size="64">

@@ -1,0 +1,135 @@
+/**
+ *
+ * Field (SCSS)
+ *
+ * @author Takuto Yanagida
+ * @version 2021-07-09
+ *
+ */
+
+
+$breakpoint-single-wrap: 45rem;
+
+
+.wplug-bimeson-post-field-single {
+	&:not(:first-child) {
+		margin-top: 0.75rem;
+	}
+	> label {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		flex-wrap: wrap;
+
+		> span:not([class]) {
+			padding-top: 0.35rem;
+			padding-bottom: 0.25rem;
+
+			min-width: 29%;
+			width: calc((#{$breakpoint-single-wrap} - 100%) * 1000);
+			max-width: 100%;
+
+			font-weight: bold;
+			color: #666;
+		}
+		> input:not([type='checkbox']), > textarea, > select, > span.checkbox {
+			padding-top: 0.25rem;
+			padding-bottom: 0.25rem;
+
+			min-width: 70%;
+			width: calc((#{$breakpoint-single-wrap} - 100%) * 1000);
+			max-width: 100%;
+		}
+	}
+}
+
+.wplug-bimeson-post-field-separator {
+	margin: 1.5rem -12px;
+	height: 4px;
+	background-color: #f1f1f1;
+}
+
+.wplug-bimeson-post-field-rich-editor {
+	margin-top: 1.5rem;
+	&:not(:last-child) {
+		margin-bottom: 2rem;
+	}
+	> label {
+		display: block;
+		font-weight: bold;
+		color: #666;
+		padding-bottom:0.5rem
+	}
+	&.no-media-button > label {
+		margin-bottom: -2rem;
+	}
+}
+
+.wplug-bimeson-post-field-group {
+	margin-top: 0.5rem;
+}
+
+.wplug-bimeson-post-field-title {
+	> input {  // Same as the default title style of Wordpress
+		padding: 3px 8px;
+		font-size: 1.7em;
+		line-height: 100%;
+		height: 1.7em;
+		width: 100%;
+		outline: none;
+		margin: 0 0 6px;
+		background-color: #fff;
+	}
+}
+
+.wplug-bimeson-post-field-media-picker {
+	margin-top: 0.75rem;
+
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	flex-wrap: wrap;
+
+
+	> label {
+		min-width: 29%;
+		width: calc((#{$breakpoint-single-wrap} - 100%) * 1000);
+		max-width: 100%;
+
+		padding-top: 0.35rem;
+		padding-bottom: 0.25rem;
+		font-weight: bold;
+		color: #666;
+	}
+	> div {
+		min-width: 70%;
+		width: calc((#{$breakpoint-single-wrap} - 100%) * 1000);
+		max-width: 100%;
+
+		display: flex;
+
+		> div:first-child {
+			margin-right: 0.5rem;
+		}
+		> div:last-child {
+			display: flex;
+			flex-direction: column;
+			flex-grow: 1;
+			align-items: flex-end;
+			justify-content: space-between;
+
+			input { width: 100%; }
+		}
+	}
+}
+
+.wplug-bimeson-post-field-media-picker-select {
+	&.button, &.button:focus, &.button:hover {
+		width: 4rem;
+		height: 4rem;
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: contain;
+		background-color: #f7f7f7;
+	}
+}

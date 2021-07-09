@@ -3,7 +3,7 @@
  * Functions and Definitions for Bimeson
  *
  * @author Takuto Yanagida
- * @version 2021-07-08
+ * @version 2021-07-09
  */
 
 namespace wplug\bimeson_post;

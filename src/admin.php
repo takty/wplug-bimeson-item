@@ -3,12 +3,13 @@
  * Bimeson (Admin)
  *
  * @author Takuto Yanagida
- * @version 2021-07-08
+ * @version 2021-07-09
  */
 
 namespace wplug\bimeson_post;
 
 require_once __DIR__ . '/importer.php';
+require_once __DIR__ . '/asset/field.php';
 
 class Bimeson_Admin {
 

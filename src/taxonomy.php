@@ -3,10 +3,11 @@
  * Bimeson (Taxonomy)
  *
  * @author Takuto Yanagida
- * @version 2021-07-08
+ * @version 2021-07-09
  */
 
 namespace wplug\bimeson_post;
+
 class Bimeson_Taxonomy {
 
 	const DEFAULT_TAXONOMY     = 'bm_cat';
