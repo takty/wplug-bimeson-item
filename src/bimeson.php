@@ -3,7 +3,7 @@
  * Functions and Definitions for Bimeson
  *
  * @author Takuto Yanagida
- * @version 2021-07-09
+ * @version 2021-07-12
  */
 
 namespace wplug\bimeson_post;
@@ -14,7 +14,7 @@ require_once __DIR__ . '/admin.php';
 
 class Bimeson {
 
-	const PT_BIMESON      = 'bimeson';
+	const PT_BIMESON      = 'bimeson';  // Each post means publication (bimeson)
 
 	const FLD_BODY        = '_body';
 	const FLD_DATE        = '_date';
@@ -205,6 +205,39 @@ class Bimeson {
 				$this->_tax->show_tax_checkboxes( $terms, $slug );
 			}
 		}
+	}
+
+	public function show_tax_checkboxes( $terms, $slug ) {
+		$v = get_query_var( $this->_tax->get_query_var_name( $slug ) );
+		$_slug = esc_attr( $slug );
+		$qvals = empty( $v ) ? [] : explode( ',', $v );
+	?>
+		<div class="bm-list-filter-cat" data-key="<?php echo $_slug ?>">
+			<div class="bm-list-filter-cat-inner">
+				<input type="checkbox" class="bm-list-filter-switch tgl tgl-light" id="<?php echo $_slug ?>" <?php if ( ! empty( $qvals ) ) echo 'checked' ?>></input>
+				<label class="tgl-btn" for="<?php echo $_slug ?>"></label>
+				<div class="bm-list-filter-cbs">
+	<?php
+		foreach ( $terms as $t ) :
+			$_id  = esc_attr( $this->_tax->term_to_taxonomy( $t ) );
+			$_val = esc_attr( $t->slug );
+			if ( class_exists( '\st\Multilang' ) ) {
+				$_name = esc_html( \st\Multilang::get_instance()->get_term_name( $t ) );
+			} else {
+				$_name = esc_html( $t->name );
+			}
+	?>
+					<label>
+						<input type="checkbox" id="<?php echo $_id ?>" <?php if ( in_array( $t->slug, $qvals, true ) ) echo 'checked' ?> data-val="<?php echo $_val ?>"></input>
+						<?php echo $_name ?>
+					</label>
+	<?php
+		endforeach;
+	?>
+				</div>
+			</div>
+		</div>
+	<?php
 	}
 
 	private function _echo_list( $ps, $al ) {

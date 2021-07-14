@@ -3,7 +3,7 @@
  * Bimeson (Taxonomy)
  *
  * @author Takuto Yanagida
- * @version 2021-07-09
+ * @version 2021-07-13
  */
 
 namespace wplug\bimeson_post;
@@ -18,8 +18,11 @@ class Bimeson_Taxonomy {
 	private $_tax_root;
 	private $_tax_sub_base;
 
-	private $_old_taxonomy = [];
+	private $_old_tax   = [];
 	private $_old_terms = [];
+
+	private $_root_terms       = null;
+	private $_sub_tax_to_terms = [];
 
 	public function __construct( $post_type, $labels, $taxonomy = false, $sub_tax_base = false ) {
 		$this->_post_type    = $post_type;
@@ -27,15 +30,17 @@ class Bimeson_Taxonomy {
 		$this->_tax_root     = ( $taxonomy === false )     ? self::DEFAULT_TAXONOMY     : $taxonomy;
 		$this->_tax_sub_base = ( $sub_tax_base === false ) ? self::DEFAULT_SUB_TAX_BASE : $sub_tax_base;
 
-		register_taxonomy( $this->_tax_root, $this->_post_type, [
-			'hierarchical'       => false,
-			'label'              => $this->_labels['taxonomy'],
-			'public'             => false,
-			'show_ui'            => true,
-			'show_in_quick_edit' => false,
-			'meta_box_cb'        => false,
-			'rewrite'            => false,
-		] );
+		if ( ! taxonomy_exists( $this->_tax_root ) ) {
+			register_taxonomy( $this->_tax_root, null, [
+				'hierarchical'       => true,
+				'label'              => $this->_labels['taxonomy'],
+				'public'             => false,
+				'show_ui'            => true,
+				'show_in_quick_edit' => false,
+				'meta_box_cb'        => false,
+				'rewrite'            => false,
+			] );
+		}
 		register_taxonomy_for_object_type( $this->_tax_root, $this->_post_type );
 		// \st\ordered_term\make_terms_ordered( [ $this->_tax_root ] );
 		$this->_register_sub_tax_all();
@@ -46,7 +51,7 @@ class Bimeson_Taxonomy {
 	}
 
 	private function _register_sub_tax_all() {
-		$roots = get_terms( $this->_tax_root, [ 'hide_empty' => 0 ]  );
+		$roots = $this->_get_root_terms();
 		$sub_taxes = [];
 		foreach ( $roots as $r ) {
 			$sub_tax = $this->term_to_taxonomy( $r );
@@ -56,41 +61,51 @@ class Bimeson_Taxonomy {
 		// \st\ordered_term\make_terms_ordered( $sub_taxes );
 	}
 
-	private function _get_query_var_name( $slug ) {
-		$slug = str_replace( '-', '_', $slug );
-		return "{$this->_tax_sub_base}{$slug}";
+	public function get_query_var_name( $slug ) {
+		$name = "{$this->_tax_sub_base}{$slug}";
+		return str_replace( '_', '-', $name );
 	}
 
 	public function register_sub_tax( $tax, $name ) {
-		register_taxonomy( $tax, $this->_post_type, [
-			'hierarchical'      => true,
-			'label'             => "{$this->_labels['taxonomy']} ($name)",
-			'public'            => true,
-			'show_ui'           => true,
-			'rewrite'           => false,
-			'sort'              => true,
-			'show_admin_column' => true
-		] );
+		if ( ! taxonomy_exists( $tax ) ) {
+			register_taxonomy( $tax, null, [
+				'hierarchical'       => true,
+				'label'              => "{$this->_labels['taxonomy']} ($name)",
+				'public'             => true,
+				'show_ui'            => true,
+				'rewrite'            => false,
+				'sort'               => true,
+				'show_admin_column'  => false,
+				'show_in_quick_edit' => false,
+				'meta_box_cb'        => false
+			] );
+		}
+		$this->_sub_tax_to_terms[ $tax ] = false;
+		register_taxonomy_for_object_type( $tax, $this->_post_type );
 	}
+
+
+	// -------------------------------------------------------------------------
+
 
 	public function get_taxonomy() {
 		return $this->_tax_root;
 	}
 
-	public function term_to_taxonomy( $term ) {
-		$slug = '';
-		if ( is_string( $term ) ) {
-			$slug = $term;
-		} else {
-			$slug = $term->slug;
-		}
-		$slug = str_replace( '-', '_', $slug );
-		return $this->_tax_sub_base . $slug;
+	private function _get_root_terms() {
+		if ( $this->_root_terms ) return $this->_root_terms;
+		$this->_root_terms = get_terms( $this->_tax_root, [ 'hide_empty' => 0 ] );
+		return $this->_root_terms;
 	}
 
 	public function get_root_slugs() {
-		$roots = get_terms( $this->_tax_root, [ 'hide_empty' => 0 ]  );
+		$roots = $this->_get_root_terms();
 		return array_map( function ( $e ) { return $e->slug; }, $roots );
+	}
+
+	public function term_to_taxonomy( $term ) {
+		$slug = is_string( $term ) ? $term : $term->slug;
+		return $this->_tax_sub_base . str_replace( '-', '_', $slug );
 	}
 
 	public function get_sub_taxonomies() {
@@ -100,56 +115,29 @@ class Bimeson_Taxonomy {
 		return $slugs;
 	}
 
-	public function get_root_slugs_to_sub_slugs() {
-		$roots = get_terms( $this->_tax_root, [ 'hide_empty' => 0 ]  );
-		$slugs = [];
-		foreach( $roots as $r ) {
-			$terms = get_terms( $this->term_to_taxonomy( $r ), [ 'hide_empty' => 0 ]  );
-			$slugs[ $r->slug ] = array_map( function ( $e ) { return $e->slug; }, $terms );;
-		}
-		return $slugs;
-	}
-
 	public function get_root_slugs_to_sub_terms() {
-		$roots = get_terms( $this->_tax_root, [ 'hide_empty' => 0 ]  );
+		$roots = $this->_get_root_terms();
 		$terms = [];
 		foreach( $roots as $r ) {
-			$terms[ $r->slug ] = get_terms( $this->term_to_taxonomy( $r ), [ 'hide_empty' => 0 ]  );
+			$sub_tax = $this->term_to_taxonomy( $r );
+			$terms[ $r->slug ] = $this->_get_sub_terms( $sub_tax );
 		}
 		return $terms;
 	}
 
-	public function show_tax_checkboxes( $terms, $slug ) {
-		$v = get_query_var( $this->_get_query_var_name( $slug ) );
-		$_slug = esc_attr( $slug );
-		$qvals = empty( $v ) ? [] : explode( ',', $v );
-	?>
-		<div class="bm-list-filter-cat" data-key="<?php echo $_slug ?>">
-			<div class="bm-list-filter-cat-inner">
-				<input type="checkbox" class="bm-list-filter-switch tgl tgl-light" id="<?php echo $_slug ?>" <?php if ( ! empty( $qvals ) ) echo 'checked' ?>></input>
-				<label class="tgl-btn" for="<?php echo $_slug ?>"></label>
-				<div class="bm-list-filter-cbs">
-	<?php
-		foreach ( $terms as $t ) :
-			$_id  = esc_attr( str_replace( '_', '-', "{$this->_tax_sub_base}{$t->slug}" ) );
-			$_val = esc_attr( $t->slug );
-			if ( class_exists( '\st\Multilang' ) ) {
-				$_name = esc_html( \st\Multilang::get_instance()->get_term_name( $t ) );
-			} else {
-				$_name = esc_html( $t->name );
-			}
-	?>
-					<label>
-						<input type="checkbox" id="<?php echo $_id ?>" <?php if ( in_array( $t->slug, $qvals, true ) ) echo 'checked' ?> data-val="<?php echo $_val ?>"></input>
-						<?php echo $_name ?>
-					</label>
-	<?php
-		endforeach;
-	?>
-				</div>
-			</div>
-		</div>
-	<?php
+	public function get_root_slugs_to_sub_slugs() {
+		$subs = $this->get_root_slugs_to_sub_terms();
+		$slugs = [];
+		foreach ( $subs as $slug => $terms ) {
+			$slugs[ $slug ] = array_map( function ( $e ) { return $e->slug; }, $terms );
+		}
+		return $slugs;
+	}
+
+	private function _get_sub_terms( $sub_tax ) {
+		if ( $this->_sub_tax_to_terms[ $sub_tax ] !== false ) return $this->_sub_tax_to_terms[ $sub_tax ];
+		$this->_sub_tax_to_terms[ $sub_tax ] = get_terms( $sub_tax, [ 'hide_empty' => 0 ] );
+		return $this->_sub_tax_to_terms[ $sub_tax ];
 	}
 
 
@@ -166,9 +154,9 @@ class Bimeson_Taxonomy {
 			wp_update_term( $term_id, $taxonomy, [ 'slug' => $s ] );
 		}
 
-		$this->_old_taxonomy = $this->term_to_taxonomy( $term );
+		$this->_old_tax = $this->term_to_taxonomy( $term );
 
-		$terms = get_terms( $this->_old_taxonomy, [ 'hide_empty' => 0 ]  );
+		$terms = get_terms( $this->_old_tax, [ 'hide_empty' => 0 ]  );
 		foreach ( $terms as $t ) {
 			$this->_old_terms[] = [ 'slug' =>  $t->slug, 'name' => $t->name, 'term_id' => $t->term_id ];
 		}
@@ -178,10 +166,10 @@ class Bimeson_Taxonomy {
 		$term = get_term_by( 'id', $term_id, $this->_tax_root );
 		$new_taxonomy = $this->term_to_taxonomy( $term );
 
-		if ( $this->_old_taxonomy !== $new_taxonomy ) {
+		if ( $this->_old_tax !== $new_taxonomy ) {
 			$this->register_sub_tax( $new_taxonomy, $term->name );
 			foreach ( $this->_old_terms as $t ) {
-				wp_delete_term( $t['term_id'], $this->_old_taxonomy );
+				wp_delete_term( $t['term_id'], $this->_old_tax );
 				wp_insert_term( $t['name'], $new_taxonomy, [ 'slug' => $t['slug'] ] );
 			}
 		}
@@ -190,21 +178,9 @@ class Bimeson_Taxonomy {
 	public function _cb_query_vars( $query_vars ) {
 		$roots = get_terms( $this->_tax_root, [ 'hide_empty' => 0 ] );
 		foreach ( $roots as $r ) {
-			$query_vars[] = $this->_get_query_var_name( $r->slug );
+			$query_vars[] = $this->get_query_var_name( $r->slug );
 		}
 		return $query_vars;
-	}
-
-	static private function _boolean_form( $term, $key, $label ) {
-		$val = get_term_meta( $term->term_id, $key, true );
-		?>
-		<tr class="form-field">
-			<th style="padding-top: 20px; padding-bottom: 20px;"><label for="<?php echo $key ?>"><?php echo esc_html( $label ) ?></label></th>
-			<td style="padding-top: 20px; padding-bottom: 20px;">
-				<input type="checkbox" name="<?php echo $key ?>" id="<?php echo $key ?>" <?php checked( $val, 1 ) ?>/>
-			</td>
-		</tr>
-		<?php
 	}
 
 }

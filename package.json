@@ -1,7 +1,7 @@
 {
 	"name": "wplug-bimeson-post",
 	"version": "1.21.7",
-	"description": "A Component of WordPress for Literature Management",
+	"description": "A Component of WordPress for Publication Management",
 	"author": "Takuto Yanagida",
 	"main": "gulpfile.js",
 	"scripts": {
