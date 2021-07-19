@@ -3,38 +3,39 @@
  * Publication List Filter (JS)
  *
  * @author Takuto Yanagida
- * @version 2021-07-08
+ * @version 2021-07-15
  *
  */
 
 
 document.addEventListener('DOMContentLoaded', function () {
 
-	var SEL_ITEM_ALL        = "*[data-bm='on']";
-	var SEL_FILTER_KEY      = '.bm-list-filter-cat';
-	var SEL_FILTER_SWITCH   = '.bm-list-filter-switch';
-	var SEL_FILTER_CHECKBOX = 'input:not(.bm-list-filter-switch)';
+	const SEL_ITEM_ALL        = "*[data-bm]";
+	const SEL_FILTER_KEY      = '.bimeson-filter-key';
+	const SEL_FILTER_SWITCH   = '.bimeson-filter-switch';
+	const SEL_FILTER_CHECKBOX = 'input:not(.bimeson-filter-switch)';
 
-	var keyToSwAndCbs = {};
-	var fkElms = document.querySelectorAll(SEL_FILTER_KEY);
-	for (var i = 0; i < fkElms.length; i += 1) {
-		var elm = fkElms[i];
-		var sw = elm.querySelector(SEL_FILTER_SWITCH);
-		var cbs = elm.querySelectorAll(SEL_FILTER_CHECKBOX);
-		keyToSwAndCbs[elm.dataset.key] = [sw, cbs];
+	const keyToSwAndCbs = {};
+	const fkElms = document.querySelectorAll(SEL_FILTER_KEY);
+
+	for (let i = 0; i < fkElms.length; i += 1) {
+		const elm = fkElms[i];
+		const sw  = elm.querySelector(SEL_FILTER_SWITCH);
+		const cbs = elm.querySelectorAll(SEL_FILTER_CHECKBOX);
+		if (sw && cbs) keyToSwAndCbs[elm.dataset.key] = [sw, cbs];
 	}
 
-	for (var key in keyToSwAndCbs) {
-		var sw = keyToSwAndCbs[key][0];
-		var cbs = keyToSwAndCbs[key][1];
+	for (let key in keyToSwAndCbs) {
+		const sw  = keyToSwAndCbs[key][0];
+		const cbs = keyToSwAndCbs[key][1];
 		assignEventListener(sw, cbs, update);
 	}
 
-	var allElms = document.querySelectorAll(SEL_ITEM_ALL);
+	const allElms = document.querySelectorAll(SEL_ITEM_ALL);
 	update();
 
 	function update() {
-		var keyToVals = getKeyToVals(keyToSwAndCbs);
+		const keyToVals = getKeyToVals(keyToSwAndCbs);
 		filterLists(allElms, keyToVals);
 		setUrlParams(keyToSwAndCbs);
 	}
@@ -42,15 +43,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// -------------------------------------------------------------------------
 
+
 	function setUrlParams(keyToSwAndCbs) {
-		var ps = [];
-		for (var key in keyToSwAndCbs) {
-			var sw = keyToSwAndCbs[key][0];
-			var cbs = keyToSwAndCbs[key][1];
+		const ps = [];
+		for (let key in keyToSwAndCbs) {
+			const sw  = keyToSwAndCbs[key][0];
+			const cbs = keyToSwAndCbs[key][1];
 			if (sw.checked) ps.push('bm_cat_' + key + '=' + concatCheckedQvals(cbs));
 		}
 		if (ps.length > 0) {
-			var ret = '?' + ps.join('&');
+			const ret = '?' + ps.join('&');
 			history.replaceState('', '', ret);
 		} else {
 			history.replaceState('', '', document.location.origin + document.location.pathname);
@@ -58,9 +60,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function concatCheckedQvals(cbs) {
-		var vs = [];
-		for (var i = 0; i < cbs.length; i += 1) {
-			if (cbs[i].checked) vs.push(cbs[i].dataset.val);
+		const vs = [];
+		for (let i = 0; i < cbs.length; i += 1) {
+			if (cbs[i].checked) vs.push(cbs[i].value);
 		}
 		return vs.join(',');
 	}
@@ -68,14 +70,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// -------------------------------------------------------------------------
 
+
 	function assignEventListener(sw, cbs, update) {
 		sw.addEventListener('click', function () {
 			if (sw.checked && !isCheckedAtLeastOne(cbs)) {
-				for (var i = 0; i < cbs.length; i += 1) cbs[i].checked = true;
+				for (let i = 0; i < cbs.length; i += 1) cbs[i].checked = true;
 			}
 			update();
 		});
-		for (var i = 0; i < cbs.length; i += 1) {
+		for (let i = 0; i < cbs.length; i += 1) {
 			cbs[i].addEventListener('click', function () {
 				sw.checked = isCheckedAtLeastOne(cbs);
 				update();
@@ -84,26 +87,26 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function isCheckedAtLeastOne(cbs) {
-		for (var i = 0; i < cbs.length; i += 1) {
+		for (let i = 0; i < cbs.length; i += 1) {
 			if (cbs[i].checked) return true;
 		}
 		return false;
 	}
 
 	function getKeyToVals(keyToSwAndCbs) {
-		var kvs = {};
-		for (var key in keyToSwAndCbs) {
-			var fs = keyToSwAndCbs[key][0];
-			var cbs = keyToSwAndCbs[key][1];
+		const kvs = {};
+		for (let key in keyToSwAndCbs) {
+			const fs  = keyToSwAndCbs[key][0];
+			const cbs = keyToSwAndCbs[key][1];
 			if (fs.checked) kvs[key] = getCheckedVals(cbs);
 		}
 		return kvs;
 	}
 
 	function getCheckedVals(cbs) {
-		var vs = [];
-		for (var i = 0; i < cbs.length; i += 1) {
-			if (cbs[i].checked) vs.push(cbs[i].dataset.val);
+		const vs = [];
+		for (let i = 0; i < cbs.length; i += 1) {
+			if (cbs[i].checked) vs.push(cbs[i].value);
 		}
 		return vs;
 	}
@@ -111,15 +114,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// -------------------------------------------------------------------------
 
+
 	function filterLists(elms, fkeyToVals) {
-		for (var j = 0, J = elms.length; j < J; j += 1) {
-			var elm = elms[j];
+		for (let j = 0, J = elms.length; j < J; j += 1) {
+			const elm = elms[j];
 			if (elm.tagName !== 'OL' && elm.tagName !== 'UL') continue;
-			var lis = elm.getElementsByTagName('li');
-			var showCount = 0;
+			const lis = elm.getElementsByTagName('li');
+			let showCount = 0;
 			for (var i = 0, I = lis.length; i < I; i += 1) {
-				var li = lis[i];
-				var show = isMatch(li, fkeyToVals);
+				const li = lis[i];
+				const show = isMatch(li, fkeyToVals);
 				li.classList.remove('bm-filtered');
 				if (!show) li.classList.add('bm-filtered');
 				if (show) showCount += 1;
@@ -129,12 +133,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function isMatch(itemElm, fkeyToVals) {
-		for (var key in fkeyToVals) {
-			var fvals = fkeyToVals[key];
-			var contains = false;
+		for (let key in fkeyToVals) {
+			const fvals = fkeyToVals[key];
+			let contains = false;
 
-			for (var i = 0; i < fvals.length; i += 1) {
-				var cls = 'bm-cat-' + key + '-' + fvals[i];
+			for (let i = 0; i < fvals.length; i += 1) {
+				let cls = 'bm-cat-' + key + '-' + fvals[i];
 				cls = cls.replace('_', '-');
 				if (itemElm.classList.contains(cls)) {
 					contains = true;

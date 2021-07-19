@@ -3,22 +3,45 @@
  * Utilities for Bimeson Post
  *
  * @author Takuto Yanagida
- * @version 2021-07-08
+ * @version 2021-07-15
  */
 
 namespace wplug\bimeson_post;
+
+function make_title( $body, $date ) {
+	$body = normalize_body( $body );
+	$words = explode( ' ', $body );
+	$first_word = empty( $words ) ? '' : $words[0];
+	$dp = explode( '-', $date );
+	$year = ( 0 < count( $dp ) ) ? $dp[0] : '';
+	return $first_word . $year;
+}
+
+function make_digest( $body ) {
+	$body = normalize_body( $body );
+	$body = str_replace( ' ', '', $body );
+	return hash( 'sha224', $body );
+}
+
+function normalize_body( $body ) {
+	$body = strip_tags( trim( $body ) );
+	$body = mb_convert_kana( $body, 'rnasKV' );
+	$body = mb_strtolower( $body );
+	$body = preg_replace( '/[\s!-\/:-@[-`{-~]|[、。，．・：；？！´｀¨＾￣＿―‐／＼～∥｜…‥‘’“”（）〔〕［］｛｝〈〉《》「」『』【】＊※]/u', ' ', $body );
+	$body = preg_replace( '/\s(?=\s)/', '', $body );
+	$body = trim( $body );
+	return $body;
+}
+
+
+// -----------------------------------------------------------------------------
+
 
 function get_the_sub_content( $meta_key, $post_id = false ) {
 	global $post;
 	if ( $post_id === false ) $post_id = $post->ID;
 	$content = get_post_meta( $post_id, $meta_key, true );
 	return $content;
-}
-
-function echo_content( $content ) {
-	$content = apply_filters( 'the_content', $content );  // Shortcodes are expanded here.
-	$content = str_replace( ']]>', ']]&gt;', $content );
-	echo $content;
 }
 
 

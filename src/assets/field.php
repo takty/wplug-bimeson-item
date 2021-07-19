@@ -3,15 +3,15 @@
  * Custom Field Utilities
  *
  * @author Takuto Yanagida
- * @version 2021-07-09
+ * @version 2021-07-15
  */
 
 namespace wplug\bimeson_post;
 
-add_action( 'admin_enqueue_scripts', function () {
-	$url_to = get_file_uri( __DIR__ );
-	wp_register_style ( 'wplug-bimeson-post-field', abs_url( $url_to, './css/field.min.css' ) );
-} );
+// add_action( 'admin_enqueue_scripts', function () {
+// 	$url_to = get_file_uri( __DIR__ );
+// 	wp_register_style ( 'wplug-bimeson-post-field', abs_url( $url_to, './css/field.min.css' ) );
+// } );
 
 
 // -----------------------------------------------------------------------------
