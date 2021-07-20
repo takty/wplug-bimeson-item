@@ -2,6 +2,7 @@
 /**
  * Utilities for Bimeson Item
  *
+ * @package Wplug Bimeson Item
  * @author Takuto Yanagida
  * @version 2021-07-20
  */
