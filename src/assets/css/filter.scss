@@ -3,7 +3,7 @@
  * Publication List Filter (SCSS)
  *
  * @author Takuto Yanagida
- * @version 2021-07-15
+ * @version 2021-07-20
  *
  */
 
@@ -18,10 +18,11 @@
 	display    : inline-flex;
 	align-items: flex-start;
 
-	margin-top: 6px;
+	width     : 100%;
+	margin-top: 0.5rem;
 
 	& + .bimeson-filter-key {
-		margin-top: 12px;
+		margin-top: 1rem;
 	}
 }
 
@@ -34,21 +35,22 @@
 
 .bimeson-filter-cat {
 	font-weight: bold;
+	user-select: none;
 }
 
 .bimeson-filter-cbs {
 	display    : flex;
 	flex-wrap  : wrap;
-	padding-top: 8px;
+	padding-top: 0.5rem;
 
 	label {
 		display    : inline-flex;
 		align-items: center;
-		padding    : 8px;
+		padding    : 0.5rem;
 		user-select: none;
 
 		line-height: 1;
-		input { margin-right: 8px; }
+		input { margin-right: 0.5rem; }
 	}
 }
 
@@ -60,31 +62,20 @@
 	*[data-count='0'] {
 		display: none;
 	}
+	ol, ul {
+		li[hidden] {
+			display: none;
+		}
+	}
 }
-
-// .bimeson-list {
-// 	*[data-count] > li div {
-// 		max-height: 50vh;
-// 		transition: all 2s ease;
-// 		overflow: hidden;
-// 	}
-// 	*[data-count='0'] > li div {
-// 		margin-top: 0;
-// 		opacity: 0.25;
-// 		max-height: 1.7rem;
-// 		transition: all 0.5s ease;
-// 	}
-// 	:is(h1, h2, h3, h4, h5, h6)[data-count='0'] {
-// 		opacity: 0.25;
-// 		transition: all 0.5s ease;
-// 	}
-// }
 
 
 // -----------------------------------------------------------------------------
 
 
-input[type=checkbox].tgl { display: none; }
+input[type='checkbox'].tgl {
+	display: none;
+}
 
 .tgl + .tgl-btn {
 	box-sizing: content-box;
@@ -94,7 +85,7 @@ input[type=checkbox].tgl { display: none; }
 	width       : 2em;
 	min-width   : 2em;
 	height      : 1em;
-	margin-right: 12px;
+	margin-right: 0.75rem;
 
 	outline    : 0;
 	cursor     : pointer;

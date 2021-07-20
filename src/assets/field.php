@@ -3,21 +3,12 @@
  * Custom Field Utilities
  *
  * @author Takuto Yanagida
- * @version 2021-07-15
+ * @version 2021-07-20
  */
 
 namespace wplug\bimeson_post;
 
-// add_action( 'admin_enqueue_scripts', function () {
-// 	$url_to = get_file_uri( __DIR__ );
-// 	wp_register_style ( 'wplug-bimeson-post-field', abs_url( $url_to, './css/field.min.css' ) );
-// } );
-
-
-// -----------------------------------------------------------------------------
-
-
-function save_post_meta( $post_id, $key, $filter = null, $default = null ) {
+function save_post_meta( int $post_id, string $key, $filter = null, $default = null ) {
 	$val = isset( $_POST[ $key ] ) ? $_POST[ $key ] : null;
 	if ( $filter !== null && $val !== null ) {
 		$val = $filter( $val );
@@ -32,7 +23,7 @@ function save_post_meta( $post_id, $key, $filter = null, $default = null ) {
 	update_post_meta( $post_id, $key, $val );
 }
 
-function save_post_meta_with_wp_filter( $post_id, $key, $filter_name = null, $default = null ) {
+function save_post_meta_with_wp_filter( int $post_id, string $key, $filter_name = null, $default = null ) {
 	$val = isset( $_POST[ $key ] ) ? $_POST[ $key ] : null;
 	if ( $filter_name !== null && $val !== null ) {
 		$val = apply_filters( $filter_name, $val );
@@ -47,7 +38,7 @@ function save_post_meta_with_wp_filter( $post_id, $key, $filter_name = null, $de
 	update_post_meta( $post_id, $key, $val );
 }
 
-function output_input_row( $label, $key, $val, $type = 'text' ) {
+function output_input_row( string $label, string $key, $val, $type = 'text' ) {
 	wp_enqueue_style( 'wplug-bimeson-post-field' );
 	$val = isset( $val ) ? esc_attr( $val ) : '';
 ?>
@@ -60,12 +51,12 @@ function output_input_row( $label, $key, $val, $type = 'text' ) {
 <?php
 }
 
-function name_id( $key ) {
+function name_id( string $key ) {
 	$_key = esc_attr( $key );
 	echo "name=\"$_key\" id=\"$_key\"";
 }
 
-function normalize_date( $str ) {
+function normalize_date( string $str ): string {
 	$str = mb_convert_kana( $str, 'n', 'utf-8' );
 	$nums = preg_split( '/\D/', $str );
 	$vals = [];
@@ -87,9 +78,9 @@ function normalize_date( $str ) {
 // Custom Meta Box -------------------------------------------------------------
 
 
-function add_rich_editor_meta_box( $key, $label, $screen, $context = 'advanced', $opts = [] ) {
+function add_rich_editor_meta_box( string $key, string $label, string $screen, string $context = 'advanced', array $opts = [] ) {
 	$priority = isset( $opts['priority'] ) ? $opts['priority'] : 'default';
-	add_meta_box(
+	\add_meta_box(
 		$key . '_mb', $label,
 		function ( $post ) use ( $key, $opts ) {
 			wp_nonce_field( $key, "{$key}_nonce" );
@@ -100,7 +91,7 @@ function add_rich_editor_meta_box( $key, $label, $screen, $context = 'advanced',
 	);
 }
 
-function save_rich_editor_meta_box( $post_id, $key ) {
+function save_rich_editor_meta_box( int $post_id, string $key ) {
 	if ( ! isset( $_POST["{$key}_nonce"] ) ) return;
 	if ( ! wp_verify_nonce( $_POST["{$key}_nonce"], $key ) ) return;
 
@@ -111,7 +102,7 @@ function save_rich_editor_meta_box( $post_id, $key ) {
 // Admin Columns ---------------------------------------------------------------
 
 
-function set_admin_columns( $post_type, $all_columns, $sortable_columns = [] ) {
+function set_admin_columns( string $post_type, array $all_columns, array $sortable_columns = [] ) {
 	$DEFAULT_COLUMNS = [
 		'cb'     => '<input type="checkbox" />',
 		'title'  => _x( 'Title', 'column name', 'default' ),
@@ -168,7 +159,7 @@ function set_admin_columns( $post_type, $all_columns, $sortable_columns = [] ) {
 	if ( count( $sortable_columns ) > 0 ) set_admin_columns_sortable( $post_type, $sortable_columns );
 }
 
-function set_admin_columns_sortable( $post_type, $sortable_columns ) {
+function set_admin_columns_sortable( string $post_type, array $sortable_columns ) {
 	$names = [];
 	$types = [];
 	foreach ( $sortable_columns as $c ) {

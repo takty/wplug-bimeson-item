@@ -8,18 +8,18 @@
  */
 
 
-var BIMESON = {};
+const BIMESON = {};
 BIMESON['loadFiles'] = (function () {
 
-	var KEY_BODY = '_body';
+	const KEY_BODY = '_body';
 
 	function loadFiles(urls, resSelector, onFinished) {
-		var recCount = 0;
-		var successCount = 0;
-		var items = [];
+		const items = [];
+		let recCount = 0;
+		let successCount = 0;
 
 		if (urls.length === 0) {
-			var res = document.querySelector(resSelector);
+			const res = document.querySelector(resSelector);
 			if (res) res.value = '';
 			console.log('Complete filtering (No data)');
 			onFinished();
@@ -28,7 +28,7 @@ BIMESON['loadFiles'] = (function () {
 
 		urls.forEach(function (url) {
 			console.log('Requesting file...');
-			var req = new XMLHttpRequest();
+			const req = new XMLHttpRequest();
 			req.open('GET', url, true);
 			req.responseType = 'arraybuffer';
 			req.onload = makeListener(url, req);
@@ -48,15 +48,15 @@ BIMESON['loadFiles'] = (function () {
 		}
 
 		function process(response) {
-			var data = new Uint8Array(response);
-			var arr = new Array();
-			for (var i = 0, I = data.length; i < I; i += 1) arr[i] = String.fromCharCode(data[i]);
-			var bstr = arr.join('');
+			const data = new Uint8Array(response);
+			const arr = new Array();
+			for (let i = 0, I = data.length; i < I; i += 1) arr[i] = String.fromCharCode(data[i]);
+			const bstr = arr.join('');
 
 			try {
-				var book = XLSX.read(bstr, {type:'binary'});
-				var sheetName = book.SheetNames[0];
-				var sheet = book.Sheets[sheetName];
+				const book = XLSX.read(bstr, {type:'binary'});
+				const sheetName = book.SheetNames[0];
+				const sheet = book.Sheets[sheetName];
 				if (sheet) processSheet(sheet, items);
 				console.log('Finish filtering file');
 				return true;
@@ -67,7 +67,7 @@ BIMESON['loadFiles'] = (function () {
 		}
 
 		function finished(successAll) {
-			var res = document.querySelector(resSelector);
+			const res = document.querySelector(resSelector);
 			if (res) res.value = JSON.stringify(items);
 			console.log('Complete filtering (' + items.length + ' items)');
 			onFinished(successAll);
@@ -77,14 +77,18 @@ BIMESON['loadFiles'] = (function () {
 
 	// -------------------------------------------------------------------------
 
-	function processSheet(sheet, retItems) {
-		var range = XLSX.utils.decode_range(sheet['!ref']);
-		var x0 = range.s.c, x1 = Math.min(range.e.c, 40) + 1;
-		var y0 = range.s.r, y1 = range.e.r + 1;
 
-		var colCount = 0, colToKey = {};
-		for (var x = x0; x < x1; x += 1) {
-			var cell = sheet[XLSX.utils.encode_cell({c: x, r: y0})];
+	function processSheet(sheet, retItems) {
+		const range = XLSX.utils.decode_range(sheet['!ref']);
+		const x0 = range.s.c;
+		const y0 = range.s.r;
+		let x1 = Math.min(range.e.c, 40) + 1;
+		let y1 = range.e.r + 1;
+
+		let colCount = 0;
+		const colToKey = {};
+		for (let x = x0; x < x1; x += 1) {
+			const cell = sheet[XLSX.utils.encode_cell({c: x, r: y0})];
 			if (!cell || cell.w === '') {
 				colToKey[x] = false;
 			} else {
@@ -94,16 +98,16 @@ BIMESON['loadFiles'] = (function () {
 		}
 		x1 = x0 + colCount;
 
-		for (var y = y0 + 1; y < y1; y += 1) {  // skip header
-			var item = {};
-			var count = 0;
-			for (var x = x0; x < x1; x += 1) {
-				var cell = sheet[XLSX.utils.encode_cell({c: x, r: y})];
-				var key = colToKey[x];
+		for (let y = y0 + 1; y < y1; y += 1) {  // skip header
+			const item = {};
+			let count = 0;
+			for (let x = x0; x < x1; x += 1) {
+				const cell = sheet[XLSX.utils.encode_cell({c: x, r: y})];
+				const key = colToKey[x];
 				if (key === false) continue;
 				if (key === KEY_BODY || key.indexOf(KEY_BODY + '_') === 0) {
 					if (cell && cell.h && cell.h.length > 0) {
-						var text = stripUnnecessarySpan(cell.h);  // remove automatically inserted 'span' tag.
+						let text = stripUnnecessarySpan(cell.h);  // remove automatically inserted 'span' tag.
 						text = text.replace(/<br\/>/g, '<br />');
 						text = text.replace(/&#x000d;&#x000a;/g, '<br />');
 						item[key] = text;
@@ -116,8 +120,8 @@ BIMESON['loadFiles'] = (function () {
 					}
 				} else {
 					if (cell && cell.w && cell.w.length > 0) {
-						var vals = cell.w.split(/\s*,\s*/);
-						item[key] = vals.map(function (x) {return normalizeKey(x, false);});
+						const vals = cell.w.split(/\s*,\s*/);
+						item[key] = vals.map(function (x) { return normalizeKey(x, false); });
 						count += 1;
 					}
 				}
@@ -127,7 +131,7 @@ BIMESON['loadFiles'] = (function () {
 	}
 
 	function normalizeKey(str, isKey) {
-		str = str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function (s) {return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);});
+		str = str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function (s) { return String.fromCharCode(s.charCodeAt(0) - 0xFEE0); });
 		str = str.replace(/[_＿]/g, '_');
 		str = str.replace(/[\-‐―ー]/g, '-');
 		str = str.replace(/[^A-Za-z0-9\-\_]/g, '');

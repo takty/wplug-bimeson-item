@@ -3,12 +3,12 @@
  * Utilities for Bimeson Post
  *
  * @author Takuto Yanagida
- * @version 2021-07-15
+ * @version 2021-07-20
  */
 
 namespace wplug\bimeson_post;
 
-function make_title( $body, $date ) {
+function make_title( string $body, string $date ): string {
 	$body = normalize_body( $body );
 	$words = explode( ' ', $body );
 	$first_word = empty( $words ) ? '' : $words[0];
@@ -17,13 +17,13 @@ function make_title( $body, $date ) {
 	return $first_word . $year;
 }
 
-function make_digest( $body ) {
+function make_digest( string $body ): string {
 	$body = normalize_body( $body );
 	$body = str_replace( ' ', '', $body );
 	return hash( 'sha224', $body );
 }
 
-function normalize_body( $body ) {
+function normalize_body( string $body ): string {
 	$body = strip_tags( trim( $body ) );
 	$body = mb_convert_kana( $body, 'rnasKV' );
 	$body = mb_strtolower( $body );
@@ -37,9 +37,9 @@ function normalize_body( $body ) {
 // -----------------------------------------------------------------------------
 
 
-function get_the_sub_content( $meta_key, $post_id = false ) {
+function get_the_sub_content( string $meta_key, ?int $post_id = null ): string {
 	global $post;
-	if ( $post_id === false ) $post_id = $post->ID;
+	if ( is_null( $post_id ) ) $post_id = $post->ID;
 	$content = get_post_meta( $post_id, $meta_key, true );
 	return $content;
 }
@@ -48,13 +48,13 @@ function get_the_sub_content( $meta_key, $post_id = false ) {
 // -----------------------------------------------------------------------------
 
 
-function is_post_type( $post_type ) {
+function is_post_type( string $post_type ): bool {
 	$post_id = get_post_id();
 	$pt = get_post_type_in_admin( $post_id );
 	return $post_type === $pt;
 }
 
-function get_post_id() {
+function get_post_id(): int {
 	$post_id = '';
 	if ( isset( $_GET['post'] ) || isset( $_POST['post_ID'] ) ) {
 		$post_id = isset( $_GET['post'] ) ? $_GET['post'] : $_POST['post_ID'];
@@ -62,7 +62,7 @@ function get_post_id() {
 	return intval( $post_id );
 }
 
-function get_post_type_in_admin( $post_id ) {
+function get_post_type_in_admin( int $post_id ): string {
 	$p = get_post( $post_id );
 	if ( $p === null ) {
 		if ( isset( $_GET['post_type'] ) ) return $_GET['post_type'];
@@ -75,7 +75,7 @@ function get_post_type_in_admin( $post_id ) {
 // -----------------------------------------------------------------------------
 
 
-function get_file_uri( $path ) {
+function get_file_uri( string $path ): string {
 	$path = wp_normalize_path( $path );
 
 	if ( is_child_theme() ) {
@@ -97,7 +97,7 @@ function get_file_uri( $path ) {
 	}
 }
 
-function abs_url( $base, $rel ) {
+function abs_url( string $base, string $rel ): string {
 	if ( parse_url( $rel, PHP_URL_SCHEME ) != '' ) return $rel;
 	$base = trailingslashit( $base );
 	if ( $rel[0] === '#' || $rel[0] === '?' ) return $base . $rel;

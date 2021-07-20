@@ -3,15 +3,13 @@
  * Bimeson (Taxonomy)
  *
  * @author Takuto Yanagida
- * @version 2021-07-19
+ * @version 2021-07-20
  */
 
 namespace wplug\bimeson_post;
 
-function initialize_taxonomy( $taxonomy = false, $sub_tax_base = false ) {
+function initialize_taxonomy() {
 	$inst = _get_instance();
-	$inst->root_tax     = ( $taxonomy === false )     ? $inst::DEFAULT_TAXONOMY     : $taxonomy;
-	$inst->sub_tax_base = ( $sub_tax_base === false ) ? $inst::DEFAULT_SUB_TAX_BASE : $sub_tax_base;
 
 	if ( ! taxonomy_exists( $inst->root_tax ) ) {
 		register_taxonomy( $inst->root_tax, null, [
@@ -26,16 +24,16 @@ function initialize_taxonomy( $taxonomy = false, $sub_tax_base = false ) {
 	}
 	register_taxonomy_for_object_type( $inst->root_tax, $inst::PT );
 
-	add_action( "{$inst->root_tax}_edit_form_fields", '\wplug\bimeson_list\_cb_taxonomy_edit_form_fields', 10, 2 );
-	add_action( "edit_terms",                         '\wplug\bimeson_list\_cb_edit_taxonomy', 10, 2 );
-	add_action( "edited_{$inst->root_tax}",           '\wplug\bimeson_list\_cb_edited_taxonomy', 10, 2 );
-	add_filter( 'query_vars',                         '\wplug\bimeson_list\_cb_query_vars_taxonomy' );
+	add_action( "{$inst->root_tax}_edit_form_fields", '\wplug\bimeson_post\_cb_taxonomy_edit_form_fields', 10, 2 );
+	add_action( "edit_terms",                         '\wplug\bimeson_post\_cb_edit_taxonomy', 10, 2 );
+	add_action( "edited_{$inst->root_tax}",           '\wplug\bimeson_post\_cb_edited_taxonomy', 10, 2 );
+	add_filter( 'query_vars',                         '\wplug\bimeson_post\_cb_query_vars_taxonomy' );
 
 	_register_sub_tax_all();
 
 	foreach ( $inst->sub_taxes as $sub_tax ) {
-		add_action( "{$sub_tax}_edit_form_fields", '\wplug\bimeson_list\_cb_taxonomy_edit_form_fields', 10, 2 );
-		add_action( "edited_{$sub_tax}",           '\wplug\bimeson_list\_cb_edited_taxonomy', 10, 2 );
+		add_action( "{$sub_tax}_edit_form_fields", '\wplug\bimeson_post\_cb_taxonomy_edit_form_fields', 10, 2 );
+		add_action( "edited_{$sub_tax}",           '\wplug\bimeson_post\_cb_edited_taxonomy', 10, 2 );
 	}
 }
 
@@ -52,7 +50,7 @@ function _register_sub_tax_all() {
 
 function get_query_var_name( string $slug ): string {
 	$inst = _get_instance();
-	$name = "{$inst->sub_tax_base}{$slug}";
+	$name = "{$inst->sub_tax_qvar_base}{$slug}";
 	return str_replace( '-', '_', $name );
 }
 
@@ -71,9 +69,8 @@ function _register_sub_tax( string $tax, string $name ) {
 			'show_ui'            => true,
 			'rewrite'            => false,
 			'sort'               => true,
-			'show_admin_column'  => false,
-			'show_in_quick_edit' => false,
-			'meta_box_cb'        => false
+			'show_admin_column'  => true,
+			'show_in_quick_edit' => true,
 		] );
 	}
 	$inst->sub_tax_to_terms[ $tax ] = null;
@@ -81,7 +78,7 @@ function _register_sub_tax( string $tax, string $name ) {
 }
 
 
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 
 function get_root_slugs(): array {
@@ -108,7 +105,7 @@ function get_root_slug_to_sub_terms( bool $do_omit_first = false, bool $do_hide 
 	$inst  = _get_instance();
 	$roots = _get_root_terms();
 	$terms = [];
-	foreach( $roots as $r ) {
+	foreach( $roots as $idx => $r ) {
 		if ( $do_omit_first && $idx === 0 ) continue;
 		if ( $do_hide ) {
 			$val_hide = get_term_meta( $r->term_id, $inst::KEY_IS_HIDDEN, true );
@@ -127,7 +124,7 @@ function _get_root_terms(): array {
 	$idx_ts = [];
 	$ts     = get_terms( $inst->root_tax, [ 'hide_empty' => 0 ] );
 	foreach ( $ts as $t ) {
-		$idx      = intval( get_term_meta( $t->term_id, '_menu_order', true ) );
+		$idx      = (int) get_term_meta( $t->term_id, '_menu_order', true );
 		$idx_ts[] = [ $idx, $t ];
 	}
 	usort( $idx_ts, function ( $a, $b ) {
@@ -212,7 +209,7 @@ function _get_sub_tax_depth( string $sub_tax, \WP_Term $term ): int {
 }
 
 
-// Callback Functions ------------------------------------------------------
+// Callback Functions ----------------------------------------------------------
 
 
 function _cb_edit_taxonomy( int $term_id, string $tax ) {
@@ -228,7 +225,7 @@ function _cb_edit_taxonomy( int $term_id, string $tax ) {
 
 	$inst->old_tax = root_term_to_sub_tax( $term );
 
-	$terms = get_terms( $inst->old_tax, [ 'hide_empty' => 0 ]  );
+	$terms = get_terms( $inst->old_tax, [ 'hide_empty' => 0 ] );
 	foreach ( $terms as $t ) {
 		$inst->old_terms[] = [ 'slug' =>  $t->slug, 'name' => $t->name, 'term_id' => $t->term_id ];
 	}
@@ -268,9 +265,9 @@ function _cb_query_vars_taxonomy( array $query_vars ): array {
 function _cb_taxonomy_edit_form_fields( \WP_Term $term, string $tax ) {
 	$inst = _get_instance();
 	if ( $tax === $inst->root_tax ) {
-		_bool_field( $term, $inst::KEY_IS_HIDDEN, _x( 'Hide from view screen', 'taxonomy', 'bimeson_list' ) );
+		_bool_field( $term, $inst::KEY_IS_HIDDEN, _x( 'Hide from view screen', 'taxonomy', 'bimeson_post' ) );
 	} else {
-		_bool_field( $term, $inst::KEY_LAST_CAT_OMITTED, _x( 'Omit the last category group', 'taxonomy', 'bimeson_list' ) );
+		_bool_field( $term, $inst::KEY_LAST_CAT_OMITTED, _x( 'Omit the last category group', 'taxonomy', 'bimeson_post' ) );
 	}
 }
 
@@ -278,7 +275,7 @@ function _bool_field( \WP_Term $term, string $key, string $label ) {
 	$val = get_term_meta( $term->term_id, $key, true );
 	?>
 	<tr class="form-field">
-		<th style="padding-bottom: 20px;"><label for="<?php echo $key ?>"><?php echo _x( 'Filter', 'taxonomy', 'bimeson_list' ); ?></label></th>
+		<th style="padding-bottom: 20px;"><label for="<?php echo $key ?>"><?php echo _x( 'Filter', 'taxonomy', 'bimeson_post' ); ?></label></th>
 		<td style="padding-bottom: 20px;">
 			<label>
 				<input type="checkbox" name="<?php echo $key ?>" id="<?php echo $key ?>" <?php checked( $val, 1 ) ?>/>
@@ -298,7 +295,7 @@ function _update_term_meta_by_post( int $term_id, string $key ) {
 }
 
 
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 
 function process_terms( array $items, bool $add_taxonomies = false, bool $add_terms = false ) {

@@ -3,15 +3,13 @@
  * Bimeson Post (Retriever)
  *
  * @author Takuto Yanagida
- * @version 2021-07-19
+ * @version 2021-07-20
  */
 
 namespace wplug\bimeson_post;
 
-function retrieve_items( string $lang, ?string $date_bgn, ?string $date_end, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat, ?array $filter_state ) {
+function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat ) {
 	$rs_idx = _make_rs_idx();
-
-	$items = _get_filtered_list_items( $lang, $date_bgn, $date_end, $filter_state );
 
 	$items = _align_sub_slugs( $items, $rs_idx );
 	if ( $dup_multi_cat ) $items = _duplicate_items( $items );
@@ -24,6 +22,10 @@ function retrieve_items( string $lang, ?string $date_bgn, ?string $date_end, ?in
 	return [ $items, $years_exist ];
 }
 
+
+// -----------------------------------------------------------------------------
+
+
 function _make_rs_idx() {
 	$rs_idx = [];
 	foreach ( get_root_slug_to_sub_slugs() as $rs => $ss ) {
@@ -31,70 +33,6 @@ function _make_rs_idx() {
 	}
 	return $rs_idx;
 }
-
-
-// -----------------------------------------------------------------------------
-
-
-function _get_filtered_list_items( string $lang, ?string $date_bgn, ?string $date_end, ?array $filter_state ) {
-	$inst = _get_instance();
-	$tq   = [];
-	$mq   = [];
-
-	if ( class_exists( '\st\Multilang' ) ) {
-		$pls = [ $inst->default_lang ];
-		if ( in_array( $lang, $inst->additional_langs, true ) ) {
-			$al    = $sl;
-			$pls[] = $al;
-		}
-		$tq[] = [ 'taxonomy' => $inst->lang_tax, 'field' => 'slug', 'terms' => $pls ];
-	}
-	foreach ( $filter_state as $rs => $slugs ) {
-		$sub_tax        = root_term_to_sub_tax( $rs );
-		$slugs          = explode( ',', $slugs );
-		$tq[ $sub_tax ] = [ 'taxonomy' => $sub_tax, 'field' => 'slug', 'terms' => $slugs ];
-	}
-	$by_date = ( ! empty( $date_bgn ) || ! empty( $date_end ) );
-	if ( $by_date ) {
-		$date_b  = (int) str_pad( empty( $date_bgn ) ? '' : $date_bgn, 8, '0', STR_PAD_RIGHT );
-		$date_e  = (int) str_pad( empty( $date_end ) ? '' : $date_end, 8, '9', STR_PAD_RIGHT );
-
-		$mq['date_num'] = [
-			'key'     => $inst::IT_DATE_NUM,
-			'type'    => 'NUMERIC',
-			'compare' => 'BETWEEN',
-			'value'   => [ $date_b, $date_e ],
-		];
-	} else {
-		$mq['date_num'] = [
-			'key'  => $inst::IT_DATE_NUM,
-			'type' => 'NUMERIC',
-		];
-	}
-	$ps = get_posts( [
-		'post_type'      => $inst::PT,
-		'posts_per_page' => -1,
-		'tax_query'      => $tq,
-		'meta_query'     => $mq,
-		'orderby'        => [ 'date_num' => 'desc', 'date' => 'desc' ],
-	] );
-	$items = array_map( '\wplug\bimeson_post\_convert_post_to_item', $ps );
-
-	$ret = [];
-	foreach ( $items as $it ) {
-		if ( empty( $it[ $inst::IT_BODY . "_$lang" ] ) && empty( $it[ $inst::IT_BODY ] ) ) continue;
-		$ret[] = $it;
-	}
-	return $ret;
-}
-
-function _convert_post_to_item( \WP_Post $p ): array {
-
-}
-
-
-// -----------------------------------------------------------------------------
-
 
 function _align_sub_slugs( array $items, array $rs_idx ): array {
 	$inst = _get_instance();
@@ -122,7 +60,7 @@ function _duplicate_items( array $items ): array {
 		$array = [];
 		$do = false;
 		foreach ( $rss as $rs ) {
-			$vs = $it[ $rs ];
+			$vs = $it[ $rs ] ?? [];
 			if ( 1 < count( $vs ) ) {
 				$do = true;
 			}
@@ -183,9 +121,9 @@ function _sort_list_items( array &$items, bool $sort_by_date_first, array $rs_id
 
 	$inst->rs_idx = $rs_idx;
 	if ( $sort_by_date_first ) {
-		usort( $items, '\wplug\bimeson_list\_compare_item_by_date_cat' );
+		usort( $items, '\wplug\bimeson_post\_compare_item_by_date_cat' );
 	} else {
-		usort( $items, '\wplug\bimeson_list\_compare_item_by_cat' );
+		usort( $items, '\wplug\bimeson_post\_compare_item_by_cat' );
 	}
 }
 

@@ -3,7 +3,7 @@
  * Bimeson (Importer)
  *
  * @author Takuto Yanagida
- * @version 2021-07-15
+ * @version 2021-07-20
  */
 
 namespace wplug\bimeson_post;
@@ -24,7 +24,7 @@ class Bimeson_Importer extends \WP_Importer {
 		$GLOBALS['bimeson_import'] = new Bimeson_Importer( $url_to );
 		register_importer(
 			'bimeson', 'Bimeson',
-			__('Import <strong>publications</strong> from a Excel file.', 'bimeson-post'),
+			_x( 'Import <strong>publications</strong> from a Excel file.', 'importer', 'bimeson_post' ),
 			[ $GLOBALS['bimeson_import'], 'dispatch' ]
 		);
 	}
@@ -42,8 +42,8 @@ class Bimeson_Importer extends \WP_Importer {
 	}
 
 	public function dispatch() {
-		wp_enqueue_script( 'bimeson-post-loader', $this->_url_to . '/assets/js/loader.min.js' );
-		wp_enqueue_script( 'xlsx',                $this->_url_to . '/assets/js/xlsx.full.min.js' );
+		wp_enqueue_script( 'bimeson_post_importer', $this->_url_to . '/assets/js/importer.min.js' );
+		wp_enqueue_script( 'xlsx',                  $this->_url_to . '/assets/js/xlsx.full.min.js' );
 
 		$this->_header();
 
@@ -72,7 +72,7 @@ class Bimeson_Importer extends \WP_Importer {
 
 	private function _header() {
 		echo '<div class="wrap">';
-		echo '<h2>' . __( 'Import Bimeson', 'bimeson-post' ) . '</h2>';
+		echo '<h2>' . _x( 'Import Publication List', 'importer', 'bimeson_post' ) . '</h2>';
 	}
 
 	private function _footer() {
@@ -85,8 +85,8 @@ class Bimeson_Importer extends \WP_Importer {
 
 	private function _greet() {
 		echo '<div class="narrow">';
-		echo '<p>'.__( 'Howdy! Upload your Bimeson Excel (xlsx) file and we&#8217;ll import the publications into this site.', 'bimeson-post' ).'</p>';
-		echo '<p>'.__( 'Choose a Excel (.xlsx) file to upload, then click Upload file and import.', 'bimeson-post' ).'</p>';
+		echo '<p>' . _x( 'Upload your Bimeson-formatted Excel (xlsx) file and we&#8217;ll import the publications into this site.', 'importer', 'bimeson_post' ) . '</p>';
+		echo '<p>' . _x( 'Choose an Excel (.xlsx) file to upload, then click Upload file and import.', 'importer', 'bimeson_post' ) . '</p>';
 		wp_import_upload_form( 'admin.php?import=bimeson&amp;step=1' );
 		echo '</div>';
 	}
@@ -99,12 +99,12 @@ class Bimeson_Importer extends \WP_Importer {
 		$file = wp_import_handle_upload();
 
 		if ( isset( $file['error'] ) ) {
-			echo '<p><strong>' . __( 'Sorry, there has been an error.', 'bimeson-post' ) . '</strong><br />';
+			echo '<p><strong>' . _x( 'Sorry, there has been an error.', 'importer', 'bimeson_post' ) . '</strong><br>';
 			echo esc_html( $file['error'] ) . '</p>';
 			return false;
 		} else if ( ! file_exists( $file['file'] ) ) {
-			echo '<p><strong>' . __( 'Sorry, there has been an error.', 'bimeson-post' ) . '</strong><br />';
-			printf( __( 'The export file could not be found at <code>%s</code>. It is likely that this was caused by a permissions problem.', 'bimeson-post' ), esc_html( $file['file'] ) );
+			echo '<p><strong>' . _x( 'Sorry, there has been an error.', 'importer', 'bimeson_post' ) . '</strong><br>';
+			printf( _x( 'The file could not be found at <code>%s</code>.', 'importer', 'bimeson_post' ), esc_html( $file['file'] ) );
 			echo '</p>';
 			return false;
 		}
@@ -117,31 +117,35 @@ class Bimeson_Importer extends \WP_Importer {
 ?>
 <form action="<?php echo admin_url( 'admin.php?import=bimeson&amp;step=2' ); ?>" method="post" name="form">
 	<?php wp_nonce_field( 'import-bimeson' ); ?>
-	<input type="hidden" name="import_id" value="<?php echo $this->_id; ?>" />
-	<input type="hidden" name="bimeson_items" id="bimeson-items" value="" />
+	<input type="hidden" name="import_id" value="<?php echo $this->_id; ?>">
+	<input type="hidden" name="bimeson_items" id="bimeson-items" value="">
 	<script>
 		document.addEventListener('DOMContentLoaded', function () {
-			BIMESON.loadFiles(['<?php echo $url ?>'], '#bimeson-items', function (successAll) {
+			BIMESON.loadFiles(['<?php echo $url; ?>'], '#bimeson-items', function (successAll) {
 				if (successAll) document.form.submit.disabled = false;
 				else document.getElementById('error').style.display = 'block';
 			});
 		});
 	</script>
 
-	<h3><?php _e( 'Add Terms', 'bimeson-post' ); ?></h3>
+	<h3><?php echo esc_html_x( 'Add Terms', 'importer', 'bimeson_post' ); ?></h3>
 	<p>
-		<input type="radio" value="taxonomy" name="add_terms" id="add-taxonomies-terms" />
-		<label for="add-taxonomies-terms"><?php _e( 'Add taxonomies (categories) and terms that import file contains', 'bimeson-post' ); ?></label>
+		<input type="radio" value="taxonomy" name="do_nothing" id="do-nothing" checked>
+		<label for="do-nothing"><?php echo _x( 'Do nothing', 'importer', 'bimeson_post' ); ?></label>
 	</p>
 	<p>
-		<input type="radio" value="term" name="add_terms" id="add-terms" />
-		<label for="add-terms"><?php _e( 'Add terms that import file contains', 'bimeson-post' ); ?></label>
+		<input type="radio" value="taxonomy" name="add_terms" id="add-taxonomies-terms">
+		<label for="add-taxonomies-terms"><?php echo _x( 'Add category groups themselves', 'importer', 'bimeson_post' ); ?></label>
+	</p>
+	<p>
+		<input type="radio" value="term" name="add_terms" id="add-terms">
+		<label for="add-terms"><?php echo _x( 'Add categories to the category group', 'importer', 'bimeson_post' ); ?></label>
 	</p>
 
-	<p class="submit"><input type="submit" name="submit" disabled class="button" value="<?php esc_attr_e( 'Submit', 'bimeson-post' ); ?>" /></p>
+	<p class="submit"><input type="submit" name="submit" disabled class="button" value="<?php echo esc_attr_x( 'Start Import', 'importer', 'bimeson_post' ); ?>"></p>
 </form>
 <?php
-		echo '<p id="error" style="display: none;"><strong>' . __( 'Sorry, there has been an error.', 'bimeson-post' ) . '</strong><br />';
+		echo '<p id="error" style="display: none;"><strong>' . _x( 'Sorry, failed to read the file.', 'importer', 'bimeson_post' ) . '</strong><br>';
 	}
 
 
@@ -153,8 +157,10 @@ class Bimeson_Importer extends \WP_Importer {
 
 		$this->_import_start( $json );
 		wp_suspend_cache_invalidation( true );
+		echo '<div style="margin-top:1em;max-height:50vh;overflow:auto;">';
 		process_terms( $this->_items, $this->_add_taxonomies, $this->_add_terms );
 		process_items( $this->_items, $this->_file_name );
+		echo '</div>';
 		wp_suspend_cache_invalidation( false );
 		$this->_import_end();
 	}
@@ -162,22 +168,19 @@ class Bimeson_Importer extends \WP_Importer {
 	private function _import_start( $json ) {
 		$data = json_decode( $json, true );
 		if ( $data === null ) {
-			echo '<p><strong>' . __( 'Sorry, there has been an error.', 'bimeson-post' ) . '</strong><br />';
-			echo __( 'The file is wrong, please try again.', 'bimeson-post' ) . '</p>';
+			echo '<p><strong>' . _x( 'Sorry, there has been an error.', 'importer', 'bimeson_post' ) . '</strong><br>';
+			echo _x( 'The content of the file is wrong, please try again.', 'importer', 'bimeson_post' ) . '</p>';
 			$this->_footer();
 			die();
 		}
 		$this->_items = $data;
-
 		do_action( 'import_start' );
 	}
 
 	private function _import_end() {
 		wp_import_cleanup( $this->_id );
 		wp_cache_flush();
-
-		echo '<p>' . __( 'All done.', 'bimeson-post' ) . ' <a href="' . admin_url() . '">' . __( 'Have fun!', 'bimeson-post' ) . '</a>' . '</p>';
-
+		echo '<p>' . _x( 'All done.', 'importer', 'bimeson_post' ) . '</p>';
 		do_action( 'import_end' );
 	}
 

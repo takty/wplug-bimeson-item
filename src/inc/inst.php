@@ -3,7 +3,7 @@
  * Bimeson (Instance)
  *
  * @author Takuto Yanagida
- * @version 2021-07-19
+ * @version 2021-07-20
  */
 
 namespace wplug\bimeson_post;
@@ -22,7 +22,7 @@ function _get_instance(): object {
 	}
 	$values = new class() {
 
-		// Admin Dest
+		// Template Admin
 
 		public $FLD_LIST_ID;
 		public $FLD_YEAR_START;
@@ -34,7 +34,7 @@ function _get_instance(): object {
 		public $FLD_OMIT_HEAD_OF_SINGLE_CAT;
 		public $FLD_JSON_PARAMS;
 
-		// Admin Src
+		// Post Type
 
 		const PT = 'bimeson';  // Each post means publication (bimeson)
 
@@ -52,6 +52,7 @@ function _get_instance(): object {
 
 		const IT_IMPORT_FROM = '_import_from';
 		const IT_DIGEST      = '_digest';
+		const IT_EDIT_URL    = '_edit_url';
 
 		public $_is_current_post_content_empty;
 
@@ -65,8 +66,6 @@ function _get_instance(): object {
 		public $rs_idx = null;
 
 		public $additional_langs;
-		public $lang_tax;
-		public $default_lang;
 
 		// Taxonomy
 
@@ -98,6 +97,22 @@ function _get_instance(): object {
 		const KEY_YEAR     = '_year';
 		const VAL_YEAR_ALL = 'all';
 
+		public $year_select_label;
+
 	};
 	return $values;
+}
+
+function _set_key_base( string $key_base ) {
+	$inst = _get_instance();
+
+	$inst->FLD_LIST_ID                 = $key_base . 'list_id';
+	$inst->FLD_YEAR_START              = $key_base . 'year_start';
+	$inst->FLD_YEAR_END                = $key_base . 'year_end';
+	$inst->FLD_COUNT                   = $key_base . 'count';
+	$inst->FLD_SORT_BY_DATE_FIRST      = $key_base . 'sort_by_date_first';
+	$inst->FLD_DUP_MULTI_CAT           = $key_base . 'duplicate_multi_category';
+	$inst->FLD_SHOW_FILTER             = $key_base . 'show_filter';
+	$inst->FLD_OMIT_HEAD_OF_SINGLE_CAT = $key_base . 'omit_head_of_single_cat';
+	$inst->FLD_JSON_PARAMS             = $key_base . 'json_params';
 }

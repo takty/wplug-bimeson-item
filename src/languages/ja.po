@@ -1,0 +1,171 @@
+# Translation of Bimeson Post - Development in Japanese
+# @package Bimeson Post
+# @author Takuto Yanagida
+# @version 2021-07-20
+
+# Post Type --------------------------------------------------------------------
+
+msgctxt "post type"
+msgid "Import from"
+msgstr "インポート元"
+
+msgctxt "post type"
+msgid "Published date"
+msgstr "公開日付"
+
+msgctxt "post type"
+msgid "Link URL"
+msgstr "リンクURL"
+
+msgctxt "post type"
+msgid "Link title"
+msgstr "リンク表題"
+
+msgctxt "post type"
+msgid "Publication data"
+msgstr "業績情報"
+
+# 'Import from',      'post type', 'ja', 'インポート元'
+# 'Published date',   'post type', 'ja', '公開日付'
+# 'Link URL',         'post type', 'ja', 'リンクURL'
+# 'Link title',       'post type', 'ja', 'リンク表題'
+# 'Publication data', 'post type', 'ja', '業績情報'
+
+# Taxonomy ---------------------------------------------------------------------
+
+msgctxt "taxonomy"
+msgid "Category group"
+msgstr "分類グループ"
+
+msgctxt "taxonomy"
+msgid "Category"
+msgstr "分類"
+
+msgctxt "taxonomy"
+msgid "Filter"
+msgstr "フィルター"
+
+msgctxt "taxonomy"
+msgid "Omit the last category group"
+msgstr "一番最後の分類グループを省略する"
+
+msgctxt "taxonomy"
+msgid "Hide from view screen"
+msgstr "閲覧画面から隠す"
+
+# 'Category group',               'taxonomy', 'ja', '分類グループ'
+# 'Category',                     'taxonomy', 'ja', '分類'
+# 'Filter',                       'taxonomy', 'ja', 'フィルター'
+# 'Omit the last category group', 'taxonomy', 'ja', '一番最後の分類グループを省略する'
+# 'Hide from view screen',        'taxonomy', 'ja', '閲覧画面から隠す'
+
+# Template Admin ---------------------------------------------------------------
+
+msgctxt "template admin"
+msgid "Target period (years):"
+msgstr "対象期間（年）:"
+
+msgctxt "template admin"
+msgid "Specify the number of items to be displayed:"
+msgstr "表示件数の指定:"
+
+msgctxt "template admin"
+msgid "(If specified, the heading will be hidden)"
+msgstr "（指定すると、見出しは非表示になります）"
+
+msgctxt "template admin"
+msgid "Sort by date first"
+msgstr "最初に日付で並び替える"
+
+msgctxt "template admin"
+msgid "Duplicate multi-category items"
+msgstr "複数のカテゴリーを持つ項目を複製"
+
+msgctxt "template admin"
+msgid "Show filter"
+msgstr "フィルターを表示"
+
+msgctxt "template admin"
+msgid "Omit headings for categories with only one item"
+msgstr "項目が1つしかない分類の見出しを省略"
+
+# 'Target period (years):',                          'template admin', 'ja', '対象期間（年）:'
+# 'Specify the number of items to be displayed:',    'template admin', 'ja', '表示件数の指定:'
+# '(If specified, the heading will be hidden)',      'template admin', 'ja', '（指定すると、見出しは非表示になります）'
+# 'Sort by date first',                              'template admin', 'ja', '最初に日付で並び替える'
+# 'Duplicate multi-category items',                  'template admin', 'ja', '複数のカテゴリーを持つ項目を複製'
+# 'Show filter',                                     'template admin', 'ja', 'フィルターを表示'
+# 'Omit headings for categories with only one item', 'template admin', 'ja', '1つしかない分類の見出しを省略'
+
+# Importer ---------------------------------------------------------------------
+
+msgctxt "importer"
+msgid "Import <strong>publications</strong> from an Excel file."
+msgstr "Excelファイルから<strong>業績</strong>をインポートします。"
+
+msgctxt "importer"
+msgid "Import Publication List"
+msgstr "業績リストのインポート"
+
+msgctxt "importer"
+msgid "Upload your Bimeson-formatted Excel (xlsx) file and we&#8217;ll import the publications into this site."
+msgstr "Bimeson形式の Excel (xlsx) ファイルをアップロードすると、このサイトに文書がインポートされます。"
+
+msgctxt "importer"
+msgid "Choose an Excel (.xlsx) file to upload, then click Upload file and import."
+msgstr "Excel（.xlsx）ファイルを選択し、「ファイルをアップロードしてインポート」をクリックします。"
+
+msgctxt "importer"
+msgid "The file could not be found at <code>%s</code>."
+msgstr "ファイルが%sに見つかりませんでした。"
+
+msgctxt "importer"
+msgid "Add Terms"
+msgstr "分類の追加"
+
+msgctxt "importer"
+msgid "Do nothing"
+msgstr "何もしない"
+
+msgctxt "importer"
+msgid "Add category groups themselves"
+msgstr "分類グループ自体を追加"
+
+msgctxt "importer"
+msgid "Add categories to the category group"
+msgstr "分類グループに分類を追加"
+
+msgctxt "importer"
+msgid "Start Import"
+msgstr "インポート開始"
+
+msgctxt "importer"
+msgid "Sorry, failed to read the file."
+msgstr "申し訳ありません。ファイルの読み込みに失敗しました。"
+
+msgctxt "importer"
+msgid "Sorry, there has been an error."
+msgstr "申し訳ありません。エラーが発生しました。"
+
+msgctxt "importer"
+msgid "The content of the file is wrong, please try again."
+msgstr "ファイルの内容に問題があります。もう一度、お試しください。"
+
+msgctxt "importer"
+msgid "All done."
+msgstr "すべてインポートしました。"
+
+# 'Import <strong>publications</strong> from an Excel file.',                                                'importer', 'ja', 'Excelファイルから業績をインポートします。'
+# 'Import Publication List',                                                                                 'importer', 'ja', '業績リストのインポート'
+# 'Upload your Bimeson-formatted Excel (xlsx) file and we&#8217;ll import the publications into this site.', 'importer', 'ja', 'Bimeson形式の Excel (xlsx) ファイルをアップロードすると、このサイトに文書がインポートされます。'
+# 'Choose an Excel (.xlsx) file to upload, then click Upload file and import.',                              'importer', 'ja', 'Excel（.xlsx）ファイルを選択し、「ファイルをアップロードしてインポート」をクリックします。'
+# 'The file could not be found at <code>%s</code>.',                                                         'importer', 'ja', 'ファイルが%sに見つかりませんでした。'
+# 'Add Terms',                                                                                               'importer', 'ja', '分類の追加'
+# 'Do nothing',                                                                                              'importer', 'ja', '何もしない'
+# 'Add category groups themselves',                                                                          'importer', 'ja', '分類グループ自体を追加'
+# 'Add categories to the category group',                                                                    'importer', 'ja', '分類グループに分類を追加'
+# 'Start Import',                                                                                            'importer', 'ja', 'インポート開始'
+# 'Sorry, failed to read the file.',                                                                         'importer', 'ja', '申し訳ありません。ファイルの読み込みに失敗しました。'
+# 'Sorry, there has been an error.',                                                                         'importer', 'ja', '申し訳ありません。エラーが発生しました。'
+# 'The content of the file is wrong, please try again.',                                                     'importer', 'ja', 'ファイルの内容に問題があります。もう一度、お試しください。'
+# 'All done.',                                                                                               'importer', 'ja', 'すべてインポートしました。'
