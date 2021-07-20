@@ -13,7 +13,7 @@ require_once __DIR__ . '/importer.php';
 function initialize_post_type( string $url_to ) {
 	$inst = _get_instance();
 	register_post_type( $inst::PT, [
-		'label'         => _x( 'Publication', 'post type', 'bimeson_item' ),
+		'label'         => __( 'Publication', 'bimeson_item' ),
 		'labels'        => [],
 		'public'        => true,
 		'show_ui'       => true,
@@ -47,12 +47,12 @@ function initialize_post_type( string $url_to ) {
 function _cb_wp_loaded() {
 	$inst = _get_instance();
 	$cs = [ 'cb', 'title' ];
-	$cs[] = [ 'label' => _x( 'Published date', 'post type', 'bimeson_item' ), 'name' => $inst::IT_DATE, 'width' => '10%', 'value' => 'esc_html' ];
+	$cs[] = [ 'label' => __( 'Published date', 'bimeson_item' ), 'name' => $inst::IT_DATE, 'width' => '10%', 'value' => 'esc_html' ];
 	foreach ( get_root_slugs() as $taxonomy ) {
 		$cs[] = [ 'name' => root_term_to_sub_tax( $taxonomy ), 'width' => '14%' ];
 	}
 	$cs[] = 'date';
-	$cs[] = [ 'label' => _x( 'Import from', 'post type', 'bimeson_item' ), 'name' => $inst::IT_IMPORT_FROM, 'width' => '10%', 'value' => 'esc_html' ];
+	$cs[] = [ 'label' => __( 'Import from', 'bimeson_item' ), 'name' => $inst::IT_IMPORT_FROM, 'width' => '10%', 'value' => 'esc_html' ];
 	set_admin_columns( 'bimeson', $cs, [ $inst::IT_DATE, $inst::IT_IMPORT_FROM ] );
 }
 
@@ -63,7 +63,7 @@ function _cb_admin_menu_post_type() {
 	foreach ( $inst->additional_langs as $al ) {
 		add_rich_editor_meta_box( "_post_content_$al", __( 'Content' ) . " [$al]", $inst::PT );
 	}
-	\add_meta_box( 'bimeson_mb', _x( 'Publication data', 'post type', 'bimeson_item' ), '\wplug\bimeson_item\_cb_output_html_post_type', $inst::PT, 'side', 'high' );
+	\add_meta_box( 'bimeson_mb', __( 'Publication data', 'bimeson_item' ), '\wplug\bimeson_item\_cb_output_html_post_type', $inst::PT, 'side', 'high' );
 }
 
 function _cb_output_html_post_type() {
@@ -76,10 +76,10 @@ function _cb_output_html_post_type() {
 	$link_url   = get_post_meta( $post_id, $inst::IT_LINK_URL,   true );
 	$link_title = get_post_meta( $post_id, $inst::IT_LINK_TITLE, true );
 
-	output_input_row( _x( 'Published date', 'post type', 'bimeson_item' ), $inst::IT_DATE, $date );
+	output_input_row( __( 'Published date', 'bimeson_item' ), $inst::IT_DATE, $date );
 	output_input_row( 'DOI', $inst::IT_DOI, $doi );
-	output_input_row( _x( 'Link URL', 'post type', 'bimeson_item' ), $inst::IT_LINK_URL, $link_url );
-	output_input_row( _x( 'Link title', 'post type', 'bimeson_item' ), $inst::IT_LINK_TITLE, $link_title );
+	output_input_row( __( 'Link URL', 'bimeson_item' ), $inst::IT_LINK_URL, $link_url );
+	output_input_row( __( 'Link title', 'bimeson_item' ), $inst::IT_LINK_TITLE, $link_title );
 }
 
 function _cb_save_post_post_type( $post_id ) {

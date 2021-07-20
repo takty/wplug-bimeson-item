@@ -82,7 +82,7 @@ function _cb_output_html_template_admin( \WP_Post $post ) {
 	<div class="bimeson-admin">
 		<div class="bimeson-admin-setting-row">
 			<label>
-				<?php echo _x( 'Target period (years):', 'admin dest', 'bimeson_item' ); ?>
+				<?php esc_html_e( 'Target period (years):', 'bimeson_item' ); ?>
 				<input type="number" size="4" name="<?php echo $inst->FLD_YEAR_START ?>" value="<?php echo $year_start ?>">
 				<span>-</span>
 				<input type="number" size="4" name="<?php echo $inst->FLD_YEAR_END ?>" value="<?php echo $year_end ?>">
@@ -90,27 +90,27 @@ function _cb_output_html_template_admin( \WP_Post $post ) {
 		</div>
 		<div class="bimeson-admin-setting-row">
 			<label>
-				<?php echo _x( 'Specify the number of items to be displayed:', 'admin dest', 'bimeson_item' ); ?>
+				<?php esc_html_e( 'Specify the number of items to be displayed:', 'bimeson_item' ); ?>
 				<input type="number" size="4" name="<?php echo $inst->FLD_COUNT ?>" value="<?php echo $count ?>">
 			</label>
-			&nbsp;<span><?php echo _x( '(If specified, the heading will be hidden)', 'admin dest', 'bimeson_item' ); ?></span>
+			&nbsp;<span><?php esc_html_e( '(If specified, the heading will be hidden)', 'bimeson_item' ); ?></span>
 		</div>
 		<div class="bimeson-admin-setting-cbs">
 			<label>
 				<input type="checkbox" name="<?php echo $inst->FLD_SORT_BY_DATE_FIRST ?>" value="true" <?php checked( $sort_by_date_first, 'true' ) ?>>
-				<?php echo _x( 'Sort by date first', 'admin dest', 'bimeson_item' ); ?>
+				<?php esc_html_e( 'Sort by date first', 'bimeson_item' ); ?>
 			</label>
 			<label>
 				<input type="checkbox" name="<?php echo $inst->FLD_DUP_MULTI_CAT ?>" value="true" <?php checked( $dup_multi_cat, 'true' ) ?>>
-				<?php echo _x( 'Duplicate multi-category items', 'admin dest', 'bimeson_item' ); ?>
+				<?php esc_html_e( 'Duplicate multi-category items', 'bimeson_item' ); ?>
 			</label>
 			<label>
 				<input type="checkbox" name="<?php echo $inst->FLD_SHOW_FILTER ?>" value="true" <?php checked( $show_filter, 'true' ) ?>>
-				<?php echo _x( 'Show filter', 'admin dest', 'bimeson_item' ); ?>
+				<?php esc_html_e( 'Show filter', 'bimeson_item' ); ?>
 			</label>
 			<label>
 				<input type="checkbox" name="<?php echo $inst->FLD_OMIT_HEAD_OF_SINGLE_CAT ?>" value="true" <?php checked( $omit_single_cat, 'true' ) ?>>
-				<?php echo _x( 'Omit headings for categories with only one item', 'admin dest', 'bimeson_item' ); ?>
+				<?php esc_html_e( 'Omit headings for categories with only one item', 'bimeson_item' ); ?>
 			</label>
 		</div>
 		<div class="bimeson-admin-filter-row">
