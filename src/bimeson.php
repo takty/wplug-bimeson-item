@@ -28,9 +28,10 @@ function initialize( array $args = [] ) {
 	$url_to = untrailingslashit( $args['url_to'] ?? get_file_uri( __DIR__ ) );
 	$lang   = $args['lang']     ?? '';
 
-	$inst->head_level       = $args['heading_level']    ?? 3;
-	$inst->year_format      = $args['year_format']      ?? null;
-	$inst->term_name_getter = $args['term_name_getter'] ?? null;
+	$inst->head_level        = $args['heading_level']     ?? 3;
+	$inst->year_format       = $args['year_format']       ?? null;
+	$inst->term_name_getter  = $args['term_name_getter']  ?? null;
+	$inst->year_select_label = $args['year_select_label'] ?? __( 'Select Year' );
 
 	$inst->root_tax          = $args['taxonomy']          ?? $inst::DEFAULT_TAXONOMY;
 	$inst->sub_tax_base      = $args['sub_tax_base']      ?? $inst::DEFAULT_SUB_TAX_BASE;
