@@ -6,7 +6,7 @@
  * @version 2021-07-20
  */
 
-namespace wplug\bimeson_post;
+namespace wplug\bimeson_item;
 
 /**
  * Gets instance.

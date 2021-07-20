@@ -23,8 +23,8 @@ endwhile;
 ?>
 			<section>
 				<div class="entry-content">
-					<?php \wplug\bimeson_post\the_filter(); ?>
-					<?php \wplug\bimeson_post\the_list(); ?>
+					<?php \wplug\bimeson_item\the_filter(); ?>
+					<?php \wplug\bimeson_item\the_list(); ?>
 				</div>
 			</section>
 

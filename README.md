@@ -1,1 +1,1 @@
-# wplug-bimeson-post
+# wplug-bimeson-item

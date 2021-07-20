@@ -1,12 +1,12 @@
 <?php
 /**
- * Bimeson Post (Retriever)
+ * Bimeson Item (Retriever)
  *
  * @author Takuto Yanagida
  * @version 2021-07-20
  */
 
-namespace wplug\bimeson_post;
+namespace wplug\bimeson_item;
 
 function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat ) {
 	$rs_idx = _make_rs_idx();
@@ -121,9 +121,9 @@ function _sort_list_items( array &$items, bool $sort_by_date_first, array $rs_id
 
 	$inst->rs_idx = $rs_idx;
 	if ( $sort_by_date_first ) {
-		usort( $items, '\wplug\bimeson_post\_compare_item_by_date_cat' );
+		usort( $items, '\wplug\bimeson_item\_compare_item_by_date_cat' );
 	} else {
-		usort( $items, '\wplug\bimeson_post\_compare_item_by_cat' );
+		usort( $items, '\wplug\bimeson_item\_compare_item_by_cat' );
 	}
 }
 

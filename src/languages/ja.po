@@ -1,5 +1,5 @@
-# Translation of Bimeson Post - Development in Japanese
-# @package Bimeson Post
+# Translation of Bimeson Item - Development in Japanese
+# @package Bimeson Item
 # @author Takuto Yanagida
 # @version 2021-07-20
 

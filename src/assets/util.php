@@ -1,12 +1,12 @@
 <?php
 /**
- * Utilities for Bimeson Post
+ * Utilities for Bimeson Item
  *
  * @author Takuto Yanagida
  * @version 2021-07-20
  */
 
-namespace wplug\bimeson_post;
+namespace wplug\bimeson_item;
 
 function make_title( string $body, string $date ): string {
 	$body = normalize_body( $body );

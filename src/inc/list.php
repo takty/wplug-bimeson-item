@@ -6,7 +6,7 @@
  * @version 2021-07-20
  */
 
-namespace wplug\bimeson_post;
+namespace wplug\bimeson_item;
 
 function echo_the_list( array $args, string $lang, string $before = '<div class="bimeson-list"%s>', string $after = '</div>', string $id = 'bml' ) {
 	if ( ! empty( $id ) ) $id = " id=\"$id\"";

@@ -8,7 +8,7 @@
  * [publication list="<slug or post ID>" count="10" date-sort omit-single dup-item date="2020-2021" taxonomy="slug1, slug2, ..."]
  */
 
-namespace wplug\bimeson_post;
+namespace wplug\bimeson_item;
 
 function register_shortcode( $lang ) {
 	static $serial = 0;
@@ -46,7 +46,7 @@ function _get_date_shortcode( array $atts, string $lang ) {
 
 	$filter_state = _extract_filter_state( $atts );
 
-	// Bimeson Post
+	// Bimeson Item
 	$items = get_filtered_items( $lang, $date_bgn, $date_end, $filter_state );
 	[ $items, $years_exist ] = retrieve_items( $items, $count, $sort_by_date_first, $dup_multi_cat );
 

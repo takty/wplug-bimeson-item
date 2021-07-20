@@ -6,10 +6,10 @@
  * @version 2021-07-20
  */
 
-namespace wplug\bimeson_post;
+namespace wplug\bimeson_item;
 
 function initialize_filter() {
-	add_filter( 'query_vars', '\wplug\bimeson_post\_cb_query_vars_filter' );
+	add_filter( 'query_vars', '\wplug\bimeson_item\_cb_query_vars_filter' );
 }
 
 function _cb_query_vars_filter( array $query_vars ): array {
@@ -19,8 +19,8 @@ function _cb_query_vars_filter( array $query_vars ): array {
 }
 
 function echo_the_filter( ?array $filter_state, array $years_exist, string $before = '<div class="bimeson-filter"%s>', string $after = '</div>', string $for = 'bml' ) {
-	wp_enqueue_style(  'bimeson_post_filter' );
-	wp_enqueue_script( 'bimeson_post_filter' );
+	wp_enqueue_style(  'bimeson_item_filter' );
+	wp_enqueue_script( 'bimeson_item_filter' );
 
 	if ( ! empty( $for ) ) $for = " for=\"$for\"";
 	$before = sprintf( $before, $for );

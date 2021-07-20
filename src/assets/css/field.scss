@@ -11,7 +11,7 @@
 $breakpoint-single-wrap: 45rem;
 
 
-.wplug-bimeson-post-field-single {
+.wplug-bimeson-item-field-single {
 	&:not(:first-child) {
 		margin-top: 0.75rem;
 	}
@@ -43,13 +43,13 @@ $breakpoint-single-wrap: 45rem;
 	}
 }
 
-.wplug-bimeson-post-field-separator {
+.wplug-bimeson-item-field-separator {
 	margin: 1.5rem -12px;
 	height: 4px;
 	background-color: #f1f1f1;
 }
 
-.wplug-bimeson-post-field-rich-editor {
+.wplug-bimeson-item-field-rich-editor {
 	margin-top: 1.5rem;
 	&:not(:last-child) {
 		margin-bottom: 2rem;
@@ -65,11 +65,11 @@ $breakpoint-single-wrap: 45rem;
 	}
 }
 
-.wplug-bimeson-post-field-group {
+.wplug-bimeson-item-field-group {
 	margin-top: 0.5rem;
 }
 
-.wplug-bimeson-post-field-title {
+.wplug-bimeson-item-field-title {
 	> input {  // Same as the default title style of Wordpress
 		padding: 3px 8px;
 		font-size: 1.7em;
@@ -82,7 +82,7 @@ $breakpoint-single-wrap: 45rem;
 	}
 }
 
-.wplug-bimeson-post-field-media-picker {
+.wplug-bimeson-item-field-media-picker {
 	margin-top: 0.75rem;
 
 	display: flex;
@@ -123,7 +123,7 @@ $breakpoint-single-wrap: 45rem;
 	}
 }
 
-.wplug-bimeson-post-field-media-picker-select {
+.wplug-bimeson-item-field-media-picker-select {
 	&.button, &.button:focus, &.button:hover {
 		width: 4rem;
 		height: 4rem;

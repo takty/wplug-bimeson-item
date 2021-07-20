@@ -6,7 +6,7 @@
  * @version 2021-07-20
  */
 
-namespace wplug\bimeson_post;
+namespace wplug\bimeson_item;
 
 function save_post_meta( int $post_id, string $key, $filter = null, $default = null ) {
 	$val = isset( $_POST[ $key ] ) ? $_POST[ $key ] : null;
@@ -39,10 +39,10 @@ function save_post_meta_with_wp_filter( int $post_id, string $key, $filter_name 
 }
 
 function output_input_row( string $label, string $key, $val, $type = 'text' ) {
-	wp_enqueue_style( 'wplug-bimeson-post-field' );
+	wp_enqueue_style( 'wplug-bimeson-item-field' );
 	$val = isset( $val ) ? esc_attr( $val ) : '';
 ?>
-	<div class="wplug-bimeson-post-field-single">
+	<div class="wplug-bimeson-item-field-single">
 		<label>
 			<span><?php echo esc_html( $label ) ?></span>
 			<input <?php name_id( $key ) ?> type="<?php echo esc_attr( $type ) ?>" value="<?php echo $val ?>" size="64">

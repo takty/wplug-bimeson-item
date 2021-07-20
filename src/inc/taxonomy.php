@@ -6,7 +6,7 @@
  * @version 2021-07-20
  */
 
-namespace wplug\bimeson_post;
+namespace wplug\bimeson_item;
 
 function initialize_taxonomy() {
 	$inst = _get_instance();
@@ -14,7 +14,7 @@ function initialize_taxonomy() {
 	if ( ! taxonomy_exists( $inst->root_tax ) ) {
 		register_taxonomy( $inst->root_tax, null, [
 			'hierarchical'       => true,
-			'label'              => _x( 'Category group', 'taxonomy', 'bimeson_post' ),
+			'label'              => _x( 'Category group', 'taxonomy', 'bimeson_item' ),
 			'public'             => false,
 			'show_ui'            => true,
 			'show_in_quick_edit' => false,
@@ -24,16 +24,16 @@ function initialize_taxonomy() {
 	}
 	register_taxonomy_for_object_type( $inst->root_tax, $inst::PT );
 
-	add_action( "{$inst->root_tax}_edit_form_fields", '\wplug\bimeson_post\_cb_taxonomy_edit_form_fields', 10, 2 );
-	add_action( "edit_terms",                         '\wplug\bimeson_post\_cb_edit_taxonomy', 10, 2 );
-	add_action( "edited_{$inst->root_tax}",           '\wplug\bimeson_post\_cb_edited_taxonomy', 10, 2 );
-	add_filter( 'query_vars',                         '\wplug\bimeson_post\_cb_query_vars_taxonomy' );
+	add_action( "{$inst->root_tax}_edit_form_fields", '\wplug\bimeson_item\_cb_taxonomy_edit_form_fields', 10, 2 );
+	add_action( "edit_terms",                         '\wplug\bimeson_item\_cb_edit_taxonomy', 10, 2 );
+	add_action( "edited_{$inst->root_tax}",           '\wplug\bimeson_item\_cb_edited_taxonomy', 10, 2 );
+	add_filter( 'query_vars',                         '\wplug\bimeson_item\_cb_query_vars_taxonomy' );
 
 	_register_sub_tax_all();
 
 	foreach ( $inst->sub_taxes as $sub_tax ) {
-		add_action( "{$sub_tax}_edit_form_fields", '\wplug\bimeson_post\_cb_taxonomy_edit_form_fields', 10, 2 );
-		add_action( "edited_{$sub_tax}",           '\wplug\bimeson_post\_cb_edited_taxonomy', 10, 2 );
+		add_action( "{$sub_tax}_edit_form_fields", '\wplug\bimeson_item\_cb_taxonomy_edit_form_fields', 10, 2 );
+		add_action( "edited_{$sub_tax}",           '\wplug\bimeson_item\_cb_edited_taxonomy', 10, 2 );
 	}
 }
 
@@ -64,7 +64,7 @@ function _register_sub_tax( string $tax, string $name ) {
 	if ( ! taxonomy_exists( $tax ) ) {
 		register_taxonomy( $tax, null, [
 			'hierarchical'       => true,
-			'label'              => _x( 'Category', 'taxonomy', 'bimeson_post' ) . " ($name)",
+			'label'              => _x( 'Category', 'taxonomy', 'bimeson_item' ) . " ($name)",
 			'public'             => true,
 			'show_ui'            => true,
 			'rewrite'            => false,
@@ -265,9 +265,9 @@ function _cb_query_vars_taxonomy( array $query_vars ): array {
 function _cb_taxonomy_edit_form_fields( \WP_Term $term, string $tax ) {
 	$inst = _get_instance();
 	if ( $tax === $inst->root_tax ) {
-		_bool_field( $term, $inst::KEY_IS_HIDDEN, _x( 'Hide from view screen', 'taxonomy', 'bimeson_post' ) );
+		_bool_field( $term, $inst::KEY_IS_HIDDEN, _x( 'Hide from view screen', 'taxonomy', 'bimeson_item' ) );
 	} else {
-		_bool_field( $term, $inst::KEY_LAST_CAT_OMITTED, _x( 'Omit the last category group', 'taxonomy', 'bimeson_post' ) );
+		_bool_field( $term, $inst::KEY_LAST_CAT_OMITTED, _x( 'Omit the last category group', 'taxonomy', 'bimeson_item' ) );
 	}
 }
 
@@ -275,7 +275,7 @@ function _bool_field( \WP_Term $term, string $key, string $label ) {
 	$val = get_term_meta( $term->term_id, $key, true );
 	?>
 	<tr class="form-field">
-		<th style="padding-bottom: 20px;"><label for="<?php echo $key ?>"><?php echo _x( 'Filter', 'taxonomy', 'bimeson_post' ); ?></label></th>
+		<th style="padding-bottom: 20px;"><label for="<?php echo $key ?>"><?php echo _x( 'Filter', 'taxonomy', 'bimeson_item' ); ?></label></th>
 		<td style="padding-bottom: 20px;">
 			<label>
 				<input type="checkbox" name="<?php echo $key ?>" id="<?php echo $key ?>" <?php checked( $val, 1 ) ?>/>

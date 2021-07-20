@@ -6,7 +6,7 @@
  * @version 2021-07-20
  */
 
-namespace wplug\bimeson_post;
+namespace wplug\bimeson_item;
 
 require_once __DIR__ . '/assets/util.php';
 require_once __DIR__ . '/assets/field.php';
@@ -54,14 +54,14 @@ function _register_script( string $url_to ) {
 	if ( is_admin() ) {
 		if ( ! _is_the_post_type() ) {
 			add_action( 'admin_enqueue_scripts', function () use ( $url_to ) {
-				wp_enqueue_style(  'bimeson_post_template_admin', $url_to . '/assets/css/template-admin.min.css' );
-				wp_enqueue_script( 'bimeson_post_template_admin', $url_to . '/assets/js/template-admin.min.js' );
+				wp_enqueue_style(  'bimeson_item_template_admin', $url_to . '/assets/css/template-admin.min.css' );
+				wp_enqueue_script( 'bimeson_item_template_admin', $url_to . '/assets/js/template-admin.min.js' );
 			} );
 		}
 	} else {
 		add_action( 'wp_enqueue_scripts', function () use ( $url_to ) {
-			wp_register_style(  'bimeson_post_filter', $url_to . '/assets/css/filter.min.css' );
-			wp_register_script( 'bimeson_post_filter', $url_to . '/assets/js/filter.min.js' );
+			wp_register_style(  'bimeson_item_filter', $url_to . '/assets/css/filter.min.css' );
+			wp_register_script( 'bimeson_item_filter', $url_to . '/assets/js/filter.min.js' );
 		} );
 	}
 }
@@ -120,7 +120,7 @@ function _get_data( int $post_id, string $lang ): array {
 
 	$d = get_template_admin_config( $post_id );
 
-	// Bimeson Post
+	// Bimeson Item
 	$items = get_filtered_items( $lang, $d['year_bgn'], $d['year_end'], $d['filter_state'] );
 	[ $items, $years_exist ] = retrieve_items( $items, $d['count'], $d['sort_by_date_first'], $d['dup_multi_cat'] );
 
