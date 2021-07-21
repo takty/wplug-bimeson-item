@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-07-21
  */
 
 namespace wplug\bimeson_item;
@@ -106,9 +106,10 @@ function _cb_save_post_post_type( $post_id ) {
 // -----------------------------------------------------------------------------
 
 
-function process_items( array &$items, string $file_name ) {  // Called by importer
+function process_items( array &$items, string $file_name ): array {  // Called by importer
 	$inst       = _get_instance();
 	$roots_subs = get_root_slug_to_sub_slugs();
+	$msgs       = [];
 
 	foreach ( $items as $item ) {
 		$body = ( ! empty( $item[$inst::IT_BODY] ) ) ? trim( $item[$inst::IT_BODY] ) : '';
@@ -171,7 +172,8 @@ function process_items( array &$items, string $file_name ) {  // Called by impor
 			}
 			if ( ! empty( $slugs ) ) wp_add_object_terms( $post_id, $slugs, $sub_tax );
 		}
-		echo '<p>' . ( $old === false ? 'New ' : 'Updated ' );
-		echo wp_kses_post( $body ) . '</p>';
+		$m      = __( $old === false ? '<strong>New</strong>' : '<strong>Updated</strong>', 'bimeson_item' );
+		$msgs[] = $m . ' ' . wp_kses_post( $body );
 	}
+	return $msgs;
 }

@@ -3,12 +3,12 @@
  * Bimeson List Filter
  *
  * @author Takuto Yanagida
- * @version 2021-07-19
+ * @version 2021-07-21
  *
  */
 
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
 
 	const SEL_FILTER = '.bimeson-filter';
 	const SEL_LIST   = '.bimeson-list';

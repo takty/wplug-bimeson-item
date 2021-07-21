@@ -1,76 +1,89 @@
 /**
  *
- * Bimeson File Loader
+ * Bimeson File Importer
  *
  * @author Takuto Yanagida
- * @version 2021-07-08
+ * @version 2021-07-21
  *
  */
 
 
-const BIMESON = {};
-BIMESON['loadFiles'] = (function () {
+document.addEventListener('DOMContentLoaded', () => {
+
+	const ID_FILE_URL    = 'import-url';
+	const ID_MSG_SUCCESS = 'msg-success';
+	const ID_MSG_FAILURE = 'msg-failure';
 
 	const KEY_BODY = '_body';
 
-	function loadFiles(urls, resSelector, onFinished) {
-		const items = [];
-		let recCount = 0;
-		let successCount = 0;
+	const items = [];
 
-		if (urls.length === 0) {
-			const res = document.querySelector(resSelector);
-			if (res) res.value = '';
+	let receiveCount = 0;
+	let successCount = 0;
+
+	const elmFileUrl = document.getElementById(ID_FILE_URL);
+	if (!elmFileUrl) return;
+	const fileUrl = elmFileUrl.value;
+	loadFiles([fileUrl]);
+
+	function loadFiles(urls) {
+		if (urls.length === 0 || !urls[0]) {
 			console.log('Complete filtering (No data)');
-			onFinished();
 			return;
 		}
-
-		urls.forEach(function (url) {
+		for (const url of urls) {
 			console.log('Requesting file...');
 			const req = new XMLHttpRequest();
 			req.open('GET', url, true);
 			req.responseType = 'arraybuffer';
-			req.onload = makeListener(url, req);
+			req.onload = makeListener(req, url, urls.length);
 			req.send();
-		});
-
-		function makeListener(url, req) {
-			return function (e) {
-				if (!req.response) {
-					console.log('Did not receive file (' + url + ')');
-					return;
-				}
-				console.log('Received file: ' + req.response.byteLength + ' bytes (' + url + ')');
-				if (process(req.response)) successCount += 1;
-				if (++recCount === urls.length) finished(recCount === successCount);
-			};
 		}
+	}
 
-		function process(response) {
-			const data = new Uint8Array(response);
-			const arr = new Array();
-			for (let i = 0, I = data.length; i < I; i += 1) arr[i] = String.fromCharCode(data[i]);
-			const bstr = arr.join('');
+	function makeListener(req, url, urlSize) {
+		return () => {
+			if (!req.response) {
+				console.log('Did not receive file (' + url + ')');
+				return;
+			}
+			console.log('Received file: ' + req.response.byteLength + ' bytes (' + url + ')');
+			if (process(req.response)) successCount += 1;
+			if (++receiveCount === urlSize) {
+				finished(receiveCount === successCount);
+			}
+		};
+	}
 
-			try {
-				const book = XLSX.read(bstr, {type:'binary'});
-				const sheetName = book.SheetNames[0];
-				const sheet = book.Sheets[sheetName];
-				if (sheet) processSheet(sheet, items);
+	function process(response) {
+		const data = new Uint8Array(response);
+		const arr  = new Array();
+		for (let i = 0, I = data.length; i < I; i += 1) {
+			arr[i] = String.fromCharCode(data[i]);
+		}
+		const bstr = arr.join('');
+
+		try {
+			const book      = XLSX.read(bstr, {type:'binary'});
+			const sheetName = book.SheetNames[0];
+			const sheet     = book.Sheets[sheetName];
+			if (sheet) {
+				processSheet(sheet, items);
 				console.log('Finish filtering file');
 				return true;
-			} catch (e) {
-				console.log('Error while filtering file');
-				return false;
 			}
+		} catch (e) {
 		}
+		console.log('Error while filtering file');
+		return false;
+	}
 
-		function finished(successAll) {
-			const res = document.querySelector(resSelector);
-			if (res) res.value = JSON.stringify(items);
-			console.log('Complete filtering (' + items.length + ' items)');
-			onFinished(successAll);
+	function finished(successAll) {
+		console.log('Complete filtering (' + items.length + ' items)');
+		if (successAll) {
+			btnStartImport.removeAttribute('disabled');
+		} else {
+			msgFailure.removeAttribute('hidden');
 		}
 	}
 
@@ -161,5 +174,123 @@ BIMESON['loadFiles'] = (function () {
 		return str;
 	}
 
-	return loadFiles;
-})();
+
+	// -------------------------------------------------------------------------
+
+
+	const CHUNK_SIZE = 8;
+
+	const ID_BTN_IMPORT  = 'btn-start-import';
+	const ID_SECTION_OPT = 'section-option';
+
+	const ID_AJAX_URL  = 'import-ajax';
+	const ID_FILE_ID   = 'import-file-id';
+	const ID_FILE_NAME = 'import-file-name';
+	const ID_MSG_RES   = 'msg-response';
+
+	const ID_DO_NOTHING = 'do-nothing';
+	const ID_ADD_TAX    = 'add-tax';
+	const ID_ADD_TERM   = 'add-term';
+
+	const btnStartImport = document.getElementById(ID_BTN_IMPORT)
+	btnStartImport.addEventListener('click', () => {
+		ajaxSendItems();
+		btnStartImport.setAttribute('disabled', '');
+		const sectionOpt = document.getElementById(ID_SECTION_OPT)
+		sectionOpt.setAttribute('hidden', '');
+	})
+	const msgSuccess = document.getElementById(ID_MSG_SUCCESS)
+	const msgFailure = document.getElementById(ID_MSG_FAILURE)
+	const elmMsgRes  = document.getElementById(ID_MSG_RES);
+
+	const ajaxUrl  = document.getElementById(ID_AJAX_URL).value;
+	const fileId   = document.getElementById(ID_FILE_ID).value;
+	const fileName = document.getElementById(ID_FILE_NAME).value;
+
+	let addTax
+	let addTerm;
+
+	function ajaxSendItems() {
+		if (document.getElementById(ID_DO_NOTHING).checked) {
+			addTax  = false;
+			addTerm = false;
+		} else if (document.getElementById(ID_ADD_TAX).checked) {
+			addTax  = true;
+			addTerm = true;
+		} else if (document.getElementById(ID_ADD_TERM).checked) {
+			addTax  = false;
+			addTerm = true;
+		}
+		console.log('ajaxSendItems: ' + ajaxUrl);
+		sendStart();
+	}
+
+	function receive(req) {
+		if (req.readyState !== 4) return;
+		if (200 <= req.status && req.status < 300) {
+			const d = JSON.parse(req.response);
+			if (d['success'] === true && d['data']) {
+				const msgs  = d['data']['msgs']  ?? [];
+				procMsgs(msgs);
+
+				const index = d['data']['index'] ?? 0;
+				if (items.length <= index) {
+					sendEnd();
+					msgSuccess.removeAttribute('hidden');
+				} else {
+					sendItems(index, items);
+				}
+				return;
+			}
+		}
+		console.log('Ajax Error!');
+		msgFailure.removeAttribute('hidden');
+	}
+
+	function procMsgs(msgs) {
+		for (const m of msgs) {
+			const p = document.createElement('p');
+			p.innerHTML = m;
+			elmMsgRes.appendChild(p);
+		}
+		elmMsgRes.scrollTop = elmMsgRes.scrollHeight;
+	}
+
+	function sendStart() {
+		const req = new XMLHttpRequest();
+		req.onreadystatechange = () => { receive(req); };
+		req.open('POST', ajaxUrl);
+		req.setRequestHeader('content-type', 'application/json');
+		req.send(JSON.stringify({
+			status: 'start'
+		}));
+	}
+
+	function sendItems(index, items) {
+		const sub = items.slice(index, index + CHUNK_SIZE);
+
+		const req = new XMLHttpRequest();
+		req.onreadystatechange = () => { receive(req); };
+		req.open('POST', ajaxUrl);
+		req.setRequestHeader('content-type', 'application/json');
+		req.send(JSON.stringify({
+			status      : 'items',
+			next_index  : index + CHUNK_SIZE,
+			items       : sub,
+			add_taxonomy: addTax,
+			add_term    : addTerm,
+			file_name   : fileName
+		}));
+	}
+
+	function sendEnd() {
+		const req = new XMLHttpRequest();
+		req.open('POST', ajaxUrl);
+		req.setRequestHeader('content-type', 'application/json');
+		req.send(JSON.stringify({
+			status : 'end',
+			file_id: fileId,
+		}));
+	}
+
+});

@@ -4,12 +4,10 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-07-21
  */
 
 namespace wplug\bimeson_item;
-
-if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) return;
 
 require_once ABSPATH . 'wp-admin/includes/import.php';
 if ( ! class_exists( '\WP_Importer' ) ) {
@@ -18,29 +16,65 @@ if ( ! class_exists( '\WP_Importer' ) ) {
 }
 if ( ! class_exists( '\WP_Importer' ) ) return;
 
+require_once __DIR__ . '/../assets/ajax.php';
 
 class Bimeson_Importer extends \WP_Importer {
 
 	static public function register( $url_to ) {
-		$GLOBALS['bimeson_import'] = new Bimeson_Importer( $url_to );
-		register_importer(
-			'bimeson', 'Bimeson',
-			__( 'Import <strong>publications</strong> from a Excel file.', 'bimeson_item' ),
-			[ $GLOBALS['bimeson_import'], 'dispatch' ]
-		);
+		new Bimeson_Importer( $url_to );
 	}
 
-	private $_url_to = null;
+	private $_url_to;
+	private $_ajax_request_url;
 
-	private $_id;
+	private $_file_id;
 	private $_file_name;
 	private $_add_taxonomies = false;
 	private $_add_terms      = false;
 	private $_items          = [];
 
-	public function __construct( $url_to = false ) {
+	public function __construct( $url_to ) {
 		$this->_url_to = $url_to;
+		$this->initialize();
+		$this->_ajax_request_url = $this->initialize_ajax();
 	}
+
+	private function initialize() {
+		$GLOBALS['bimeson_import'] = $this;
+		register_importer(
+			'bimeson',
+			'Bimeson',
+			__( 'Import <strong>publications</strong> from a Excel file.', 'bimeson_item' ),
+			[ $GLOBALS['bimeson_import'], 'dispatch' ]
+		);
+	}
+
+	private function initialize_ajax() {
+		$ajax = new Ajax( 'bimeson_import', function ( $data ) {
+			$status = $data['status'] ?? '';
+			if ( 'start' === $status ) {
+				add_filter( 'http_request_timeout', function () { return 60; } );
+				do_action( 'import_start' );
+				wp_suspend_cache_invalidation( true );
+				Ajax::send_success( [ 'index' => 0 ] );
+			} else if ( 'end' === $status ) {
+				wp_suspend_cache_invalidation( false );
+				wp_import_cleanup( (int) $data['file_id'] );
+				wp_cache_flush();
+				do_action( 'import_end' );
+			} else {
+				set_time_limit(0);
+				$msgs_t = process_terms( $data['items'], $data['add_taxonomy'], $data['add_term'] );
+				$msgs_i = process_items( $data['items'], $data['file_name'] );
+				Ajax::send_success( [ 'msgs' => array_merge( $msgs_t, $msgs_i ), 'index' => $data['next_index'] ] );
+			}
+		}, false );
+		return $ajax->get_url();
+	}
+
+
+	// -------------------------------------------------------------------------
+
 
 	public function dispatch() {
 		wp_enqueue_script( 'bimeson_item_importer', $this->_url_to . '/assets/js/importer.min.js' );
@@ -48,23 +82,15 @@ class Bimeson_Importer extends \WP_Importer {
 
 		$this->_header();
 
-		$step = empty( $_GET['step'] ) ? 0 : (int) $_GET['step'];
+		$step = (int) ( $_GET['step'] ?? 0 );
 		switch ( $step ) {
 			case 0:
 				$this->_greet();
 				break;
 			case 1:
 				check_admin_referer( 'import-upload' );
-				if ( $this->_handle_upload() ) $this->_parse_upload();
-				break;
-			case 2:
-				check_admin_referer( 'import-bimeson' );
-				$this->_id             = (int) $_POST['import_id'];
-				$this->_file_name      = pathinfo( get_attached_file( $this->_id ), PATHINFO_FILENAME );
-				$this->_add_taxonomies = ( ! empty( $_POST['add_terms'] ) && $_POST['add_terms'] === 'taxonomy' );
-				$this->_add_terms      = ( ! empty( $_POST['add_terms'] ) && $_POST['add_terms'] === 'term' );
-				set_time_limit(0);
-				$this->_import( stripslashes( $_POST['bimeson_items'] ) );
+				$fid = $this->_handle_upload();
+				if ( ! is_null( $fid ) ) $this->_parse_upload( $fid );
 				break;
 		}
 
@@ -96,93 +122,60 @@ class Bimeson_Importer extends \WP_Importer {
 	// Step 1 ------------------------------------------------------------------
 
 
-	private function _handle_upload() {
+	private function _handle_upload(): ?int {
 		$file = wp_import_handle_upload();
 
 		if ( isset( $file['error'] ) ) {
 			echo '<p><strong>' . esc_html__( 'Sorry, there has been an error.', 'bimeson_item' ) . '</strong><br>';
 			echo esc_html( $file['error'] ) . '</p>';
-			return false;
+			return null;
 		} else if ( ! file_exists( $file['file'] ) ) {
 			echo '<p><strong>' . esc_html__( 'Sorry, there has been an error.', 'bimeson_item' ) . '</strong><br>';
 			printf( esc_html__( 'The file could not be found at <code>%s</code>.', 'bimeson_item' ), esc_html( $file['file'] ) );
 			echo '</p>';
-			return false;
+			return null;
 		}
-		$this->_id = (int) $file['id'];
-		return true;
+		$this->_file_id = (int) $file['id'];
+		return $this->_file_id;
 	}
 
-	private function _parse_upload() {
-		$url = wp_get_attachment_url( $this->_id );
-?>
-<form action="<?php echo admin_url( 'admin.php?import=bimeson&amp;step=2' ); ?>" method="post" name="form">
-	<?php wp_nonce_field( 'import-bimeson' ); ?>
-	<input type="hidden" name="import_id" value="<?php echo $this->_id; ?>">
-	<input type="hidden" name="bimeson_items" id="bimeson-items" value="">
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			BIMESON.loadFiles(['<?php echo $url; ?>'], '#bimeson-items', function (successAll) {
-				if (successAll) document.form.submit.disabled = false;
-				else document.getElementById('error').style.display = 'block';
-			});
-		});
-	</script>
-
-	<h3><?php esc_html_e( 'Add Terms', 'bimeson_item' ); ?></h3>
-	<p>
-		<input type="radio" value="taxonomy" name="do_nothing" id="do-nothing" checked>
-		<label for="do-nothing"><?php esc_html_e( 'Do nothing', 'bimeson_item' ); ?></label>
-	</p>
-	<p>
-		<input type="radio" value="taxonomy" name="add_terms" id="add-taxonomies-terms">
-		<label for="add-taxonomies-terms"><?php esc_html_e( 'Add category groups themselves', 'bimeson_item' ); ?></label>
-	</p>
-	<p>
-		<input type="radio" value="term" name="add_terms" id="add-terms">
-		<label for="add-terms"><?php esc_html_e( 'Add categories to the category group', 'bimeson_item' ); ?></label>
-	</p>
-
-	<p class="submit"><input type="submit" name="submit" disabled class="button" value="<?php esc_attr_e( 'Start Import', 'bimeson_item' ); ?>"></p>
-</form>
-<?php
-		echo '<p id="error" style="display: none;"><strong>' . esc_html__( 'Sorry, failed to read the file.', 'bimeson_item' ) . '</strong><br>';
-	}
-
-
-	// Step 2 ------------------------------------------------------------------
-
-
-	private function _import( $json ) {
-		add_filter( 'http_request_timeout', function ( $val ) { return 60; } );
-
-		$this->_import_start( $json );
-		wp_suspend_cache_invalidation( true );
-		echo '<div style="margin-top:1em;max-height:50vh;overflow:auto;">';
-		process_terms( $this->_items, $this->_add_taxonomies, $this->_add_terms );
-		process_items( $this->_items, $this->_file_name );
-		echo '</div>';
-		wp_suspend_cache_invalidation( false );
-		$this->_import_end();
-	}
-
-	private function _import_start( $json ) {
-		$data = json_decode( $json, true );
-		if ( $data === null ) {
-			echo '<p><strong>' . esc_html__( 'Sorry, there has been an error.', 'bimeson_item' ) . '</strong><br>';
-			esc_html_e( 'The content of the file is wrong, please try again.', 'bimeson_item' ) . '</p>';
-			$this->_footer();
-			die();
-		}
-		$this->_items = $data;
-		do_action( 'import_start' );
-	}
-
-	private function _import_end() {
-		wp_import_cleanup( $this->_id );
-		wp_cache_flush();
-		echo '<p>' . esc_html__( 'All done.', 'bimeson_item' ) . '</p>';
-		do_action( 'import_end' );
+	private function _parse_upload( int $file_id ) {
+		$_url   = esc_attr( wp_get_attachment_url( $file_id ) );
+		$_fname = esc_attr( pathinfo( get_attached_file( $file_id ), PATHINFO_FILENAME ) );
+		$_ajax  = esc_attr( $this->_ajax_request_url );
+		?>
+		<input type="hidden" id="import-url" value="<?php echo $_url; ?>">
+		<input type="hidden" id="import-file-id" value="<?php echo $file_id; ?>">
+		<input type="hidden" id="import-file-name" value="<?php echo $_fname; ?>">
+		<input type="hidden" id="import-ajax" value="<?php echo $_ajax; ?>">
+		<div id="section-option">
+			<h3><?php esc_html_e( 'Add Terms', 'bimeson_item' ); ?></h3>
+			<p>
+				<label>
+					<input type="radio" id="do-nothing" checked>
+					<?php esc_html_e( 'Do nothing', 'bimeson_item' ); ?>
+				</label>
+			</p>
+			<p>
+				<label>
+					<input type="radio" id="add-tax">
+					<?php esc_html_e( 'Add category groups themselves', 'bimeson_item' ); ?>
+				</label>
+			</p>
+			<p>
+				<label>
+					<input type="radio" id="add-term">
+					<?php esc_html_e( 'Add categories to the category group', 'bimeson_item' ); ?>
+				</label>
+			</p>
+		</div>
+		<p class="submit">
+			<button type="button" id="btn-start-import" class="button"><?php esc_html_e( 'Start Import' ); ?></button>
+		</p>
+		<div id="msg-response" style="margin-top:1rem;max-height:50vh;overflow:auto;"></div>
+		<p id="msg-success" hidden><strong><?php esc_html_e( 'All done.', 'bimeson_item' ); ?></strong></p>
+		<p id="msg-failure" hidden><strong><?php esc_html_e( 'Sorry, failed to read the file.', 'bimeson_item' ); ?></strong></p>
+		<?php
 	}
 
 }

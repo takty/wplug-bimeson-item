@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-07-21
  */
 
 namespace wplug\bimeson_item;
@@ -299,11 +299,12 @@ function _update_term_meta_by_post( int $term_id, string $key ) {
 // -----------------------------------------------------------------------------
 
 
-function process_terms( array $items, bool $add_taxonomies = false, bool $add_terms = false ) {
+function process_terms( array $items, bool $add_taxonomies = false, bool $add_terms = false ): array {  // Called by importer
 	$inst         = _get_instance();
 	$roots_subs   = get_root_slug_to_sub_slugs();
 	$new_tax_term = [];
 	$new_term     = [];
+	$msgs         = [];
 
 	foreach ( $items as $item ) {
 		foreach ( $item as $key => $vals ) {
@@ -324,35 +325,39 @@ function process_terms( array $items, bool $add_taxonomies = false, bool $add_te
 		}
 	}
 	if ( $add_taxonomies ) {
-		foreach ( $new_tax_term as $slug => $terms ) {
-			wp_insert_term( $slug, $inst->root_tax, [ 'slug' => $slug ] );
+		foreach ( $new_tax_term as $rs => $terms ) {
+			wp_insert_term( $rs, $inst->root_tax, [ 'slug' => $rs ] );
 
-			$sub_tax = root_term_to_sub_tax( $slug );
+			$sub_tax = root_term_to_sub_tax( $rs );
 			_register_sub_tax( $sub_tax, $sub_tax );
+
+			$m      = sprintf( __( 'Add new category group "%s"' ), $rs );
+			$msgs[] = $m;
 
 			if ( $add_terms ) {
 				foreach ( $terms as $t ) {
 					$ret = wp_insert_term( $t, $sub_tax, [ 'slug' => $t ] );
 					if ( is_array( $ret ) ) {
-						if ( ! isset( $roots_subs[ $slug ] ) ) $roots_subs[ $slug ] = [];
-						$roots_subs[ $slug ][] = $t;
+						$m      = sprintf( __( 'Add new category "%s" to "%s"' ), $t, $rs );
+						$msgs[] = $m;
 					}
 				}
 			}
 		}
 	}
 	if ( $add_terms ) {
-		foreach ( $new_term as $slug => $terms ) {
-			$sub_tax = root_term_to_sub_tax( $slug );
+		foreach ( $new_term as $rs => $terms ) {
+			$sub_tax = root_term_to_sub_tax( $rs );
 			if ( ! taxonomy_exists( $sub_tax ) ) continue;
 
 			foreach ( $terms as $t ) {
 				$ret = wp_insert_term( $t, $sub_tax, [ 'slug' => $t ] );
 				if ( is_array( $ret ) ) {
-					if ( ! isset( $roots_subs[ $slug ] ) ) $roots_subs[ $slug ] = [];
-					$roots_subs[ $slug ][] = $t;
+					$m      = sprintf( __( 'Add new category "%s" to "%s"' ), $t, $rs );
+					$msgs[] = $m;
 				}
 			}
 		}
 	}
+	return $msgs;
 }

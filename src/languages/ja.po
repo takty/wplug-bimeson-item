@@ -128,6 +128,18 @@ msgstr "ファイルの内容に問題があります。もう一度、お試し
 msgid "All done."
 msgstr "すべてインポートしました。"
 
+msgid "Add new category group \"%s\""
+msgstr "新規分類グループ「%s」を追加"
+
+msgid "Add new category \"%s\" to \"%s\""
+msgstr "新規分類「%s」を「%s」に追加"
+
+msgid "<strong>New</strong>"
+msgstr "<strong>新規</strong>"
+
+msgid "<strong>Updated</strong>"
+msgstr "<strong>更新</strong>"
+
 # 'Import <strong>publications</strong> from an Excel file.',                                                'ja', 'Excelファイルから業績をインポートします。'
 # 'Import Publication List',                                                                                 'ja', '業績リストのインポート'
 # 'Upload your Bimeson-formatted Excel (xlsx) file and we&#8217;ll import the publications into this site.', 'ja', 'Bimeson形式の Excel (xlsx) ファイルをアップロードすると、このサイトに文書がインポートされます。'
@@ -142,3 +154,7 @@ msgstr "すべてインポートしました。"
 # 'Sorry, there has been an error.',                                                                         'ja', '申し訳ありません。エラーが発生しました。'
 # 'The content of the file is wrong, please try again.',                                                     'ja', 'ファイルの内容に問題があります。もう一度、お試しください。'
 # 'All done.',                                                                                               'ja', 'すべてインポートしました。'
+# 'Add new category group "%s"',                                                                             'ja', '新規分類グループ「%s」を追加'
+# 'Add new category "%s" to "%s"',                                                                           'ja', '新規分類「%s」を「%s」に追加'
+# '<strong>New</strong>',                                                                                    'ja', '<strong>新規</strong>'
+# '<strong>Updated</strong>',                                                                                'ja', '<strong>更新</strong>'
