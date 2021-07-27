@@ -34,8 +34,8 @@ msgstr "分類グループ"
 msgid "Category"
 msgstr "分類"
 
-msgid "Filter"
-msgstr "フィルター"
+msgid "List"
+msgstr "リスト"
 
 msgid "Omit the heading of the last category group"
 msgstr "一番最後の分類グループの見出しを省略する"

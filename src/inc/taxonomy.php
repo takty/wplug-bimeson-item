@@ -276,7 +276,7 @@ function _bool_field( \WP_Term $term, string $key, string $label ) {
 	$val = get_term_meta( $term->term_id, $key, true );
 	?>
 	<tr class="form-field">
-		<th style="padding-bottom: 20px;"><label for="<?php echo $key ?>"><?php esc_html_e( 'Filter', 'bimeson_item' ); ?></label></th>
+		<th style="padding-bottom: 20px;"><label for="<?php echo $key ?>"><?php esc_html_e( 'List', 'bimeson_item' ); ?></label></th>
 		<td style="padding-bottom: 20px;">
 			<label>
 				<input type="checkbox" name="<?php echo $key ?>" id="<?php echo $key ?>" <?php checked( $val, 1 ) ?>/>
