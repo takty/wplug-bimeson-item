@@ -51,7 +51,7 @@ msgstr "閲覧画面から隠す"
 
 # Template Admin ---------------------------------------------------------------
 
-msgid "Publication list"
+msgid "Publication List"
 msgstr "業績リスト"
 
 msgid "Target period (years):"
