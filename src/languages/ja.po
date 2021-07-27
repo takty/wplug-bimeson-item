@@ -1,7 +1,7 @@
 # Translation of Bimeson Item - Development in Japanese
 # @package Bimeson Item
 # @author Takuto Yanagida
-# @version 2021-07-20
+# @version 2021-07-27
 
 # Post Type --------------------------------------------------------------------
 
@@ -37,17 +37,17 @@ msgstr "分類"
 msgid "Filter"
 msgstr "フィルター"
 
-msgid "Omit the last category group"
-msgstr "一番最後の分類グループを省略する"
+msgid "Omit the heading of the last category group"
+msgstr "一番最後の分類グループの見出しを省略する"
 
 msgid "Hide from view screen"
 msgstr "閲覧画面から隠す"
 
-# 'Category group',               'ja', '分類グループ'
-# 'Category',                     'ja', '分類'
-# 'Filter',                       'ja', 'フィルター'
-# 'Omit the last category group', 'ja', '一番最後の分類グループを省略する'
-# 'Hide from view screen',        'ja', '閲覧画面から隠す'
+# 'Category group',                              'ja', '分類グループ'
+# 'Category',                                    'ja', '分類'
+# 'Filter',                                      'ja', 'フィルター'
+# 'Omit the heading of the last category group', 'ja', '一番最後の分類グループの見出しを省略する'
+# 'Hide from view screen',                       'ja', '閲覧画面から隠す'
 
 # Template Admin ---------------------------------------------------------------
 

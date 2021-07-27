@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-21
+ * @version 2021-07-27
  */
 
 namespace wplug\bimeson_item;
@@ -268,7 +268,7 @@ function _cb_taxonomy_edit_form_fields( \WP_Term $term, string $tax ) {
 	if ( $tax === $inst->root_tax ) {
 		_bool_field( $term, $inst::KEY_IS_HIDDEN, __( 'Hide from view screen', 'bimeson_item' ) );
 	} else {
-		_bool_field( $term, $inst::KEY_LAST_CAT_OMITTED, __( 'Omit the last category group', 'bimeson_item' ) );
+		_bool_field( $term, $inst::KEY_LAST_CAT_OMITTED, __( 'Omit the heading of the last category group', 'bimeson_item' ) );
 	}
 }
 
