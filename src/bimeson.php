@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-07-28
  */
 
 namespace wplug\bimeson_item;
@@ -139,8 +139,10 @@ function _get_data( int $post_id, string $lang ): array {
 
 function get_filtered_items( string $lang, ?string $date_bgn, ?string $date_end, ?array $filter_state ) {
 	$inst = _get_instance();
-	$tq   = [];
-	$mq   = [];
+	if ( isset( $filter_state[ $inst::KEY_VISIBLE ] ) ) unset( $filter_state[ $inst::KEY_VISIBLE ] );
+
+	$tq = [];
+	$mq = [];
 
 	foreach ( $filter_state as $rs => $slugs ) {
 		$sub_tax        = root_term_to_sub_tax( $rs );

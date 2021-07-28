@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-27
+ * @version 2021-07-28
  */
 
 namespace wplug\bimeson_item;
@@ -36,6 +36,7 @@ function echo_the_filter( ?array $filter_state, array $years_exist, string $befo
 
 
 function echo_filter( ?array $filter_state, array $years_exist ) {
+	$inst        = _get_instance();
 	$rs_to_terms = get_root_slug_to_sub_terms( false, true );
 	$state       = _get_filter_state_from_query();
 
@@ -45,14 +46,14 @@ function echo_filter( ?array $filter_state, array $years_exist ) {
 			_echo_tax_checkboxes( $rs, $terms, $state );
 		}
 	} else {
+		$vs = $filter_state[ $inst::KEY_VISIBLE ] ?? null;
 		foreach ( $rs_to_terms as $rs => $terms ) {
 			$fs = $filter_state[ $rs ] ?? [];
-			if ( 1 !== count( $fs ) ) {
+			if ( 1 !== count( $fs ) && ( is_null( $vs ) || in_array( $rs, $vs, true ) ) ) {
 				_echo_tax_checkboxes( $rs, $terms, $state, empty( $fs ) ? null : $fs );
 			}
 		}
 	}
-	$inst = _get_instance();
 	echo "<input type=\"hidden\" value=\"{$inst->sub_tax_cls_base}\" id=\"bimeson-sub-tax-cls-base\">";
 	echo "<input type=\"hidden\" value=\"{$inst->sub_tax_qvar_base}\" id=\"bimeson-sub-tax-qvar-base\">";
 	echo "<input type=\"hidden\" value=\"{$inst->year_cls_base}\" id=\"bimeson-year-cls-base\">";

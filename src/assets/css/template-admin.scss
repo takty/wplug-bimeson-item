@@ -3,13 +3,13 @@
  * Bimeson (Template Admin)
  *
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-07-28
  *
  */
 
 
 .bimeson-admin {
-	input[type='number'] {
+	input[type="number"] {
 		padding-right: 0;
 		width: 4.5rem;
 	}
@@ -31,13 +31,13 @@
 		padding    : 8px;
 		user-select: none;
 	}
-	input[type=checkbox] {
+	input[type="checkbox"] {
 		margin-top: 0;
 	}
 }
 
 .bimeson-admin-filter-row {
-	padding      : 6px;
+	padding      : 12px;
 	border       : 1px solid #ddd;
 	border-radius: 4px;
 }
@@ -46,20 +46,15 @@
 /* -------------------------------------------------------------------------- */
 
 
-.bimeson-admin-filter-key {
-	display    : flex;
-	align-items: flex-start;
-
-	margin-top: 6px;
-}
-
 .bimeson-admin-filter-key + .bimeson-admin-filter-key {
-	margin-top: 12px;
+	margin-top: 18px;
 }
 
 .bimeson-admin-filter-key-inner > div:first-child {
 	display    : flex;
 	align-items: center;
+
+	label:last-child { margin-left: auto; }
 }
 
 .bimeson-admin-filter-cat {
@@ -87,7 +82,7 @@
 /* -------------------------------------------------------------------------- */
 
 
-input[type=checkbox].tgl { display: none; }
+input[type="checkbox"].tgl { display: none; }
 
 .tgl + .tgl-btn {
 	box-sizing: content-box;

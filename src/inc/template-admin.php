@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-07-28
  */
 
 namespace wplug\bimeson_item;
@@ -135,15 +135,23 @@ function _echo_tax_checkboxes_admin( string $root_slug, array $terms, array $sta
 	$t          = get_term_by( 'slug', $root_slug, $inst->root_tax );
 	$_cat_label = esc_html( $func( $t ) );
 	$_slug      = esc_attr( $root_slug );
+	$_sub_tax   = esc_attr( root_term_to_sub_tax( $root_slug ) );
 	$qvs        = $state[ $root_slug ];
 	$checked    = ( ! empty( $qvs ) ) ? ' checked' : '';
+
+	$visible = empty( $state[ $inst::KEY_VISIBLE ] ) ? true : in_array( $root_slug, $state[ $inst::KEY_VISIBLE ], true );
+	$vc      = $visible ? ' checked' : '';
 ?>
 	<div class="bimeson-admin-filter-key" data-key="<?php echo $_slug; ?>">
 		<div class="bimeson-admin-filter-key-inner">
 			<div>
-				<input type="checkbox" class="bimeson-admin-filter-switch tgl tgl-light" id="<?php echo $_slug; ?>" name="<?php echo $_slug; ?>"<?php echo $checked; ?> value="1">
+				<input type="checkbox" class="bimeson-admin-filter-switch tgl tgl-light" id="<?php echo $_slug; ?>" name="<?php echo $_sub_tax; ?>"<?php echo $checked; ?> value="1">
 				<label class="tgl-btn" for="<?php echo $_slug; ?>"></label>
 				<span class="bimeson-admin-filter-cat"><label for="<?php echo $_slug; ?>"><?php echo $_cat_label; ?></label></span>
+				<label>
+					<input type="checkbox" class="bimeson-admin-filter-visible" name="<?php echo $inst::NAME_VISIBLE . '[]'; ?>"<?php echo $vc; ?> value="<?php echo $_slug; ?>">
+					<?php esc_html_e( 'Visible' ); ?>
+				</label>
 			</div>
 			<div class="bimeson-admin-filter-cbs">
 <?php
@@ -154,7 +162,7 @@ function _echo_tax_checkboxes_admin( string $root_slug, array $terms, array $sta
 		$checked = in_array( $t->slug, $qvs, true ) ? ' checked' : '';
 ?>
 				<label>
-					<input type="checkbox" name="<?php echo $_name; ?>"<?php echo $checked; ?> value="<?php echo $_val; ?>">
+					<input type="checkbox" name="<?php echo $_sub_tax . '_slugs[]'; ?>"<?php echo $checked; ?> value="<?php echo $_val; ?>">
 					<?php echo $_label; ?>
 				</label>
 <?php
@@ -190,16 +198,14 @@ function _get_filter_state_from_meta( \WP_Post $post ): array {
 function _get_filter_state_from_env(): array {
 	$ret = [];
 
-	foreach ( get_root_slug_to_sub_terms() as $rs => $terms ) {
-		if ( ! isset( $_POST[ $rs ] ) ) continue;
-		$temp = [];
-
-		foreach ( $terms as $t ) {
-			$name = sub_term_to_name( $t );
-			$val  = $_POST[ $name ] ?? false;
-			if ( $val ) $temp[] = $t->slug;
-		}
-		$ret[ $rs ] = $temp;
+	foreach ( get_root_slug_to_sub_slugs() as $rs => $slugs ) {
+		$sub_tax = root_term_to_sub_tax( $rs );
+		if ( ! isset( $_POST[ $sub_tax ] ) || ! isset( $_POST[ "{$sub_tax}_slugs" ] ) ) continue;
+		$ret[ $rs ] = array_intersect( $slugs, $_POST[ "{$sub_tax}_slugs" ] );
+	}
+	$inst = _get_instance();
+	if ( isset( $_POST[ $inst::NAME_VISIBLE ] ) ) {
+		$ret[ $inst::KEY_VISIBLE ] = array_intersect( get_root_slugs(), $_POST[ $inst::NAME_VISIBLE ] );
 	}
 	return $ret;
 }

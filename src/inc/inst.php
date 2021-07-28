@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-07-28
  */
 
 namespace wplug\bimeson_item;
@@ -24,6 +24,9 @@ function _get_instance(): object {
 	$values = new class() {
 
 		// Template Admin
+
+		const KEY_VISIBLE  = '_visible';
+		const NAME_VISIBLE = '_bimeson_visible';
 
 		public $FLD_LIST_ID;
 		public $FLD_YEAR_START;
