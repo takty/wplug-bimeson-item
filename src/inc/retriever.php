@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-07-28
  */
 
 namespace wplug\bimeson_item;
@@ -188,7 +188,7 @@ function _assign_cat_key( array $items ): array {
 	return $items;
 }
 
-function _make_cat_key( array $it, array $rs_to_slugs, array $rs_to_depths, array $slug_to_ancestors ): string {
+function _make_cat_key( array $it, array $rs_to_slugs, array $rs_to_depths, array $slug_to_ancestors ): array {
 	$cats = [];
 	foreach ( $rs_to_slugs as $rs => $slugs ) {
 		if ( ! isset( $rs_to_depths[ $rs ] ) ) continue;
@@ -204,7 +204,7 @@ function _make_cat_key( array $it, array $rs_to_slugs, array $rs_to_depths, arra
 		}
 		for ( $i = 0; $i < $depth; $i += 1 ) $cats[] = '';
 	}
-	return implode( ',', $cats );
+	return $cats;
 }
 
 

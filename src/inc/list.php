@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-07-28
  */
 
 namespace wplug\bimeson_item;
@@ -108,8 +108,8 @@ function _make_omitted_heading( ?array $filter_state ): ?array {
 }
 
 function _get_cat_slug( array $it, int $hr_size ): array {
-	$inst = _get_instance();
-	$cat_slugs = explode( ',', $it[ $inst::IT_CAT_KEY ] );
+	$inst      = _get_instance();
+	$cat_slugs = $it[ $inst::IT_CAT_KEY ];
 	if ( count( $cat_slugs ) !== $hr_size ) {  // for invalid sort key
 		$cat_slugs = array_pad( $cat_slugs, $hr_size, '' );
 	}
