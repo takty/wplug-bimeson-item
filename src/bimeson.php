@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-28
+ * @version 2021-08-04
  */
 
 namespace wplug\bimeson_item;
@@ -23,8 +23,7 @@ require_once __DIR__ . '/inc/shortcode.php';
 function initialize( array $args = [] ) {
 	$inst = _get_instance();
 
-	$key_base = $args['key_base'] ?? '_bimeson_';
-	_set_key_base( $key_base );
+	_set_key( $args['key'] ?? '_bimeson' );
 
 	$url_to = untrailingslashit( $args['url_to'] ?? get_file_uri( __DIR__ ) );
 	$lang   = $args['lang']     ?? '';
@@ -123,7 +122,7 @@ function _get_data( int $post_id, string $lang ): array {
 	$d = get_template_admin_config( $post_id );
 
 	// Bimeson Item
-	$items = get_filtered_items( $lang, $d['year_bgn'], $d['year_end'], $d['filter_state'] );
+	$items = get_filtered_items( $lang, (string) $d['year_bgn'], (string) $d['year_end'], $d['filter_state'] );
 	[ $items, $years_exist ] = retrieve_items( $items, $d['count'], $d['sort_by_date_first'], $d['dup_multi_cat'] );
 
 	$d['items']       = $items;

@@ -3,7 +3,7 @@
  * Bimeson (Template Admin)
  *
  * @author Takuto Yanagida
- * @version 2021-07-28
+ * @version 2021-08-04
  *
  */
 
@@ -18,13 +18,13 @@
 	}
 }
 
-.bimeson-admin-setting-row {
+.bimeson-admin-config-row {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 }
 
-.bimeson-admin-setting-cbs {
+.bimeson-admin-config-cbs {
 	> label {
 		display    : inline-flex;
 		align-items: center;
