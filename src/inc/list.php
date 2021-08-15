@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-28
+ * @version 2021-08-15
  */
 
 namespace wplug\bimeson_item;
@@ -15,7 +15,7 @@ function echo_the_list( array $args, string $lang, string $before = '<div class=
 
 	echo $before;
 	if ( is_null( $args['count'] ) ) {
-		_echo_heading_list_element( $args['items'], $lang, $args['sort_by_date_first'], $args['omit_single_cat'] ? $args['filter_state'] : null );
+		_echo_heading_list_element( $args['items'], $lang, $args['sort_by_date_first'], $args['omit_single_cat'], $args['filter_state'] );
 	} else {
 		_echo_list_element( $args['items'], $lang );
 	}
@@ -26,18 +26,20 @@ function echo_the_list( array $args, string $lang, string $before = '<div class=
 // -----------------------------------------------------------------------------
 
 
-function _echo_heading_list_element( array $its, string $lang, bool $sort_by_date_first, ?array $filter_state ) {
+function _echo_heading_list_element( array $its, string $lang, bool $sort_by_date_first, bool $omit_single_cat, ?array $filter_state ) {
 	$inst = _get_instance();
+	$vs   = $filter_state[ $inst::KEY_VISIBLE ] ?? null;
 
 	$root_slug_to_depth    = get_root_slug_to_sub_depths();
 	$sub_slug_to_last_omit = get_sub_slug_to_last_omit();
 
 	$last_cat_depth  = $root_slug_to_depth[ array_key_last( $root_slug_to_depth ) ];
-	$omitted_heading = _make_omitted_heading( $filter_state );
+	$omitted_heading = $omit_single_cat ? _make_omitted_heading( $filter_state ) : null;
 
 	$hr_size_orig = 0;
 	$hr_to_sub_tax = [];
 	foreach ( $root_slug_to_depth as $rs => $d ) {
+		if ( ! is_null( $vs ) && ! in_array( $rs, $vs, true ) ) continue;
 		$hr_size_orig += $d;
 		for ( $i = 0; $i < $d; $i++ ) $hr_to_sub_tax[] = $inst->sub_taxes[ $rs ];
 	}

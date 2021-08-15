@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-08-15
  *
  * [publication list="<slug or post ID>" count="10" date-sort omit-single dup-item date="2020-2021" taxonomy="slug1, slug2, ..."]
  */
@@ -49,7 +49,7 @@ function _get_date_shortcode( array $atts, string $lang ) {
 
 	// Bimeson Item
 	$items = get_filtered_items( $lang, $date_bgn, $date_end, $filter_state );
-	[ $items, $years_exist ] = retrieve_items( $items, $count, $sort_by_date_first, $dup_multi_cat );
+	[ $items, $years_exist ] = retrieve_items( $items, $count, $sort_by_date_first, $dup_multi_cat, $filter_state );
 
 	$d = compact( 'count', 'sort_by_date_first', 'omit_single_cat', 'filter_state' );
 

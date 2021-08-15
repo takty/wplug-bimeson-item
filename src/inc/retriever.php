@@ -4,20 +4,21 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-07-28
+ * @version 2021-08-15
  */
 
 namespace wplug\bimeson_item;
 
-function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat ) {
+function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat, ?array $filter_state ) {
 	$rs_idx = _make_rs_idx();
+	$vs     = $filter_state[ _get_instance()::KEY_VISIBLE ] ?? null;
 
 	$items = _align_sub_slugs( $items, $rs_idx );
 	if ( $dup_multi_cat ) $items = _duplicate_items( $items );
-	_sort_list_items( $items, $sort_by_date_first, $rs_idx );
+	_sort_list_items( $items, $sort_by_date_first, $rs_idx, $vs );
 
 	if ( is_numeric( $count ) && 0 < $count ) array_splice( $items, $count );
-	$items = _assign_cat_key( $items );
+	$items       = _assign_cat_key( $items, $vs );
 	$years_exist = _collect_existing_year( $items );
 
 	return [ $items, $years_exist ];
@@ -117,9 +118,14 @@ function _generate_combination( array $arrays ): array {
 // -----------------------------------------------------------------------------
 
 
-function _sort_list_items( array &$items, bool $sort_by_date_first, array $rs_idx ) {
+function _sort_list_items( array &$items, bool $sort_by_date_first, array $rs_idx, ?array $visible_state ) {
 	$inst = _get_instance();
 
+	if ( ! is_null( $visible_state ) ) {
+		foreach ( $rs_idx as $rs => $v ) {
+			if ( ! in_array( $rs, $visible_state, true ) ) unset( $rs_idx[ $rs ] );
+		}
+	}
 	$inst->rs_idx = $rs_idx;
 	if ( $sort_by_date_first ) {
 		usort( $items, '\wplug\bimeson_item\_compare_item_by_date_cat' );
@@ -175,13 +181,18 @@ function _get_first_sub_slug_index( array $item, string $rs, array $rs_idx ): in
 // -----------------------------------------------------------------------------
 
 
-function _assign_cat_key( array $items ): array {
+function _assign_cat_key( array $items, ?array $visible_state ): array {
 	$inst = _get_instance();
 
 	$rs_to_slugs       = get_root_slug_to_sub_slugs();
 	$rs_to_depths      = get_root_slug_to_sub_depths();
 	$slug_to_ancestors = get_sub_slug_to_ancestors();
 
+	if ( ! is_null( $visible_state ) ) {
+		foreach ( $rs_to_depths as $rs => $d ) {
+			if ( ! in_array( $rs, $visible_state, true ) ) unset( $rs_to_depths[ $rs ] );
+		}
+	}
 	foreach ( $items as &$it ) {
 		$it[ $inst::IT_CAT_KEY ] = _make_cat_key( $it, $rs_to_slugs, $rs_to_depths, $slug_to_ancestors );
 	}
