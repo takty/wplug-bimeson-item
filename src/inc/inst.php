@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-04
+ * @version 2021-08-31
  */
 
 namespace wplug\bimeson_item;
@@ -23,17 +23,22 @@ function _get_instance(): object {
 	}
 	$values = new class() {
 
-		// Template Admin
+		// Template Admin.
 
-		const KEY_VISIBLE  = '_visible';
+		const KEY_VISIBLE = '_visible';
 
-		public $FLD_LIST_CFG = '_bimeson';
+		/**
+		 * The meta key of list config.
+		 *
+		 * @var 1.0
+		 */
+		public $fld_list_cfg = '_bimeson';
 
-		// Post Type
+		// Post Type.
 
-		const PT = 'bimeson';  // Each post means publication (bimeson)
+		const PT = 'bimeson';  // Each post means publication (bimeson).
 
-		// Item
+		// Item.
 
 		const IT_BODY       = '_body';
 		const IT_DATE       = '_date';
@@ -49,20 +54,51 @@ function _get_instance(): object {
 		const IT_DIGEST      = '_digest';
 		const IT_EDIT_URL    = '_edit_url';
 
-		public $_is_current_post_content_empty;
+		// Common.
 
-		// Common
+		/**
+		 * First heading level of publication lists.
+		 *
+		 * @var 1.0
+		 */
+		public $head_level = 3;
 
-		public $head_level       = 3;
-		public $year_format      = null;
+		/**
+		 * Year heading format.
+		 *
+		 * @var 1.0
+		 */
+		public $year_format = null;
+
+		/**
+		 * Callable for getting term names.
+		 *
+		 * @var 1.0
+		 */
 		public $term_name_getter = null;
 
-		public $cache  = [];
+		/**
+		 * Data cache.
+		 *
+		 * @var 1.0
+		 */
+		public $cache = array();
+
+		/**
+		 * The array of root slug to sub slug indices.
+		 *
+		 * @var 1.0
+		 */
 		public $rs_idx = null;
 
+		/**
+		 * Additional languages.
+		 *
+		 * @var 1.0
+		 */
 		public $additional_langs;
 
-		// Taxonomy
+		// Taxonomy.
 
 		const KEY_LAST_CAT_OMITTED = '_bimeson_last_cat_omitted';
 		const KEY_IS_HIDDEN        = '_bimeson_is_hidden';
@@ -72,35 +108,111 @@ function _get_instance(): object {
 		const DEFAULT_SUB_TAX_CLS_BASE  = 'bm-cat-';
 		const DEFAULT_SUB_TAX_QVAR_BASE = 'bm_';
 
+		/**
+		 * Root taxonomy slug.
+		 *
+		 * @var 1.0
+		 */
 		public $root_tax;
+
+		/**
+		 * Slug base of sub taxonomies.
+		 *
+		 * @var 1.0
+		 */
 		public $sub_tax_base;
+
+		/**
+		 * Class base of sub taxonomies.
+		 *
+		 * @var 1.0
+		 */
 		public $sub_tax_cls_base;
+
+		/**
+		 * Query variable name base of sub taxonomies.
+		 *
+		 * @var 1.0
+		 */
 		public $sub_tax_qvar_base;
 
 		const DEFAULT_YEAR_CLS_BASE = 'bm-year-';
 		const DEFAULT_YEAR_QVAR     = 'bm_year';
 
+		/**
+		 * Class base of year.
+		 *
+		 * @var 1.0
+		 */
 		public $year_cls_base;
+
+		/**
+		 * Query variable name of year.
+		 *
+		 * @var 1.0
+		 */
 		public $year_qvar;
 
-		public $sub_taxes        = [];
-		public $old_tax          = [];
-		public $old_terms        = [];
-		public $root_terms       = null;
-		public $sub_tax_to_terms = [];
+		/**
+		 * The sub taxonomy slugs.
+		 *
+		 * @var 1.0
+		 */
+		public $sub_taxes = array();
 
-		// Filter
+		/**
+		 * Previously edited taxonomy.
+		 *
+		 * @var 1.0
+		 */
+		public $old_tax = array();
+
+		/**
+		 * Previously edited terms.
+		 *
+		 * @var 1.0
+		 */
+		public $old_terms = array();
+
+		/**
+		 * The root terms.
+		 *
+		 * @var 1.0
+		 */
+		public $root_terms = null;
+
+		/**
+		 * The sub terms.
+		 *
+		 * @var 1.0
+		 */
+		public $sub_tax_to_terms = array();
+
+		// Filter.
 
 		const KEY_YEAR     = '_year';
 		const VAL_YEAR_ALL = 'all';
 
+		/**
+		 * Label of year select markup.
+		 *
+		 * @var 1.0
+		 */
 		public $year_select_label;
 
 	};
 	return $values;
 }
 
+/**
+ * Sets the meta key of list config.
+ *
+ * @access private
+ *
+ * @param string $key Key.
+ */
 function _set_key( string $key ) {
 	$inst = _get_instance();
-	$inst->FLD_LIST_CFG = $key;
+
+	$inst->fld_list_cfg = $key;
 }

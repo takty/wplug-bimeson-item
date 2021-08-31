@@ -4,28 +4,52 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-15
+ * @version 2021-08-31
  */
 
 namespace wplug\bimeson_item;
 
+require_once __DIR__ . '/class-itembuffer.php';
+
+/**
+ * Displays the list.
+ *
+ * @param array  $args   Array of arguments.
+ * @param string $lang   Language.
+ * @param string $before Content to prepend to the output.
+ * @param string $after  Content to append to the output.
+ * @param string $id     The ID of the output markup.
+ */
 function echo_the_list( array $args, string $lang, string $before = '<div class="bimeson-list"%s>', string $after = '</div>', string $id = 'bml' ) {
-	if ( ! empty( $id ) ) $id = " id=\"$id\"";
+	if ( ! empty( $id ) ) {
+		$id = " id=\"$id\"";
+	}
 	$before = sprintf( $before, $id );
 
-	echo $before;
+	echo $before;  // phpcs:ignore
 	if ( is_null( $args['count'] ) ) {
 		_echo_heading_list_element( $args['items'], $lang, $args['sort_by_date_first'], $args['omit_single_cat'], $args['filter_state'] );
 	} else {
 		_echo_list_element( $args['items'], $lang );
 	}
-	echo $after;
+	echo $after;  // phpcs:ignore
 }
 
 
 // -----------------------------------------------------------------------------
 
 
+/**
+ * Displays headings and lists.
+ *
+ * @access private
+ *
+ * @param array  $its                Array of items.
+ * @param string $lang               Language.
+ * @param bool   $sort_by_date_first Whether to sort by date first.
+ * @param bool   $omit_single_cat    Whether to omit categories which have one item.
+ * @param ?array $filter_state       Filter states.
+ */
 function _echo_heading_list_element( array $its, string $lang, bool $sort_by_date_first, bool $omit_single_cat, ?array $filter_state ) {
 	$inst = _get_instance();
 	$vs   = $filter_state[ $inst::KEY_VISIBLE ] ?? null;
@@ -36,16 +60,20 @@ function _echo_heading_list_element( array $its, string $lang, bool $sort_by_dat
 	$last_cat_depth  = $root_slug_to_depth[ array_key_last( $root_slug_to_depth ) ];
 	$omitted_heading = $omit_single_cat ? _make_omitted_heading( $filter_state ) : null;
 
-	$hr_size_orig = 0;
-	$hr_to_sub_tax = [];
+	$hr_size_orig  = 0;
+	$hr_to_sub_tax = array();
 	foreach ( $root_slug_to_depth as $rs => $d ) {
-		if ( ! is_null( $vs ) && ! in_array( $rs, $vs, true ) ) continue;
+		if ( ! is_null( $vs ) && ! in_array( $rs, $vs, true ) ) {
+			continue;
+		}
 		$hr_size_orig += $d;
-		for ( $i = 0; $i < $d; $i++ ) $hr_to_sub_tax[] = $inst->sub_taxes[ $rs ];
+		for ( $i = 0; $i < $d; $i++ ) {
+			$hr_to_sub_tax[] = $inst->sub_taxes[ $rs ];
+		}
 	}
-	$prev_cat_slug = array_pad( [], $hr_size_orig, '' );
+	$prev_cat_slug = array_pad( array(), $hr_size_orig, '' );
 
-	$buf = new ItemBuffer( $lang );
+	$buf      = new ItemBuffer( $lang );
 	$cur_year = '';
 	foreach ( $its as $it ) {
 		if ( $sort_by_date_first && isset( $it[ $inst::IT_DATE_NUM ] ) ) {
@@ -57,8 +85,8 @@ function _echo_heading_list_element( array $its, string $lang, bool $sort_by_dat
 			}
 		}
 		$cat_slugs = _get_cat_slug( $it, $hr_size_orig );
-		$hr = -1;
-		$hr_size = $hr_size_orig;
+		$hr        = -1;
+		$hr_size   = $hr_size_orig;
 
 		for ( $h = 0; $h < $hr_size_orig; $h++ ) {
 			$key = $cat_slugs[ $h ];
@@ -70,15 +98,19 @@ function _echo_heading_list_element( array $its, string $lang, bool $sort_by_dat
 				break;
 			}
 		}
-		if ( $hr !== -1 && $hr < $hr_size ) {
+		if ( -1 !== $hr && $hr < $hr_size ) {
 			$is_cat_exist = false;
 			for ( $h = $hr; $h < $hr_size; $h++ ) {
 				if ( ! empty( $cat_slugs[ $h ] ) ) {
 					$is_cat_exist = _is_cat_exist( $hr_to_sub_tax[ $h ], $cat_slugs[ $h ] );
-					if ( $is_cat_exist ) break;
+					if ( $is_cat_exist ) {
+						break;
+					}
 				}
 			}
-			if ( $is_cat_exist ) $buf->echo();
+			if ( $is_cat_exist ) {
+				$buf->echo();
+			}
 			for ( $h = $hr; $h < $hr_size; $h++ ) {
 				if ( ! empty( $cat_slugs[ $h ] ) ) {
 					if ( is_null( $omitted_heading ) || ! $omitted_heading[ $hr_to_sub_tax[ $h ] ] ) {
@@ -97,30 +129,63 @@ function _echo_heading_list_element( array $its, string $lang, bool $sort_by_dat
 // -----------------------------------------------------------------------------
 
 
+/**
+ * Creates omitted heading data.
+ *
+ * @access private
+ *
+ * @param ?array $filter_state Filter states.
+ * @return ?array Omitted heading data.
+ */
 function _make_omitted_heading( ?array $filter_state ): ?array {
-	if ( is_null( $filter_state ) ) return null;
+	if ( is_null( $filter_state ) ) {
+		return null;
+	}
 	$inst = _get_instance();
-	$ret = [];
+	$ret  = array();
 	foreach ( $inst->sub_taxes as $rs => $sub_tax ) {
 		$ret[ $sub_tax ] = false;
-		$s = $filter_state[ $rs ] ?? [];
-		if ( count( $s ) === 1 ) $ret[ $sub_tax ] = true;
+
+		$s = $filter_state[ $rs ] ?? array();
+		if ( count( $s ) === 1 ) {
+			$ret[ $sub_tax ] = true;
+		}
 	}
 	return $ret;
 }
 
+/**
+ * Retrieves category slugs.
+ *
+ * @access private
+ *
+ * @param array $it      The item.
+ * @param int   $hr_size Heading hierarchy size.
+ * @return array Slugs.
+ */
 function _get_cat_slug( array $it, int $hr_size ): array {
 	$inst      = _get_instance();
 	$cat_slugs = $it[ $inst::IT_CAT_KEY ];
-	if ( count( $cat_slugs ) !== $hr_size ) {  // for invalid sort key
+	if ( count( $cat_slugs ) !== $hr_size ) {  // for invalid sort key.
 		$cat_slugs = array_pad( $cat_slugs, $hr_size, '' );
 	}
 	return $cat_slugs;
 }
 
+/**
+ * Checks whether the category exists.
+ *
+ * @access private
+ *
+ * @param string $sub_tax Sub taxonomy slug.
+ * @param string $slug    Slug.
+ * @return bool True if the category exists.
+ */
 function _is_cat_exist( string $sub_tax, string $slug ): bool {
 	$t = get_term_by( 'slug', $slug, $sub_tax );
-	if ( ! $t ) return false;
+	if ( ! $t ) {
+		return false;
+	}
 	return true;
 }
 
@@ -128,6 +193,16 @@ function _is_cat_exist( string $sub_tax, string $slug ): bool {
 // -----------------------------------------------------------------------------
 
 
+/**
+ * Displays a heading markup.
+ *
+ * @access private
+ *
+ * @param int    $hr                 Hierarchy level.
+ * @param bool   $sort_by_date_first Whether to sort by date first.
+ * @param string $sub_tax            Sub taxonomy slug.
+ * @param string $slug               Slug.
+ */
 function _echo_heading( int $hr, bool $sort_by_date_first, string $sub_tax, string $slug ) {
 	$inst = _get_instance();
 
@@ -144,9 +219,18 @@ function _echo_heading( int $hr, bool $sort_by_date_first, string $sub_tax, stri
 	$level = $hr + $inst->head_level + ( $sort_by_date_first ? 1 : 0 );
 	$tag   = ( $level <= 6 ) ? "h$level" : 'div';
 	$depth = $level - 1;
-	echo "<$tag class=\"$slug\" data-depth=\"$depth\">$_label</$tag>\n";
+	echo "<$tag class=\"$slug\" data-depth=\"$depth\">$_label</$tag>\n";  // phpcs:ignore
 }
 
+/**
+ * Displays a year heading markup.
+ *
+ * @access private
+ *
+ * @param int    $level    Hierarchy level.
+ * @param string $date_num String of number representing date.
+ * @param string $format   String format.
+ */
 function _echo_heading_year( int $level, string $date_num, string $format ) {
 	$year = substr( $date_num, 0, 4 );
 	if ( is_string( $format ) ) {
@@ -156,57 +240,56 @@ function _echo_heading_year( int $level, string $date_num, string $format ) {
 	}
 	$tag   = ( $level <= 6 ) ? "h$level" : 'div';
 	$depth = $level - 1;
-	echo "<$tag class=\"year\" data-depth=\"$depth\">$_label</$tag>\n";
+	echo "<$tag class=\"year\" data-depth=\"$depth\">$_label</$tag>\n";  // phpcs:ignore
 }
 
 
 // -----------------------------------------------------------------------------
 
 
-class ItemBuffer {
-
-	private $_items = [];
-	private $_lang;
-
-	public function __construct( string $lang ) {
-		$this->_lang = $lang;
-	}
-
-	public function add( array $item ) {
-		$this->_items[] = $item;
-	}
-
-	public function echo() {
-		if ( ! empty( $this->_items ) ) {
-			_echo_list_element( $this->_items, $this->_lang );
-			$this->_items = [];
-		}
-	}
-
-	public function has_item(): bool {
-		return ! empty( $this->_items );
-	}
-
-}
-
+/**
+ * Displays a list markup.
+ *
+ * @access private
+ *
+ * @param array  $its  Items.
+ * @param string $lang Language.
+ */
 function _echo_list_element( array $its, string $lang ) {
 	$tag = ( count( $its ) === 1 ) ? 'ul' : 'ol';
-	echo "<$tag data-bm>\n";
-	foreach ( $its as $it ) _echo_list_item( $it, $lang );
-	echo "</$tag>\n";
+	echo "<$tag data-bm>\n";  // phpcs:ignore
+	foreach ( $its as $it ) {
+		_echo_list_item( $it, $lang );
+	}
+	echo "</$tag>\n";  // phpcs:ignore
 }
 
+/**
+ * Displays the markup of an item.
+ *
+ * @access private
+ *
+ * @param array  $it   The item.
+ * @param string $lang Language.
+ */
 function _echo_list_item( $it, $lang ) {
 	$inst = _get_instance();
 
 	$body = '';
-	if ( ! empty( $lang ) ) $body = $it[ $inst::IT_BODY . "_$lang" ] ?? '';
-	if ( empty( $body ) ) $body = $it[ $inst::IT_BODY ] ?? '';
-	if ( empty( $body ) ) return;
-
+	if ( ! empty( $lang ) ) {
+		$body = $it[ $inst::IT_BODY . "_$lang" ] ?? '';
+	}
+	if ( empty( $body ) ) {
+		$body = $it[ $inst::IT_BODY ] ?? '';
+	}
+	if ( empty( $body ) ) {
+		return;
+	}
+	// phpcs:disable
 	$doi   = $it[ $inst::IT_DOI ]        ?? '';
 	$url   = $it[ $inst::IT_LINK_URL ]   ?? '';
 	$title = $it[ $inst::IT_LINK_TITLE ] ?? '';
+	// phpcs:enable
 
 	$_doi = '';
 	if ( ! empty( $doi ) ) {
@@ -226,22 +309,32 @@ function _echo_list_item( $it, $lang ) {
 	}
 	$_cls = esc_attr( _make_cls( $it ) );
 
-	echo "<li class=\"$_cls\"><div>\n";
-	echo "<span class=\"body\">$body</span>$_link$_doi\n";
-	echo "</div></li>\n";
+	echo "<li class=\"$_cls\"><div>\n";  // phpcs:ignore
+	echo "<span class=\"body\">$body</span>$_link$_doi\n";  // phpcs:ignore
+	echo "</div></li>\n";  // phpcs:ignore
 }
 
+/**
+ * Creates CSS class of an item.
+ *
+ * @access private
+ *
+ * @param array $it The item.
+ * @return string CSS class.
+ */
 function _make_cls( array $it ): string {
 	$inst = _get_instance();
-	$cs   = [];
+	$cs   = array();
 
 	$year = $it[ $inst::IT_DATE_NUM ] ?? '';
 	if ( ! empty( $year ) ) {
 		$cs[] = $inst->year_cls_base . substr( '' . $year, 0, 4 );
 	}
 	foreach ( $inst->sub_taxes as $rs => $sub_tax ) {
-		$ss = $it[ $rs ] ?? [];
-		foreach ( $ss as $s ) $cs[] = $inst->sub_tax_cls_base . "$rs-$s";
+		$ss = $it[ $rs ] ?? array();
+		foreach ( $ss as $s ) {
+			$cs[] = $inst->sub_tax_cls_base . "$rs-$s";
+		}
 	}
 	return str_replace( '_', '-', implode( ' ', $cs ) );
 }

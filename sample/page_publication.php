@@ -1,15 +1,13 @@
 <?php
 /**
- *
  * The Template for Publication Static Pages
  *
  * Template Name: Publications
  *
+ * @package Sample
  * @author Takuto Yanagida
- * @version 2021-07-20
- *
+ * @version 2021-08-31
  */
-
 
 get_header();
 ?>
@@ -17,9 +15,10 @@ get_header();
 		<main id="main" class="site-main" role="main">
 
 <?php
-while ( have_posts() ) : the_post();
+while ( have_posts() ) {
+	the_post();
 	get_template_part( 'template-parts/entry', 'page' );
-endwhile;
+}
 ?>
 			<section>
 				<div class="entry-content">

@@ -1,7 +1,7 @@
 # Translation of Bimeson Item - Development in Japanese
 # @package Bimeson Item
 # @author Takuto Yanagida
-# @version 2021-07-27
+# @version 2021-08-31
 
 # Post Type --------------------------------------------------------------------
 
@@ -86,8 +86,8 @@ msgstr "項目が1つしかない分類の見出しを省略"
 
 # Importer ---------------------------------------------------------------------
 
-msgid "Import <strong>publications</strong> from an Excel file."
-msgstr "Excelファイルから<strong>業績</strong>をインポートします。"
+msgid "Import publications from an Excel file."
+msgstr "Excelファイルから業績をインポートします。"
 
 msgid "Import Publication List"
 msgstr "業績リストのインポート"
@@ -131,16 +131,16 @@ msgstr "すべてインポートしました。"
 msgid "Add new category group \"%s\""
 msgstr "新規分類グループ「%s」を追加"
 
-msgid "Add new category \"%s\" to \"%s\""
-msgstr "新規分類「%s」を「%s」に追加"
+msgid "Add new category \"%1$s\" to \"%2$s\""
+msgstr "新規分類「%1$s」を「%2$s」に追加"
 
-msgid "<strong>New</strong>"
-msgstr "<strong>新規</strong>"
+msgid "New"
+msgstr "新規"
 
-msgid "<strong>Updated</strong>"
-msgstr "<strong>更新</strong>"
+msgid "Updated"
+msgstr "更新"
 
-# 'Import <strong>publications</strong> from an Excel file.',                                                'ja', 'Excelファイルから業績をインポートします。'
+# 'Import publications from an Excel file.',                                                'ja', 'Excelファイルから業績をインポートします。'
 # 'Import Publication List',                                                                                 'ja', '業績リストのインポート'
 # 'Upload your Bimeson-formatted Excel (xlsx) file and we&#8217;ll import the publications into this site.', 'ja', 'Bimeson形式の Excel (xlsx) ファイルをアップロードすると、このサイトに文書がインポートされます。'
 # 'Choose an Excel (.xlsx) file to upload, then click Upload file and import.',                              'ja', 'Excel（.xlsx）ファイルを選択し、「ファイルをアップロードしてインポート」をクリックします。'
@@ -155,6 +155,6 @@ msgstr "<strong>更新</strong>"
 # 'The content of the file is wrong, please try again.',                                                     'ja', 'ファイルの内容に問題があります。もう一度、お試しください。'
 # 'All done.',                                                                                               'ja', 'すべてインポートしました。'
 # 'Add new category group "%s"',                                                                             'ja', '新規分類グループ「%s」を追加'
-# 'Add new category "%s" to "%s"',                                                                           'ja', '新規分類「%s」を「%s」に追加'
-# '<strong>New</strong>',                                                                                    'ja', '<strong>新規</strong>'
-# '<strong>Updated</strong>',                                                                                'ja', '<strong>更新</strong>'
+# 'Add new category "%1$s" to "%2$s"',                                                                           'ja', '新規分類「%s」を「%s」に追加'
+# 'New',                                                                                    'ja', '新規'
+# 'Updated',                                                                                'ja', '更新'
