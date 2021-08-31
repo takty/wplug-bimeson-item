@@ -3,12 +3,12 @@
  * Bimeson (Template Admin)
  *
  * @author Takuto Yanagida
- * @version 2021-08-04
+ * @version 2021-08-31
  *
  */
 
 
-.bimeson-admin {
+.wplug-bimeson-admin {
 	input[type="number"] {
 		padding-right: 0;
 		width: 4.5rem;
@@ -18,13 +18,13 @@
 	}
 }
 
-.bimeson-admin-config-row {
+.wplug-bimeson-admin-config-row {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 }
 
-.bimeson-admin-config-cbs {
+.wplug-bimeson-admin-config-cbs {
 	> label {
 		display    : inline-flex;
 		align-items: center;
@@ -36,7 +36,7 @@
 	}
 }
 
-.bimeson-admin-filter-row {
+.wplug-bimeson-admin-filter-row {
 	padding      : 12px;
 	border       : 1px solid #ddd;
 	border-radius: 4px;
@@ -46,23 +46,23 @@
 /* -------------------------------------------------------------------------- */
 
 
-.bimeson-admin-filter-key + .bimeson-admin-filter-key {
+.wplug-bimeson-admin-filter-key + .wplug-bimeson-admin-filter-key {
 	margin-top: 18px;
 }
 
-.bimeson-admin-filter-key-inner > div:first-child {
+.wplug-bimeson-admin-filter-key-inner > div:first-child {
 	display    : flex;
 	align-items: center;
 
 	label:last-child { margin-left: auto; }
 }
 
-.bimeson-admin-filter-cat {
+.wplug-bimeson-admin-filter-cat {
 	font-weight: bold;
 	user-select: none;
 }
 
-.bimeson-admin-filter-cbs {
+.wplug-bimeson-admin-filter-cbs {
 	display    : flex;
 	flex-wrap  : wrap;
 	padding-top: 8px;

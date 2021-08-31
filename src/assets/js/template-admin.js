@@ -3,17 +3,17 @@
  * Bimeson (Template Admin)
  *
  * @author Takuto Yanagida
- * @version 2021-07-28
+ * @version 2021-08-31
  *
  */
 
 
 document.addEventListener('DOMContentLoaded', function () {
 
-	const SEL_FILTER_KEY      = '.bimeson-admin-filter-key';
-	const SEL_FILTER_SWITCH   = '.bimeson-admin-filter-switch';
-	const SEL_FILTER_VISIBLE  = '.bimeson-admin-filter-visible';
-	const SEL_FILTER_CHECKBOX = 'input:not(.bimeson-admin-filter-switch):not(.bimeson-admin-filter-visible)';
+	const SEL_FILTER_KEY      = '.wplug-bimeson-admin-filter-key';
+	const SEL_FILTER_SWITCH   = '.wplug-bimeson-admin-filter-switch';
+	const SEL_FILTER_VISIBLE  = '.wplug-bimeson-admin-filter-visible';
+	const SEL_FILTER_CHECKBOX = 'input:not(.wplug-bimeson-admin-filter-switch):not(.wplug-bimeson-admin-filter-visible)';
 
 	const keyToSwAndCbs = {};
 	const fkElms = document.querySelectorAll(SEL_FILTER_KEY);

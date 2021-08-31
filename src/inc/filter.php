@@ -39,9 +39,9 @@ function _cb_query_vars_filter( array $query_vars ): array {
  * @param string $after        Content to append to the output.
  * @param string $for          Attribute of 'for'.
  */
-function echo_the_filter( ?array $filter_state, array $years_exist, string $before = '<div class="bimeson-filter"%s>', string $after = '</div>', string $for = 'bml' ) {
-	wp_enqueue_style( 'bimeson_item_filter' );
-	wp_enqueue_script( 'bimeson_item_filter' );
+function echo_the_filter( ?array $filter_state, array $years_exist, string $before = '<div class="wplug-bimeson-filter"%s>', string $after = '</div>', string $for = 'bml' ) {
+	wp_enqueue_style( 'wplug-bimeson-item-filter' );
+	wp_enqueue_script( 'wplug-bimeson-item-filter' );
 
 	if ( ! empty( $for ) ) {
 		$for = " for=\"$for\"";
@@ -84,10 +84,10 @@ function echo_filter( ?array $filter_state, array $years_exist ) {
 			}
 		}
 	}
-	echo '<input type="hidden" value="' . esc_attr( $inst->sub_tax_cls_base ) . '" id="bimeson-sub-tax-cls-base">';
-	echo '<input type="hidden" value="' . esc_attr( $inst->sub_tax_qvar_base ) . '" id="bimeson-sub-tax-qvar-base">';
-	echo '<input type="hidden" value="' . esc_attr( $inst->year_cls_base ) . '" id="bimeson-year-cls-base">';
-	echo '<input type="hidden" value="' . esc_attr( $inst->year_qvar ) . '" id="bimeson-year-qvar">';
+	echo '<input type="hidden" value="' . esc_attr( $inst->sub_tax_cls_base ) . '" id="wplug-bimeson-sub-tax-cls-base">';
+	echo '<input type="hidden" value="' . esc_attr( $inst->sub_tax_qvar_base ) . '" id="wplug-bimeson-sub-tax-qvar-base">';
+	echo '<input type="hidden" value="' . esc_attr( $inst->year_cls_base ) . '" id="wplug-bimeson-year-cls-base">';
+	echo '<input type="hidden" value="' . esc_attr( $inst->year_qvar ) . '" id="wplug-bimeson-year-qvar">';
 }
 
 /**
@@ -103,10 +103,10 @@ function _echo_year_select( array $years, array $state ) {
 	$val  = $state[ $inst::KEY_YEAR ];
 	$yf   = is_string( $inst->year_format ) ? $inst->year_format : '%d';
 	?>
-	<div class="bimeson-filter-key" data-key="<?php echo esc_attr( $inst::KEY_YEAR ); ?>">
-		<div class="bimeson-filter-key-inner">
+	<div class="wplug-bimeson-filter-key" data-key="<?php echo esc_attr( $inst::KEY_YEAR ); ?>">
+		<div class="wplug-bimeson-filter-key-inner">
 			<label class="select">
-				<select name="<?php echo esc_attr( $inst::KEY_YEAR ); ?>" class="bimeson-filter-select">
+				<select name="<?php echo esc_attr( $inst::KEY_YEAR ); ?>" class="wplug-bimeson-filter-select">
 					<option value="<?php echo esc_attr( $inst::VAL_YEAR_ALL ); ?>"><?php echo esc_html( $inst->year_select_label ); ?></option>
 	<?php
 	foreach ( $years as $y ) {
@@ -146,14 +146,14 @@ function _echo_tax_checkboxes( string $root_slug, array $terms, array $state, ?a
 	$qvs       = $state[ $root_slug ];
 	$checked   = ( ! empty( $qvs ) ) ? ' checked' : '';
 	?>
-	<div class="bimeson-filter-key" data-key="<?php echo esc_attr( $slug ); ?>">
-		<div class="bimeson-filter-key-inner">
+	<div class="wplug-bimeson-filter-key" data-key="<?php echo esc_attr( $slug ); ?>">
+		<div class="wplug-bimeson-filter-key-inner">
 			<div>
-				<input type="checkbox" class="bimeson-filter-switch tgl tgl-light" id="<?php echo esc_attr( $slug ); ?>" name="<?php echo esc_attr( $slug ); ?>"<?php echo $checked; // phpcs:ignore ?>>
+				<input type="checkbox" class="wplug-bimeson-filter-switch tgl tgl-light" id="<?php echo esc_attr( $slug ); ?>" name="<?php echo esc_attr( $slug ); ?>"<?php echo $checked; // phpcs:ignore ?>>
 				<label class="tgl-btn" for="<?php echo esc_attr( $slug ); ?>"></label>
-				<div class="bimeson-filter-cat"><label for="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $cat_label ); ?></label></div>
+				<div class="wplug-bimeson-filter-cat"><label for="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $cat_label ); ?></label></div>
 			</div>
-			<div class="bimeson-filter-cbs">
+			<div class="wplug-bimeson-filter-cbs">
 	<?php
 	foreach ( $terms as $t ) :
 		if ( ! is_null( $filtered ) && ! in_array( $t->slug, $filtered, true ) ) {

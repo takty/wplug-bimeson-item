@@ -20,7 +20,7 @@ require_once __DIR__ . '/class-itembuffer.php';
  * @param string $after  Content to append to the output.
  * @param string $id     The ID of the output markup.
  */
-function echo_the_list( array $args, string $lang, string $before = '<div class="bimeson-list"%s>', string $after = '</div>', string $id = 'bml' ) {
+function echo_the_list( array $args, string $lang, string $before = '<div class="wplug-bimeson-list"%s>', string $after = '</div>', string $id = 'bml' ) {
 	if ( ! empty( $id ) ) {
 		$id = " id=\"$id\"";
 	}
@@ -147,7 +147,7 @@ function _make_omitted_heading( ?array $filter_state ): ?array {
 		$ret[ $sub_tax ] = false;
 
 		$s = $filter_state[ $rs ] ?? array();
-		if ( count( $s ) === 1 ) {
+		if ( 1 === count( $s ) ) {
 			$ret[ $sub_tax ] = true;
 		}
 	}
@@ -272,7 +272,7 @@ function _echo_list_element( array $its, string $lang ) {
  * @param array  $it   The item.
  * @param string $lang Language.
  */
-function _echo_list_item( $it, $lang ) {
+function _echo_list_item( array $it, string $lang ) {
 	$inst = _get_instance();
 
 	$body = '';

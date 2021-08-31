@@ -3,28 +3,28 @@
  * Bimeson List Filter
  *
  * @author Takuto Yanagida
- * @version 2021-07-21
+ * @version 2021-08-31
  *
  */
 
 
 document.addEventListener('DOMContentLoaded', () => {
 
-	const SEL_FILTER = '.bimeson-filter';
-	const SEL_LIST   = '.bimeson-list';
+	const SEL_FILTER = '.wplug-bimeson-filter';
+	const SEL_LIST   = '.wplug-bimeson-list';
 
-	const SEL_FILTER_KEY      = '.bimeson-filter-key';
-	const SEL_FILTER_SWITCH   = '.bimeson-filter-switch';
-	const SEL_FILTER_CHECKBOX = 'input:not(.bimeson-filter-switch)';
+	const SEL_FILTER_KEY      = '.wplug-bimeson-filter-key';
+	const SEL_FILTER_SWITCH   = '.wplug-bimeson-filter-switch';
+	const SEL_FILTER_CHECKBOX = 'input:not(.wplug-bimeson-filter-switch)';
 
-	const SEL_FILTER_SELECT = '.bimeson-filter-select';
+	const SEL_FILTER_SELECT = '.wplug-bimeson-filter-select';
 	const KEY_YEAR          = '_year';
 	const VAL_YEAR_ALL      = 'all';
 
-	const SUB_TAX_CLS_BASE  = document.getElementById('bimeson-sub-tax-cls-base')?.value  ?? 'bm-cat-';
-	const SUB_TAX_QVAR_BASE = document.getElementById('bimeson-sub-tax-qvar-base')?.value ?? 'bm_';
-	const YEAR_CLS_BASE     = document.getElementById('bimeson-year-cls-base')?.value     ?? 'bm-year-';
-	const YEAR_QVAR         = document.getElementById('bimeson-year-qvar')?.value         ?? 'bm_year';
+	const SUB_TAX_CLS_BASE  = document.getElementById('wplug-bimeson-sub-tax-cls-base')?.value  ?? 'bm-cat-';
+	const SUB_TAX_QVAR_BASE = document.getElementById('wplug-bimeson-sub-tax-qvar-base')?.value ?? 'bm_';
+	const YEAR_CLS_BASE     = document.getElementById('wplug-bimeson-year-cls-base')?.value     ?? 'bm-year-';
+	const YEAR_QVAR         = document.getElementById('wplug-bimeson-year-qvar')?.value         ?? 'bm_year';
 
 	const DS_KEY   = 'key';    // For filters
 	const DS_COUNT = 'count';  // For headings and lists

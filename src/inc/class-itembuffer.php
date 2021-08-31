@@ -7,7 +7,7 @@
  * @version 2021-08-31
  */
 
-namespace wplug\bimeson_list;
+namespace wplug\bimeson_item;
 
 /**
  * Item buffer

@@ -21,7 +21,7 @@ function initialize_post_type( string $url_to ) {
 	register_post_type(
 		$inst::PT,
 		array(
-			'label'         => __( 'Publication', 'bimeson_item' ),
+			'label'         => __( 'Publication', 'wplug_bimeson_item' ),
 			'labels'        => array(),
 			'public'        => true,
 			'show_ui'       => true,
@@ -65,7 +65,7 @@ function _cb_wp_loaded() {
 	$inst = _get_instance();
 	$cs   = array( 'cb', 'title' );
 	$cs[] = array(
-		'label' => __( 'Published date', 'bimeson_item' ),
+		'label' => __( 'Published date', 'wplug_bimeson_item' ),
 		'name'  => $inst::IT_DATE,
 		'width' => '10%',
 		'value' => 'esc_html',
@@ -78,7 +78,7 @@ function _cb_wp_loaded() {
 	}
 	$cs[] = 'date';
 	$cs[] = array(
-		'label' => __( 'Import from', 'bimeson_item' ),
+		'label' => __( 'Import from', 'wplug_bimeson_item' ),
 		'name'  => $inst::IT_IMPORT_FROM,
 		'width' => '10%',
 		'value' => 'esc_html',
@@ -100,7 +100,7 @@ function _cb_admin_menu_post_type() {
 	foreach ( $inst->additional_langs as $al ) {
 		add_rich_editor_meta_box( "_post_content_$al", __( 'Content' ) . " [$al]", $inst::PT );
 	}
-	\add_meta_box( 'bimeson_mb', __( 'Publication data', 'bimeson_item' ), '\wplug\bimeson_item\_cb_output_html_post_type', $inst::PT, 'side', 'high' );
+	\add_meta_box( 'wplug_bimeson_item_mb', __( 'Publication data', 'wplug_bimeson_item' ), '\wplug\bimeson_item\_cb_output_html_post_type', $inst::PT, 'side', 'high' );
 }
 
 /**
@@ -110,7 +110,7 @@ function _cb_admin_menu_post_type() {
  */
 function _cb_output_html_post_type() {
 	$inst = _get_instance();
-	wp_nonce_field( 'bimeson_item', 'bimeson_item_nonce' );
+	wp_nonce_field( 'wplug_bimeson_item', 'wplug_bimeson_item_nonce' );
 	$post_id = get_the_ID();
 
 	// phpcs:disable
@@ -120,10 +120,10 @@ function _cb_output_html_post_type() {
 	$link_title = get_post_meta( $post_id, $inst::IT_LINK_TITLE, true );
 	// phpcs:enable
 
-	output_input_row( __( 'Published date', 'bimeson_item' ), $inst::IT_DATE, $date );
+	output_input_row( __( 'Published date', 'wplug_bimeson_item' ), $inst::IT_DATE, $date );
 	output_input_row( 'DOI', $inst::IT_DOI, $doi );
-	output_input_row( __( 'Link URL', 'bimeson_item' ), $inst::IT_LINK_URL, $link_url );
-	output_input_row( __( 'Link title', 'bimeson_item' ), $inst::IT_LINK_TITLE, $link_title );
+	output_input_row( __( 'Link URL', 'wplug_bimeson_item' ), $inst::IT_LINK_URL, $link_url );
+	output_input_row( __( 'Link title', 'wplug_bimeson_item' ), $inst::IT_LINK_TITLE, $link_title );
 }
 
 /**
@@ -135,7 +135,7 @@ function _cb_output_html_post_type() {
  */
 function _cb_save_post_post_type( $post_id ) {
 	$inst = _get_instance();
-	if ( ! isset( $_POST['bimeson_item_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['bimeson_item_nonce'] ), 'bimeson_item' ) ) {
+	if ( ! isset( $_POST['wplug_bimeson_item_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['wplug_bimeson_item_nonce'] ), 'wplug_bimeson_item' ) ) {
 		return;
 	}
 	if ( ! current_user_can( 'edit_post', $post_id ) ) {
@@ -258,7 +258,7 @@ function process_items( array &$items, string $file_name ): array {
 				wp_add_object_terms( $post_id, $slugs, $sub_tax );
 			}
 		}
-		$m      = false === $old ? __( 'New', 'bimeson_item' ) : __( 'Updated', 'bimeson_item' );
+		$m      = false === $old ? __( 'New', 'wplug_bimeson_item' ) : __( 'Updated', 'wplug_bimeson_item' );
 		$msgs[] = "<strong>$m</strong>" . ' ' . wp_kses_post( $body );
 	}
 	return $msgs;

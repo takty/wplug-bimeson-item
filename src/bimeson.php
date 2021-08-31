@@ -86,8 +86,8 @@ function _register_script( string $url_to ) {
 			add_action(
 				'admin_enqueue_scripts',
 				function () use ( $url_to ) {
-					wp_enqueue_style( 'bimeson_item_template_admin', abs_url( $url_to, './assets/css/template-admin.min.css' ), array(), '1.0' );
-					wp_enqueue_script( 'bimeson_item_template_admin', abs_url( $url_to, './assets/js/template-admin.min.js' ), array(), '1.0', false );
+					wp_enqueue_style( 'wplug-bimeson-item-template-admin', abs_url( $url_to, './assets/css/template-admin.min.css' ), array(), '1.0' );
+					wp_enqueue_script( 'wplug-bimeson-item-template-admin', abs_url( $url_to, './assets/js/template-admin.min.js' ), array(), '1.0', false );
 				}
 			);
 		}
@@ -95,8 +95,8 @@ function _register_script( string $url_to ) {
 		add_action(
 			'wp_enqueue_scripts',
 			function () use ( $url_to ) {
-				wp_register_style( 'bimeson_item_filter', abs_url( $url_to, './assets/css/filter.min.css' ), array(), '1.0' );
-				wp_register_script( 'bimeson_item_filter', abs_url( $url_to, './assets/js/filter.min.js' ), array(), '1.0', false );
+				wp_register_style( 'wplug-bimeson-item-filter', abs_url( $url_to, './assets/css/filter.min.css' ), array(), '1.0' );
+				wp_register_script( 'wplug-bimeson-item-filter', abs_url( $url_to, './assets/js/filter.min.js' ), array(), '1.0', false );
 			}
 		);
 	}
@@ -109,20 +109,20 @@ function _register_script( string $url_to ) {
  *
  * @return bool True if the post type is bimeson.
  */
-function _is_the_post_type() {
+function _is_the_post_type(): bool {
 	$inst = _get_instance();
 	global $pagenow;
 	return in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) && is_post_type( $inst::PT );
 }
 
 
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 
 /**
  * Gets the root taxonomy slug.
  */
-function get_taxonomy() {
+function get_taxonomy(): string {
 	$inst = _get_instance();
 	return $inst->root_tax;
 }
@@ -130,7 +130,7 @@ function get_taxonomy() {
 /**
  * Gets the sub taxonomy slugs.
  */
-function get_sub_taxonomies() {
+function get_sub_taxonomies(): array {
 	$inst = _get_instance();
 	return $inst->sub_taxes;
 }
@@ -155,7 +155,7 @@ function save_meta_box( int $post_id ) {
 }
 
 
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 
 /**
@@ -167,7 +167,7 @@ function save_meta_box( int $post_id ) {
  * @param string $after   Content to append to the output.
  * @param string $for     Attribute of 'for'.
  */
-function the_filter( ?int $post_id = null, string $lang = '', string $before = '<div class="bimeson-filter"%s>', string $after = '</div>', string $for = 'bml' ) {
+function the_filter( ?int $post_id = null, string $lang = '', string $before = '<div class="wplug-bimeson-filter"%s>', string $after = '</div>', string $for = 'bml' ) {
 	$post = get_post( $post_id );
 	$d    = _get_data( $post->ID, $lang );
 
@@ -186,7 +186,7 @@ function the_filter( ?int $post_id = null, string $lang = '', string $before = '
  * @param string $after   Content to append to the output.
  * @param string $id      Attribute of 'id'.
  */
-function the_list( ?int $post_id = null, string $lang = '', string $before = '<div class="bimeson-list"%s>', string $after = '</div>', string $id = 'bml' ) {
+function the_list( ?int $post_id = null, string $lang = '', string $before = '<div class="wplug-bimeson-list"%s>', string $after = '</div>', string $id = 'bml' ) {
 	$post = get_post( $post_id );
 	$d    = _get_data( $post->ID, $lang );
 
@@ -237,7 +237,7 @@ function _get_data( int $post_id, string $lang ): array {
  * @param ?array  $filter_state Filter states.
  * @return array Items.
  */
-function get_filtered_items( string $lang, ?string $date_bgn, ?string $date_end, ?array $filter_state ) {
+function get_filtered_items( string $lang, ?string $date_bgn, ?string $date_end, ?array $filter_state ): array {
 	$inst = _get_instance();
 	if ( isset( $filter_state[ $inst::KEY_VISIBLE ] ) ) {
 		unset( $filter_state[ $inst::KEY_VISIBLE ] );

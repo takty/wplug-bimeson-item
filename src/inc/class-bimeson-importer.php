@@ -20,7 +20,7 @@ if ( ! class_exists( '\WP_Importer' ) ) {
 	return;
 }
 
-require_once __DIR__ . '/../assets/ajax.php';
+require_once __DIR__ . '/../assets/class-ajax.php';
 
 /**
  * Bimeson importer
@@ -81,12 +81,12 @@ class Bimeson_Importer extends \WP_Importer {
 	 * @access private
 	 */
 	private function initialize() {
-		$GLOBALS['bimeson_import'] = $this;
+		$GLOBALS['wplug_bimeson_import'] = $this;
 		register_importer(
-			'bimeson',
+			'wplug_bimeson',
 			'Bimeson',
-			__( 'Import <strong>publications</strong> from a Excel file.', 'bimeson_item' ),
-			array( $GLOBALS['bimeson_import'], 'dispatch' )
+			__( 'Import <strong>publications</strong> from a Excel file.', 'wplug_bimeson_item' ),
+			array( $GLOBALS['wplug_bimeson_import'], 'dispatch' )
 		);
 	}
 
@@ -97,7 +97,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 */
 	private function initialize_ajax() {
 		$ajax = new Ajax(
-			'bimeson_import',
+			'wplug_bimeson_import',
 			function ( $data ) {
 				$status = $data['status'] ?? '';
 				if ( 'start' === $status ) {
@@ -140,7 +140,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 * Dispatches the request.
 	 */
 	public function dispatch() {
-		wp_enqueue_script( 'bimeson_item_importer', $this->url_to . '/assets/js/importer.min.js', array(), '1.0', false );
+		wp_enqueue_script( 'wplug-bimeson-item-importer', $this->url_to . '/assets/js/importer.min.js', array(), '1.0', false );
 		wp_enqueue_script( 'xlsx', $this->url_to . '/assets/js/xlsx.full.min.js', array(), '1.0', false );
 
 		$this->header();
@@ -169,7 +169,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 */
 	private function header() {
 		echo '<div class="wrap">';
-		echo '<h2>' . esc_html__( 'Import Publication List', 'bimeson_item' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Import Publication List', 'wplug_bimeson_item' ) . '</h2>';
 	}
 
 	/**
@@ -192,9 +192,9 @@ class Bimeson_Importer extends \WP_Importer {
 	 */
 	private function greet() {
 		echo '<div class="narrow">';
-		echo '<p>' . esc_html__( 'Upload your Bimeson-formatted Excel (xlsx) file and we&#8217;ll import the publications into this site.', 'bimeson_item' ) . '</p>';
-		echo '<p>' . esc_html__( 'Choose an Excel (.xlsx) file to upload, then click Upload file and import.', 'bimeson_item' ) . '</p>';
-		wp_import_upload_form( 'admin.php?import=bimeson&amp;step=1' );
+		echo '<p>' . esc_html__( 'Upload your Bimeson-formatted Excel (xlsx) file and we&#8217;ll import the publications into this site.', 'wplug_bimeson_item' ) . '</p>';
+		echo '<p>' . esc_html__( 'Choose an Excel (.xlsx) file to upload, then click Upload file and import.', 'wplug_bimeson_item' ) . '</p>';
+		wp_import_upload_form( 'admin.php?import=wplug_bimeson&amp;step=1' );
 		echo '</div>';
 	}
 
@@ -213,13 +213,13 @@ class Bimeson_Importer extends \WP_Importer {
 		$file = wp_import_handle_upload();
 
 		if ( isset( $file['error'] ) ) {
-			echo '<p><strong>' . esc_html__( 'Sorry, there has been an error.', 'bimeson_item' ) . '</strong><br>';
+			echo '<p><strong>' . esc_html__( 'Sorry, there has been an error.', 'wplug_bimeson_item' ) . '</strong><br>';
 			echo esc_html( $file['error'] ) . '</p>';
 			return null;
 		} elseif ( ! file_exists( $file['file'] ) ) {
-			echo '<p><strong>' . esc_html__( 'Sorry, there has been an error.', 'bimeson_item' ) . '</strong><br>';
+			echo '<p><strong>' . esc_html__( 'Sorry, there has been an error.', 'wplug_bimeson_item' ) . '</strong><br>';
 			/* translators: Path of uploaded file. */
-			printf( esc_html__( 'The file could not be found at <code>%s</code>.', 'bimeson_item' ), esc_html( $file['file'] ) );
+			printf( esc_html__( 'The file could not be found at <code>%s</code>.', 'wplug_bimeson_item' ), esc_html( $file['file'] ) );
 			echo '</p>';
 			return null;
 		}
@@ -244,23 +244,23 @@ class Bimeson_Importer extends \WP_Importer {
 		<input type="hidden" id="import-file-name" value="<?php echo esc_attr( $fname ); ?>">
 		<input type="hidden" id="import-ajax" value="<?php echo esc_attr( $ajax ); ?>">
 		<div id="section-option">
-			<h3><?php esc_html_e( 'Add Terms', 'bimeson_item' ); ?></h3>
+			<h3><?php esc_html_e( 'Add Terms', 'wplug_bimeson_item' ); ?></h3>
 			<p>
 				<label>
 					<input type="radio" id="do-nothing" checked>
-					<?php esc_html_e( 'Do nothing', 'bimeson_item' ); ?>
+					<?php esc_html_e( 'Do nothing', 'wplug_bimeson_item' ); ?>
 				</label>
 			</p>
 			<p>
 				<label>
 					<input type="radio" id="add-tax">
-					<?php esc_html_e( 'Add category groups themselves', 'bimeson_item' ); ?>
+					<?php esc_html_e( 'Add category groups themselves', 'wplug_bimeson_item' ); ?>
 				</label>
 			</p>
 			<p>
 				<label>
 					<input type="radio" id="add-term">
-					<?php esc_html_e( 'Add categories to the category group', 'bimeson_item' ); ?>
+					<?php esc_html_e( 'Add categories to the category group', 'wplug_bimeson_item' ); ?>
 				</label>
 			</p>
 		</div>
@@ -268,8 +268,8 @@ class Bimeson_Importer extends \WP_Importer {
 			<button type="button" id="btn-start-import" class="button"><?php esc_html_e( 'Start Import' ); ?></button>
 		</p>
 		<div id="msg-response" style="margin-top:1rem;max-height:50vh;overflow:auto;"></div>
-		<p id="msg-success" hidden><strong><?php esc_html_e( 'All done.', 'bimeson_item' ); ?></strong></p>
-		<p id="msg-failure" hidden><strong><?php esc_html_e( 'Sorry, failed to read the file.', 'bimeson_item' ); ?></strong></p>
+		<p id="msg-success" hidden><strong><?php esc_html_e( 'All done.', 'wplug_bimeson_item' ); ?></strong></p>
+		<p id="msg-failure" hidden><strong><?php esc_html_e( 'Sorry, failed to read the file.', 'wplug_bimeson_item' ); ?></strong></p>
 		<?php
 	}
 

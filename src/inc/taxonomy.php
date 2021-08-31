@@ -21,7 +21,7 @@ function initialize_taxonomy() {
 			null,
 			array(
 				'hierarchical'       => true,
-				'label'              => __( 'Category group', 'bimeson_item' ),
+				'label'              => __( 'Category group', 'wplug_bimeson_item' ),
 				'public'             => false,
 				'show_ui'            => true,
 				'show_in_quick_edit' => false,
@@ -101,7 +101,7 @@ function _register_sub_tax( string $tax, string $label ) {
 			null,
 			array(
 				'hierarchical'       => true,
-				'label'              => __( 'Category', 'bimeson_item' ) . " ($label)",
+				'label'              => __( 'Category', 'wplug_bimeson_item' ) . " ($label)",
 				'public'             => true,
 				'show_ui'            => true,
 				'rewrite'            => false,
@@ -446,14 +446,14 @@ function _cb_query_vars_taxonomy( array $query_vars ): array {
 function _cb_taxonomy_edit_form_fields( \WP_Term $term, string $tax ) {
 	$inst = _get_instance();
 	if ( $tax === $inst->root_tax ) {
-		_bool_field( $term, $inst::KEY_IS_HIDDEN, __( 'Hide from view screen', 'bimeson_item' ) );
+		_bool_field( $term, $inst::KEY_IS_HIDDEN, __( 'Hide from view screen', 'wplug_bimeson_item' ) );
 	} else {
-		_bool_field( $term, $inst::KEY_LAST_CAT_OMITTED, __( 'Omit the heading of the last category group', 'bimeson_item' ) );
+		_bool_field( $term, $inst::KEY_LAST_CAT_OMITTED, __( 'Omit the heading of the last category group', 'wplug_bimeson_item' ) );
 	}
 }
 
 /**
- * Output a bool input field.
+ * Outputs a bool input field.
  *
  * @access private
  *
@@ -465,7 +465,7 @@ function _bool_field( \WP_Term $term, string $key, string $label ) {
 	$val = get_term_meta( $term->term_id, $key, true );
 	?>
 	<tr class="form-field">
-		<th style="padding-bottom: 20px;"><label for="<?php echo esc_attr( $key ); ?>"><?php esc_html_e( 'List', 'bimeson_item' ); ?></label></th>
+		<th style="padding-bottom: 20px;"><label for="<?php echo esc_attr( $key ); ?>"><?php esc_html_e( 'List', 'wplug_bimeson_item' ); ?></label></th>
 		<td style="padding-bottom: 20px;">
 			<label>
 				<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" <?php checked( $val, 1 ); ?>>

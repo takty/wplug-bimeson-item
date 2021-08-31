@@ -17,9 +17,9 @@ namespace wplug\bimeson_item;
  * @param bool   $sort_by_date_first Whether to sort by date first.
  * @param bool   $dup_multi_cat      Whether to duplicate multiple category items.
  * @param ?array $filter_state       Filter states.
- * @return ?array Retrieved items.
+ * @return array Array of retrieved items and existing years.
  */
-function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat, ?array $filter_state ) {
+function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat, ?array $filter_state ): array {
 	$rs_idx = _make_rs_idx();
 	$vs     = $filter_state[ _get_instance()::KEY_VISIBLE ] ?? null;
 
@@ -49,7 +49,7 @@ function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bo
  *
  * @return array Indices.
  */
-function _make_rs_idx() {
+function _make_rs_idx(): array {
 	$rs_idx = array();
 	foreach ( get_root_slug_to_sub_slugs() as $rs => $ss ) {
 		$rs_idx[ $rs ] = array_flip( $ss );

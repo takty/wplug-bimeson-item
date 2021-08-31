@@ -16,7 +16,7 @@ namespace wplug\bimeson_item;
  *
  * @param string $lang Language.
  */
-function register_shortcode( $lang ) {
+function register_shortcode( string $lang ) {
 	static $serial = 0;
 
 	\add_shortcode(
@@ -31,13 +31,13 @@ function register_shortcode( $lang ) {
 
 			ob_start();
 			if ( $d && $d['show_filter'] ) {
-				echo_the_filter( $d['filter_state'], $d['years_exist'], '<div class="bimeson-filter"%s>', '</div>', $id );
+				echo_the_filter( $d['filter_state'], $d['years_exist'], '<div class="wplug-bimeson-filter"%s>', '</div>', $id );
 			}
 			if ( ! is_null( $content ) ) {
 				echo str_replace( '<p></p>', '', balanceTags( $content, true ) );  // phpcs:ignore
 			}
 			if ( $d ) {
-				echo_the_list( $d, $lang, '<div class="bimeson-list"%s>', '</div>', $id );
+				echo_the_list( $d, $lang, '<div class="wplug-bimeson-list"%s>', '</div>', $id );
 			}
 			$ret = ob_get_contents();
 			ob_end_clean();

@@ -98,7 +98,7 @@ function get_post_id(): int {
 	if ( isset( $_GET['post'] ) || isset( $_POST['post_ID'] ) ) {  // phpcs:ignore
 		$post_id = isset( $_GET['post'] ) ? $_GET['post'] : $_POST['post_ID'];  // phpcs:ignore
 	}
-	return intval( $post_id );
+	return (int) $post_id;
 }
 
 /**

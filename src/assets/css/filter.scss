@@ -3,42 +3,42 @@
  * Publication List Filter (SCSS)
  *
  * @author Takuto Yanagida
- * @version 2021-07-20
+ * @version 2021-08-31
  *
  */
 
 
 @media (min-width: 900px) {
-	.bimeson-filter {
+	.wplug-bimeson-filter {
 		column-count: 2;
 	}
 }
 
-.bimeson-filter-key {
+.wplug-bimeson-filter-key {
 	display    : inline-flex;
 	align-items: flex-start;
 
 	width     : 100%;
 	margin-top: 0.5rem;
 
-	& + .bimeson-filter-key {
+	& + .wplug-bimeson-filter-key {
 		margin-top: 1rem;
 	}
 }
 
-.bimeson-filter-key-inner {
+.wplug-bimeson-filter-key-inner {
 	> div:first-child {
 		display    : flex;
 		align-items: center;
 	}
 }
 
-.bimeson-filter-cat {
+.wplug-bimeson-filter-cat {
 	font-weight: bold;
 	user-select: none;
 }
 
-.bimeson-filter-cbs {
+.wplug-bimeson-filter-cbs {
 	display    : flex;
 	flex-wrap  : wrap;
 	padding-top: 0.5rem;
@@ -58,7 +58,7 @@
 // -----------------------------------------------------------------------------
 
 
-.bimeson-list {
+.wplug-bimeson-list {
 	*[data-count='0'] {
 		display: none;
 	}
