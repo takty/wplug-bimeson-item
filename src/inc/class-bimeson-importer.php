@@ -94,8 +94,10 @@ class Bimeson_Importer extends \WP_Importer {
 	 * Initializes Ajax.
 	 *
 	 * @access private
+	 *
+	 * @return string Ajax URL.
 	 */
-	private function initialize_ajax() {
+	private function initialize_ajax(): string {
 		$ajax = new Ajax(
 			'wplug_bimeson_import',
 			function ( $data ) {
