@@ -3,16 +3,15 @@
  * Function for gulp (Locale)
  *
  * @author Takuto Yanagida
- * @version 2021-10-14
+ * @version 2022-03-23
  *
  */
 
 'use strict';
 
 const gulp = require('gulp');
-const $    = require('gulp-load-plugins')({ pattern: ['gulp-*', '!gulp-sass'] });
-
-const gp = require('gettext-parser');
+const gp   = require('gettext-parser');
+const $    = require('gulp-load-plugins')({ pattern: ['gulp-plumber', 'gulp-changed'] });
 
 function makeLocaleTask(src, dest = '/dest', base = null) {
 	const localeTask = () => gulp.src(src, { base: base })
