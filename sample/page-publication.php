@@ -1,12 +1,12 @@
 <?php
 /**
- * The Template for Publication Static Pages
+ * The Template for Publication List Static Pages
  *
- * Template Name: Publications
+ * Template Name: Publication List
  *
  * @package Sample
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  */
 
 get_header();
