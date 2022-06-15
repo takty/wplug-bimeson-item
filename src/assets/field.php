@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  */
 
 namespace wplug\bimeson_item;
@@ -119,11 +119,11 @@ function normalize_date( string $str ): string {
 /**
  * Adds a rich editor meta box.
  *
- * @param string  $key     Post meta key.
- * @param string  $title   Title of the meta box.
- * @param ?string $screen  The screen or screens on which to show the box.
- * @param string  $context The context within the screen where the box should display.
- * @param array   $opts    Options for wp_editor.
+ * @param string      $key     Post meta key.
+ * @param string      $title   Title of the meta box.
+ * @param string|null $screen  The screen or screens on which to show the box.
+ * @param string      $context The context within the screen where the box should display.
+ * @param array       $opts    Options for wp_editor.
  */
 function add_rich_editor_meta_box( string $key, string $title, ?string $screen = null, string $context = 'advanced', array $opts = array() ) {
 	$priority = isset( $opts['priority'] ) ? $opts['priority'] : 'default';

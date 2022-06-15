@@ -12,11 +12,11 @@ namespace wplug\bimeson_item;
 /**
  * Retrieves items.
  *
- * @param array  $items              All items.
- * @param ?int   $count              Count limit.
- * @param bool   $sort_by_date_first Whether to sort by date first.
- * @param bool   $dup_multi_cat      Whether to duplicate multiple category items.
- * @param ?array $filter_state       Filter states.
+ * @param array      $items              All items.
+ * @param int|null   $count              Count limit.
+ * @param bool       $sort_by_date_first Whether to sort by date first.
+ * @param bool       $dup_multi_cat      Whether to duplicate multiple category items.
+ * @param array|null $filter_state       Filter states.
  * @return array Array of retrieved items and existing years.
  */
 function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat, ?array $filter_state ): array {
@@ -166,10 +166,10 @@ function _generate_combination( array $arrays ): array {
  *
  * @access private
  *
- * @param array  $items              Items to be sorted.
- * @param bool   $sort_by_date_first Whether to sort by date first.
- * @param array  $rs_idx             The array of root slug to sub slug indices.
- * @param ?array $visible_state      Visibility states.
+ * @param array      $items              Items to be sorted.
+ * @param bool       $sort_by_date_first Whether to sort by date first.
+ * @param array      $rs_idx             The array of root slug to sub slug indices.
+ * @param array|null $visible_state      Visibility states.
  */
 function _sort_list_items( array &$items, bool $sort_by_date_first, array $rs_idx, ?array $visible_state ) {
 	$inst = _get_instance();
@@ -291,8 +291,8 @@ function _get_first_sub_slug_index( array $item, string $rs, array $rs_idx ): in
  *
  * @access private
  *
- * @param array  $items         Items.
- * @param ?array $visible_state Visibility states.
+ * @param array      $items         Items.
+ * @param array|null $visible_state Visibility states.
  * @return array Items.
  */
 function _assign_cat_key( array $items, ?array $visible_state ): array {

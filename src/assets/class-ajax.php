@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  */
 
 namespace wplug\bimeson_item;
@@ -56,10 +56,10 @@ class Ajax {
 	/**
 	 * Constructor.
 	 *
-	 * @param string   $action   Ajax action.
-	 * @param callable $response Function called when receive message.
-	 * @param bool     $public   Whether this ajax is public.
-	 * @param ?string  $nonce    Nonce.
+	 * @param string      $action   Ajax action.
+	 * @param callable    $response Function called when receive message.
+	 * @param bool        $public   Whether this ajax is public.
+	 * @param string|null $nonce    Nonce.
 	 */
 	public function __construct( string $action, $response, bool $public = false, ?string $nonce = null ) {
 		if ( ! preg_match( '/^[a-zA-Z0-9_\-]+$/', $action ) ) {

@@ -33,11 +33,11 @@ function _cb_query_vars_filter( array $query_vars ): array {
 /**
  * Displays the filter.
  *
- * @param ?array $filter_state Array of filter states.
- * @param array  $years_exist  Array of existing years.
- * @param string $before       Content to prepend to the output.
- * @param string $after        Content to append to the output.
- * @param string $for          Attribute of 'for'.
+ * @param array|null $filter_state Array of filter states.
+ * @param array      $years_exist  Array of existing years.
+ * @param string     $before       Content to prepend to the output.
+ * @param string     $after        Content to append to the output.
+ * @param string     $for          Attribute of 'for'.
  */
 function echo_the_filter( ?array $filter_state, array $years_exist, string $before = '<div class="wplug-bimeson-filter"%s>', string $after = '</div>', string $for = 'bml' ) {
 	wp_enqueue_style( 'wplug-bimeson-item-filter' );
@@ -60,8 +60,8 @@ function echo_the_filter( ?array $filter_state, array $years_exist, string $befo
 /**
  * Displays a filter itself.
  *
- * @param ?array $filter_state Array of filter states.
- * @param array  $years_exist  Array of existing years.
+ * @param array|null $filter_state Array of filter states.
+ * @param array      $years_exist  Array of existing years.
  */
 function echo_filter( ?array $filter_state, array $years_exist ) {
 	$inst        = _get_instance();
@@ -127,10 +127,10 @@ function _echo_year_select( array $years, array $state ) {
  *
  * @access private
  *
- * @param string $root_slug A root slug.
- * @param array  $terms     Corresponding terms.
- * @param array  $state     Filter states.
- * @param ?array $filtered  Filtered term slugs.
+ * @param string     $root_slug A root slug.
+ * @param array      $terms     Corresponding terms.
+ * @param array      $state     Filter states.
+ * @param array|null $filtered  Filtered term slugs.
  */
 function _echo_tax_checkboxes( string $root_slug, array $terms, array $state, ?array $filtered = null ) {
 	$inst = _get_instance();

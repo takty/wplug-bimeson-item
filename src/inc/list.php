@@ -44,11 +44,11 @@ function echo_the_list( array $args, string $lang, string $before = '<div class=
  *
  * @access private
  *
- * @param array  $its                Array of items.
- * @param string $lang               Language.
- * @param bool   $sort_by_date_first Whether to sort by date first.
- * @param bool   $omit_single_cat    Whether to omit categories which have one item.
- * @param ?array $filter_state       Filter states.
+ * @param array      $its                Array of items.
+ * @param string     $lang               Language.
+ * @param bool       $sort_by_date_first Whether to sort by date first.
+ * @param bool       $omit_single_cat    Whether to omit categories which have one item.
+ * @param array|null $filter_state       Filter states.
  */
 function _echo_heading_list_element( array $its, string $lang, bool $sort_by_date_first, bool $omit_single_cat, ?array $filter_state ) {
 	$inst = _get_instance();
@@ -140,8 +140,8 @@ function _echo_heading_list_element( array $its, string $lang, bool $sort_by_dat
  *
  * @access private
  *
- * @param ?array $filter_state Filter states.
- * @return ?array Omitted heading data.
+ * @param array|null $filter_state Filter states.
+ * @return array|null Omitted heading data.
  */
 function _make_omitted_heading( ?array $filter_state ): ?array {
 	if ( is_null( $filter_state ) ) {

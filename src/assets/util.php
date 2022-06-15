@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  */
 
 namespace wplug\bimeson_item;
@@ -60,8 +60,8 @@ function normalize_body( string $body ): string {
 /**
  * Retrieves the sub content.
  *
- * @param string $meta_key Meta key.
- * @param ?int   $post_id  (Optional) Post ID.
+ * @param string   $meta_key Meta key.
+ * @param int|null $post_id  (Optional) Post ID.
  */
 function get_the_sub_content( string $meta_key, ?int $post_id = null ): string {
 	global $post;

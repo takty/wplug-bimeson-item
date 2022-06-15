@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  */
 
 namespace wplug\bimeson_item;
@@ -34,8 +34,8 @@ function get_template_admin_config( int $post_id ): ?array {
 /**
  * Adds the meta box.
  *
- * @param string  $title  Title of the meta box.
- * @param ?string $screen (Optional) The screen or screens on which to show the box.
+ * @param string      $title  Title of the meta box.
+ * @param string|null $screen (Optional) The screen or screens on which to show the box.
  */
 function add_meta_box_template_admin( string $title, ?string $screen = null ) {
 	\add_meta_box( 'wplug_bimeson_item_admin_mb', $title, '\wplug\bimeson_item\_cb_output_html_template_admin', $screen );
