@@ -1,7 +1,7 @@
 # Translation of Bimeson Item - Development in Japanese
 # @package Bimeson Item
 # @author Takuto Yanagida
-# @version 2021-08-31
+# @version 2022-06-15
 
 # Post Type --------------------------------------------------------------------
 
@@ -43,11 +43,19 @@ msgstr "一番最後の分類グループの見出しを省略する"
 msgid "Hide from view screen"
 msgstr "閲覧画面から隠す"
 
+msgid "Sort"
+msgstr "並び替え"
+
+msgid "Sort uncategorized items last"
+msgstr "未分類の項目を最後に並べる"
+
 # 'Category group',                              'ja', '分類グループ'
 # 'Category',                                    'ja', '分類'
 # 'Filter',                                      'ja', 'フィルター'
 # 'Omit the heading of the last category group', 'ja', '一番最後の分類グループの見出しを省略する'
 # 'Hide from view screen',                       'ja', '閲覧画面から隠す'
+# 'Sort',                                        'ja', '並び替え'
+# 'Sort uncategorized items last',               'ja', '未分類の項目を最後に並べる'
 
 # Template Admin ---------------------------------------------------------------
 

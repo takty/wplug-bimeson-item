@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  */
 
 namespace wplug\bimeson_item;
@@ -149,13 +149,12 @@ function root_term_to_sub_tax( $term ): string {
 /**
  * Retrieves the array of root slugs to sub slugs.
  *
- * @param bool $do_omit_first Whether to omit the first slug.
- * @param bool $do_hide       Whether to hide slugs.
  * @return array Array of root slugs to sub slugs.
  */
-function get_root_slug_to_sub_slugs( bool $do_omit_first = false, bool $do_hide = false ): array {
-	$subs  = get_root_slug_to_sub_terms( $do_omit_first, $do_hide );
+function get_root_slug_to_sub_slugs(): array {
+	$subs  = get_root_slug_to_sub_terms();
 	$slugs = array();
+
 	foreach ( $subs as $slug => $terms ) {
 		$slugs[ $slug ] = array_map(
 			function ( $e ) {
@@ -170,27 +169,37 @@ function get_root_slug_to_sub_slugs( bool $do_omit_first = false, bool $do_hide 
 /**
  * Retrieves the array of root slugs to sub terms.
  *
- * @param bool $do_omit_first Whether to omit the first slug.
- * @param bool $do_hide       Whether to hide slugs.
  * @return array Array of root slugs to sub terms.
  */
-function get_root_slug_to_sub_terms( bool $do_omit_first = false, bool $do_hide = false ): array {
+function get_root_slug_to_sub_terms(): array {
+	$roots = _get_root_terms();
+	$terms = array();
+
+	foreach ( $roots as $idx => $r ) {
+		$sub_tax           = root_term_to_sub_tax( $r );
+		$terms[ $r->slug ] = _get_sub_terms( $sub_tax );
+	}
+	return $terms;
+}
+
+/**
+ * Retrieves the array of root slugs to options.
+ *
+ * @return array Array of root slugs to options.
+ */
+function get_root_slug_to_options(): array {
 	$inst  = _get_instance();
 	$roots = _get_root_terms();
 	$terms = array();
 
 	foreach ( $roots as $idx => $r ) {
-		if ( $do_omit_first && 0 === $idx ) {
-			continue;
-		}
-		if ( $do_hide ) {
-			$val_hide = get_term_meta( $r->term_id, $inst::KEY_IS_HIDDEN, true );
-			if ( $val_hide ) {
-				continue;
-			}
-		}
-		$sub_tax           = root_term_to_sub_tax( $r );
-		$terms[ $r->slug ] = _get_sub_terms( $sub_tax );
+		$is_hidden  = get_term_meta( $r->term_id, $inst::KEY_IS_HIDDEN, true );
+		$uncat_last = get_term_meta( $r->term_id, $inst::KEY_SORT_UNCAT_LAST, true );
+
+		$terms[ $r->slug ] = array(
+			'is_hidden'  => $is_hidden ? true : false,
+			'uncat_last' => $uncat_last ? true : false,
+		);
 	}
 	return $terms;
 }
@@ -258,7 +267,7 @@ function get_sub_slug_to_last_omit(): array {
 	$slug_to_last_omit = array();
 	foreach ( get_root_slug_to_sub_terms() as $rs => $terms ) {
 		foreach ( $terms as $t ) {
-			$val = get_term_meta( $t->term_id, $inst::KEY_LAST_CAT_OMITTED, true );
+			$val = get_term_meta( $t->term_id, $inst::KEY_OMIT_LAST_CAT_GROUP, true );
 			if ( '1' === $val ) {
 				$slug_to_last_omit[ $t->slug ] = true;
 			}
@@ -397,8 +406,9 @@ function _cb_edit_taxonomy( int $term_id, string $tax ) {
  */
 function _cb_edited_taxonomy( int $term_id, int $tt_id ) {
 	$inst = _get_instance();
-	_update_term_meta_by_post( $term_id, $inst::KEY_LAST_CAT_OMITTED );
 	_update_term_meta_by_post( $term_id, $inst::KEY_IS_HIDDEN );
+	_update_term_meta_by_post( $term_id, $inst::KEY_SORT_UNCAT_LAST );
+	_update_term_meta_by_post( $term_id, $inst::KEY_OMIT_LAST_CAT_GROUP );
 
 	$term    = get_term_by( 'term_taxonomy_id', $tt_id );
 	$new_tax = root_term_to_sub_tax( $term );
@@ -446,9 +456,10 @@ function _cb_query_vars_taxonomy( array $query_vars ): array {
 function _cb_taxonomy_edit_form_fields( \WP_Term $term, string $tax ) {
 	$inst = _get_instance();
 	if ( $tax === $inst->root_tax ) {
-		_bool_field( $term, $inst::KEY_IS_HIDDEN, __( 'Hide from view screen', 'wplug_bimeson_item' ) );
+		_bool_field( $term, $inst::KEY_IS_HIDDEN, __( 'List', 'wplug_bimeson_item' ), __( 'Hide from view screen', 'wplug_bimeson_item' ) );
+		_bool_field( $term, $inst::KEY_SORT_UNCAT_LAST, __( 'Sort', 'wplug_bimeson_item' ), __( 'Sort uncategorized items last', 'wplug_bimeson_item' ) );
 	} else {
-		_bool_field( $term, $inst::KEY_LAST_CAT_OMITTED, __( 'Omit the heading of the last category group', 'wplug_bimeson_item' ) );
+		_bool_field( $term, $inst::KEY_OMIT_LAST_CAT_GROUP, __( 'List', 'wplug_bimeson_item' ), __( 'Omit the heading of the last category group', 'wplug_bimeson_item' ) );
 	}
 }
 
@@ -457,15 +468,16 @@ function _cb_taxonomy_edit_form_fields( \WP_Term $term, string $tax ) {
  *
  * @access private
  *
- * @param \WP_Term $term  Current term.
- * @param string   $key   Input name.
- * @param string   $label Label.
+ * @param \WP_Term $term    Current term.
+ * @param string   $key     Input name.
+ * @param string   $heading Heading.
+ * @param string   $label   Label.
  */
-function _bool_field( \WP_Term $term, string $key, string $label ) {
+function _bool_field( \WP_Term $term, string $key, string $heading, string $label ) {
 	$val = get_term_meta( $term->term_id, $key, true );
 	?>
 	<tr class="form-field">
-		<th style="padding-bottom: 20px;"><label for="<?php echo esc_attr( $key ); ?>"><?php esc_html_e( 'List', 'wplug_bimeson_item' ); ?></label></th>
+		<th style="padding-bottom: 20px;"><label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $heading ); ?></label></th>
 		<td style="padding-bottom: 20px;">
 			<label>
 				<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" <?php checked( $val, 1 ); ?>>

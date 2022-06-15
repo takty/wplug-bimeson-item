@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  */
 
 namespace wplug\bimeson_item;
@@ -52,23 +52,29 @@ function echo_the_list( array $args, string $lang, string $before = '<div class=
  */
 function _echo_heading_list_element( array $its, string $lang, bool $sort_by_date_first, bool $omit_single_cat, ?array $filter_state ) {
 	$inst = _get_instance();
-	$vs   = $filter_state[ $inst::KEY_VISIBLE ] ?? null;
+	$vs   = get_visible_root_slugs( $filter_state );
 
 	$root_slug_to_depth    = get_root_slug_to_sub_depths();
 	$sub_slug_to_last_omit = get_sub_slug_to_last_omit();
+	$root_slug_to_options  = get_root_slug_to_options();
 
+	if ( empty( $root_slug_to_depth ) ) {
+		return;
+	}
 	$last_cat_depth  = $root_slug_to_depth[ array_key_last( $root_slug_to_depth ) ];
 	$omitted_heading = $omit_single_cat ? _make_omitted_heading( $filter_state ) : null;
 
-	$hr_size_orig  = 0;
-	$hr_to_sub_tax = array();
+	$hr_size_orig     = 0;
+	$hr_to_sub_tax    = array();
+	$hr_to_uncat_last = array();
 	foreach ( $root_slug_to_depth as $rs => $d ) {
 		if ( ! is_null( $vs ) && ! in_array( $rs, $vs, true ) ) {
 			continue;
 		}
 		$hr_size_orig += $d;
 		for ( $i = 0; $i < $d; $i++ ) {
-			$hr_to_sub_tax[] = $inst->sub_taxes[ $rs ];
+			$hr_to_sub_tax[]    = $inst->sub_taxes[ $rs ];
+			$hr_to_uncat_last[] = $root_slug_to_options[ $rs ]['uncat_last'];
 		}
 	}
 	$prev_cat_slug = array_pad( array(), $hr_size_orig, '' );
@@ -112,7 +118,7 @@ function _echo_heading_list_element( array $its, string $lang, bool $sort_by_dat
 				$buf->echo();
 			}
 			for ( $h = $hr; $h < $hr_size; $h++ ) {
-				if ( ! empty( $cat_slugs[ $h ] ) ) {
+				if ( ! empty( $cat_slugs[ $h ] ) || ( $hr_to_uncat_last[ $h ] && $h === $hr ) ) {
 					if ( is_null( $omitted_heading ) || ! $omitted_heading[ $hr_to_sub_tax[ $h ] ] ) {
 						_echo_heading( $h, $sort_by_date_first ? 1 : 0, $hr_to_sub_tax[ $h ], $cat_slugs[ $h ] );
 					}
@@ -206,15 +212,20 @@ function _is_cat_exist( string $sub_tax, string $slug ): bool {
 function _echo_heading( int $hr, bool $sort_by_date_first, string $sub_tax, string $slug ) {
 	$inst = _get_instance();
 
-	$t = get_term_by( 'slug', $slug, $sub_tax );
-	if ( $t ) {
-		if ( is_callable( $inst->term_name_getter ) ) {
-			$_label = esc_html( ( $inst->term_name_getter )( $t ) );
-		} else {
-			$_label = esc_html( $t->name );
-		}
+	if ( empty( $slug ) ) {
+		$_label = $inst->uncat_label;
+		$slug   = 'uncategorized';
 	} else {
-		$_label = esc_html( is_numeric( $slug ) ? $slug : "[$slug]" );
+		$t = get_term_by( 'slug', $slug, $sub_tax );
+		if ( $t ) {
+			if ( is_callable( $inst->term_name_getter ) ) {
+				$_label = esc_html( ( $inst->term_name_getter )( $t ) );
+			} else {
+				$_label = esc_html( $t->name );
+			}
+		} else {
+			$_label = esc_html( is_numeric( $slug ) ? $slug : "[$slug]" );
+		}
 	}
 	$level = $hr + $inst->head_level + ( $sort_by_date_first ? 1 : 0 );
 	$tag   = ( $level <= 6 ) ? "h$level" : 'div';

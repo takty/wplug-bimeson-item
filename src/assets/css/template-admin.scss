@@ -3,7 +3,7 @@
  * Bimeson (Template Admin)
  *
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  *
  */
 
@@ -54,7 +54,15 @@
 	display    : flex;
 	align-items: center;
 
-	label:last-child { margin-left: auto; }
+	label:last-child {
+		margin-left: auto;
+		user-select: none;
+
+		&[disabled] {
+			pointer-events: none;
+			opacity       : 0.5;
+		}
+	}
 }
 
 .wplug-bimeson-admin-filter-cat {

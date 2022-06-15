@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  */
 
 namespace wplug\bimeson_item;
@@ -21,7 +21,7 @@ namespace wplug\bimeson_item;
  */
 function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat, ?array $filter_state ): array {
 	$rs_idx = _make_rs_idx();
-	$vs     = $filter_state[ _get_instance()::KEY_VISIBLE ] ?? null;
+	$vs     = get_visible_root_slugs( $filter_state );
 
 	$items = _align_sub_slugs( $items, $rs_idx );
 	if ( $dup_multi_cat ) {
@@ -181,7 +181,8 @@ function _sort_list_items( array &$items, bool $sort_by_date_first, array $rs_id
 			}
 		}
 	}
-	$inst->rs_idx = $rs_idx;
+	$inst->rs_idx  = $rs_idx;
+	$inst->rs_opts = get_root_slug_to_options();
 	if ( $sort_by_date_first ) {
 		usort( $items, '\wplug\bimeson_item\_compare_item_by_date_cat' );
 	} else {
@@ -232,8 +233,9 @@ function _compare_item_by_date( array $a, array $b ): int {
  * @return int Comparison result.
  */
 function _compare_item_by_cat( array $a, array $b ): int {
-	$inst   = _get_instance();
-	$rs_idx = $inst->rs_idx;
+	$inst    = _get_instance();
+	$rs_idx  = $inst->rs_idx;
+	$rs_opts = $inst->rs_opts;
 
 	foreach ( get_root_slug_to_sub_slugs() as $rs => $slugs ) {
 		$ai = _get_first_sub_slug_index( $a, $rs, $rs_idx );
@@ -242,6 +244,10 @@ function _compare_item_by_cat( array $a, array $b ): int {
 		if ( -1 === $ai && -1 === $bi ) {
 			continue;
 		} else {
+			if ( $rs_opts[ $rs ]['uncat_last'] ) {
+				$ai = ( -1 === $ai ) ? PHP_INT_MAX : $ai;
+				$bi = ( -1 === $bi ) ? PHP_INT_MAX : $bi;
+			}
 			if ( $ai < $bi ) {
 				return -1;
 			}

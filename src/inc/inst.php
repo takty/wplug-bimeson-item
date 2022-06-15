@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  */
 
 namespace wplug\bimeson_item;
@@ -92,6 +92,13 @@ function _get_instance(): object {
 		public $rs_idx = null;
 
 		/**
+		 * The array of root slug to options.
+		 *
+		 * @var 1.0
+		 */
+		public $rs_opts = null;
+
+		/**
 		 * Additional languages.
 		 *
 		 * @var 1.0
@@ -100,8 +107,9 @@ function _get_instance(): object {
 
 		// Taxonomy.
 
-		const KEY_LAST_CAT_OMITTED = '_bimeson_last_cat_omitted';
-		const KEY_IS_HIDDEN        = '_bimeson_is_hidden';
+		const KEY_IS_HIDDEN           = '_bimeson_is_hidden';
+		const KEY_SORT_UNCAT_LAST     = '_bimeson_sort_uncat_last';
+		const KEY_OMIT_LAST_CAT_GROUP = '_bimeson_omit_last_cat_group';
 
 		const DEFAULT_TAXONOMY          = 'bm_cat';
 		const DEFAULT_SUB_TAX_BASE      = 'bm_cat_';
@@ -199,6 +207,13 @@ function _get_instance(): object {
 		 * @var 1.0
 		 */
 		public $year_select_label;
+
+		/**
+		 * Label of heading meaning 'uncategorized'.
+		 *
+		 * @var 1.0
+		 */
+		public $uncat_label;
 
 	};
 	return $values;

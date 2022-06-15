@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  */
 
 namespace wplug\bimeson_item;
@@ -65,18 +65,18 @@ function echo_the_filter( ?array $filter_state, array $years_exist, string $befo
  */
 function echo_filter( ?array $filter_state, array $years_exist ) {
 	$inst        = _get_instance();
-	$rs_to_terms = get_root_slug_to_sub_terms( false, true );
+	$rs_to_terms = get_root_slug_to_sub_terms();
+	$vs          = get_visible_root_slugs( $filter_state );
 	$state       = _get_filter_state_from_query();
 
 	if ( ! empty( $years_exist ) ) {
 		_echo_year_select( $years_exist, $state );
 	}
-	if ( is_null( $filter_state ) ) {
+	if ( is_null( $vs ) ) {
 		foreach ( $rs_to_terms as $rs => $terms ) {
 			_echo_tax_checkboxes( $rs, $terms, $state );
 		}
 	} else {
-		$vs = $filter_state[ $inst::KEY_VISIBLE ] ?? null;
 		foreach ( $rs_to_terms as $rs => $terms ) {
 			$fs = $filter_state[ $rs ] ?? array();
 			if ( 1 !== count( $fs ) && ( is_null( $vs ) || in_array( $rs, $vs, true ) ) ) {

@@ -3,7 +3,7 @@
  * Bimeson (Template Admin)
  *
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2022-06-15
  *
  */
 
@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	for (let key in keyToSwAndCbs) {
 		const [sw, sv, cbs] = keyToSwAndCbs[key];
 		if (isCheckedOne(cbs)) {
-			sv.setAttribute('disabled', '');
+			sv.checked = false;
 		} else {
-			sv.removeAttribute('disabled');
+			sv.checked = true;
 		}
 		assignEventListener(sw, sv, cbs);
 	}
@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			cbs[i].addEventListener('click', () => {
 				sw.checked = isCheckedAtLeastOne(cbs);
 				if (isCheckedOne(cbs)) {
-					sv.setAttribute('disabled', '');
+					sv.checked = false;
 				} else {
-					sv.removeAttribute('disabled');
+					sv.checked = true;
 				}
 			});
 		}
