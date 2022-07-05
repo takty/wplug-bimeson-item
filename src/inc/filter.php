@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2022-06-15
+ * @version 2022-07-05
  */
 
 namespace wplug\bimeson_item;
@@ -79,7 +79,7 @@ function echo_filter( ?array $filter_state, array $years_exist ) {
 	} else {
 		foreach ( $rs_to_terms as $rs => $terms ) {
 			$fs = $filter_state[ $rs ] ?? array();
-			if ( 1 !== count( $fs ) && ( is_null( $vs ) || in_array( $rs, $vs, true ) ) ) {
+			if ( 1 !== count( $fs ) && in_array( $rs, $vs, true ) ) {
 				_echo_tax_checkboxes( $rs, $terms, $state, empty( $fs ) ? null : $fs );
 			}
 		}
