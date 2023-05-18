@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2023-05-18
  */
 
 namespace wplug\bimeson_item;
@@ -146,7 +146,7 @@ function _cb_save_post_post_type( $post_id ) {
 	}
 	$date = ( ! empty( $_POST[ $inst::IT_DATE ] ) ) ? normalize_date( wp_unslash( $_POST[ $inst::IT_DATE ] ) ) : '';  // phpcs:ignore
 	if ( $date ) {
-		$date_num = str_pad( str_replace( '-', '', $date ), 8, '9', STR_PAD_RIGHT );
+		$date_num = create_date_number( $date );
 		update_post_meta( $post_id, $inst::IT_DATE_NUM, $date_num );
 	}
 	save_post_meta( $post_id, $inst::IT_DATE, '\\wplug\\bimeson_item\\normalize_date' );
@@ -178,7 +178,7 @@ function process_items( array &$items, string $file_name ): array {
 			continue;
 		}
 		$date       = ( ! empty( $item[ $inst::IT_DATE ] ) ) ? normalize_date( $item[ $inst::IT_DATE ] ) : '';
-		$date_num   = str_pad( str_replace( '-', '', $date ), 8, '9', STR_PAD_RIGHT );
+		$date_num   = create_date_number( $date );
 		$doi        = ( ! empty( $item[ $inst::IT_DOI ] ) ) ? $item[ $inst::IT_DOI ] : '';
 		$link_url   = ( ! empty( $item[ $inst::IT_LINK_URL ] ) ) ? $item[ $inst::IT_LINK_URL ] : '';
 		$link_title = ( ! empty( $item[ $inst::IT_LINK_TITLE ] ) ) ? $item[ $inst::IT_LINK_TITLE ] : '';
