@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2023-05-18
  */
 
 namespace wplug\bimeson_item;
@@ -143,7 +143,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 */
 	public function dispatch() {
 		wp_enqueue_script( 'wplug-bimeson-item-importer', $this->url_to . '/assets/js/importer.min.js', array(), '1.0', false );
-		wp_enqueue_script( 'xlsx', $this->url_to . '/assets/js/xlsx.full.min.js', array(), '1.0', false );
+		wp_enqueue_script( 'xlsx', $this->url_to . '/assets/js/sheetjs/xlsx.full.min.js', array(), '1.0', false );
 
 		$this->header();
 
