@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-05-18
+ * @version 2023-06-25
  */
 
 namespace wplug\bimeson_item;
@@ -126,7 +126,7 @@ function create_date_number( string $date ): string {
 		return str_pad( $date, 8, '9', STR_PAD_RIGHT );
 	}
 	$date = str_replace( array( '-', '/' ), '|', $date );
-	$ds   = explode( '|', array_map( 'intval', $ds ) );
+	$ds   = array_map( 'intval', explode( '|', $date ) );
 
 	if ( isset( $ds[0] ) && 0 === $ds[0] ) {
 		return str_pad( $date, 8, '9', STR_PAD_RIGHT );
