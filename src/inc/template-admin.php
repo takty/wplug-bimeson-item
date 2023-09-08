@@ -4,16 +4,19 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2022-06-15
+ * @version 2023-09-08
  */
 
 namespace wplug\bimeson_item;
+
+require_once __DIR__ . '/inst.php';
+require_once __DIR__ . '/taxonomy.php';
 
 /**
  * Retrieves the config of a template admin.
  *
  * @param int $post_id Post ID.
- * @return ?array Config.
+ * @return array<string, mixed>|null Config.
  */
 function get_template_admin_config( int $post_id ): ?array {
 	$inst     = _get_instance();
@@ -37,7 +40,7 @@ function get_template_admin_config( int $post_id ): ?array {
  * @param string      $title  Title of the meta box.
  * @param string|null $screen (Optional) The screen or screens on which to show the box.
  */
-function add_meta_box_template_admin( string $title, ?string $screen = null ) {
+function add_meta_box_template_admin( string $title, ?string $screen = null ): void {
 	\add_meta_box( 'wplug_bimeson_item_admin_mb', $title, '\wplug\bimeson_item\_cb_output_html_template_admin', $screen );
 }
 
@@ -46,7 +49,7 @@ function add_meta_box_template_admin( string $title, ?string $screen = null ) {
  *
  * @param int $post_id Post ID.
  */
-function save_meta_box_template_admin( int $post_id ) {
+function save_meta_box_template_admin( int $post_id ): void {
 	if ( ! isset( $_POST['wplug_bimeson_admin_nonce'] ) ) {
 		return;
 	}
@@ -82,8 +85,10 @@ function save_meta_box_template_admin( int $post_id ) {
 	$cfg['filter_state'] = _get_filter_state_from_env();
 
 	$json = wp_json_encode( $cfg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-	// Because the meta value is passed through the stripslashes() function upon being stored.
-	update_post_meta( $post_id, $inst->fld_list_cfg, addslashes( $json ) );
+	if ( false !== $json ) {
+		// Because the meta value is passed through the stripslashes() function upon being stored.
+		update_post_meta( $post_id, $inst->fld_list_cfg, addslashes( $json ) );
+	}
 }
 
 /**
@@ -93,7 +98,7 @@ function save_meta_box_template_admin( int $post_id ) {
  *
  * @param \WP_Post $post Current post.
  */
-function _cb_output_html_template_admin( \WP_Post $post ) {
+function _cb_output_html_template_admin( \WP_Post $post ): void {
 	$inst = _get_instance();
 	wp_nonce_field( 'wplug_bimeson_admin', 'wplug_bimeson_admin_nonce' );
 	$cfg = get_template_admin_config( $post->ID );
@@ -157,9 +162,9 @@ function _cb_output_html_template_admin( \WP_Post $post ) {
  *
  * @access private
  *
- * @param array $state Filter states.
+ * @param array<string, mixed> $state Filter states.
  */
-function _echo_filter( array $state ) {
+function _echo_filter( array $state ): void {
 	$opts = get_root_slug_to_options();
 	foreach ( get_root_slug_to_sub_terms() as $rs => $terms ) {
 		_echo_tax_checkboxes_admin( $rs, $terms, $state, $opts[ $rs ]['is_hidden'] );
@@ -171,12 +176,12 @@ function _echo_filter( array $state ) {
  *
  * @access private
  *
- * @param string $root_slug Root slug.
- * @param array  $terms     Sub terms.
- * @param array  $state     Filter states.
- * @param bool   $is_hidden Whether the root term is hidden.
+ * @param string               $root_slug Root slug.
+ * @param \WP_Term[]           $terms     Sub terms.
+ * @param array<string, mixed> $state     Filter states.
+ * @param bool                 $is_hidden Whether the root term is hidden.
  */
-function _echo_tax_checkboxes_admin( string $root_slug, array $terms, array $state, bool $is_hidden ) {
+function _echo_tax_checkboxes_admin( string $root_slug, array $terms, array $state, bool $is_hidden ): void {
 	$inst = _get_instance();
 	$func = $inst->term_name_getter;
 	if ( ! is_callable( $func ) ) {
@@ -236,7 +241,7 @@ function _echo_tax_checkboxes_admin( string $root_slug, array $terms, array $sta
  *
  * @access private
  *
- * @return array Filter states.
+ * @return array<string, mixed> Filter states.
  */
 function _get_filter_state_from_env(): array {
 	$ret = array();
@@ -250,7 +255,7 @@ function _get_filter_state_from_env(): array {
 	}
 	$inst = _get_instance();
 	if ( isset( $_POST['wplug_bimeson_visible'] ) ) {  // phpcs:ignore
-		$ret[ $inst::KEY_VISIBLE ] = array_values( array_intersect( get_root_slugs(), wp_unslash( $_POST['wplug_bimeson_visible'] ) ) );  // phpcs:ignore
+		$ret[ (string) $inst::KEY_VISIBLE ] = array_values( array_intersect( get_root_slugs(), wp_unslash( $_POST['wplug_bimeson_visible'] ) ) );  // phpcs:ignore
 	}
 	return $ret;
 }

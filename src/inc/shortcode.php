@@ -4,19 +4,26 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2023-09-08
  *
  * [publication list="<slug or post ID>" count="10" date-sort omit-single dup-item date="2020-2021" taxonomy="slug1, slug2, ..."]
  */
 
 namespace wplug\bimeson_item;
 
+require_once __DIR__ . '/../bimeson.php';
+require_once __DIR__ . '/filter.php';
+require_once __DIR__ . '/inst.php';
+require_once __DIR__ . '/list.php';
+require_once __DIR__ . '/retriever.php';
+require_once __DIR__ . '/taxonomy.php';
+
 /**
  * Registers the shortcode.
  *
  * @param string $lang Language.
  */
-function register_shortcode( string $lang ) {
+function register_shortcode( string $lang ): void {
 	static $serial = 0;
 
 	\add_shortcode(
@@ -39,7 +46,7 @@ function register_shortcode( string $lang ) {
 			if ( $d ) {
 				echo_the_list( $d, $lang, '<div class="wplug-bimeson-list"%s>', '</div>', $id );
 			}
-			$ret = ob_get_contents();
+			$ret = (string) ob_get_contents();
 			ob_end_clean();
 			return $ret;
 		}
@@ -51,9 +58,9 @@ function register_shortcode( string $lang ) {
  *
  * @access private
  *
- * @param array  $atts Attributes.
- * @param string $lang Language.
- * @return array Data.
+ * @param array<string, mixed> $atts Attributes.
+ * @param string               $lang Language.
+ * @return array<string, mixed> Data.
  */
 function _get_data_shortcode( array $atts, string $lang ): array {
 	list( $date_bgn, $date_end ) = _extract_date_atts( $atts );
@@ -83,20 +90,20 @@ function _get_data_shortcode( array $atts, string $lang ): array {
  *
  * @access private
  *
- * @param array $atts Attributes.
- * @return array Date.
+ * @param array<string, mixed> $atts Attributes.
+ * @return array{string|null, string|null} Date.
  */
 function _extract_date_atts( array $atts ): array {
 	$ds = array();
 	foreach ( array( 'date', 'date-start', 'date-end' ) as $key ) {
 		if ( ! empty( $atts[ $key ] ) ) {
 			if ( is_numeric( $atts[ $key ] ) ) {
-				$ds[] = $atts[ $key ];
+				$ds[] = (string) $atts[ $key ];
 			} else {
 				$vs = array_map( '\trim', explode( '-', $atts[ $key ] ) );
 				foreach ( $vs as $v ) {
 					if ( is_numeric( $v ) ) {
-						$ds[] = $v;
+						$ds[] = (string) $v;
 					}
 				}
 			}
@@ -115,8 +122,8 @@ function _extract_date_atts( array $atts ): array {
  *
  * @access private
  *
- * @param array $atts Attributes.
- * @return ?array Filter states.
+ * @param array<string, mixed> $atts Attributes.
+ * @return array<string, mixed>|null Filter states.
  */
 function _extract_filter_state( array $atts ): ?array {
 	$fs = array();

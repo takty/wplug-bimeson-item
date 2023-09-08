@@ -4,19 +4,25 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-05-18
+ * @version 2023-09-08
  */
 
 namespace wplug\bimeson_item;
 
+require_once __DIR__ . '/../assets/admin-current-post.php';
+require_once __DIR__ . '/../assets/date-field.php';
 require_once __DIR__ . '/class-bimeson-importer.php';
+require_once __DIR__ . '/field.php';
+require_once __DIR__ . '/inst.php';
+require_once __DIR__ . '/taxonomy.php';
+require_once __DIR__ . '/util.php';
 
 /**
  * Initializes the post type.
  *
  * @param string $url_to Base URL.
  */
-function initialize_post_type( string $url_to ) {
+function initialize_post_type( string $url_to ): void {
 	$inst = _get_instance();
 	register_post_type(
 		$inst::PT,
@@ -61,7 +67,7 @@ function initialize_post_type( string $url_to ) {
  *
  * @access private
  */
-function _cb_wp_loaded() {
+function _cb_wp_loaded(): void {
 	$inst = _get_instance();
 	$cs   = array( 'cb', 'title' );
 	$cs[] = array(
@@ -92,9 +98,9 @@ function _cb_wp_loaded() {
  *
  * @access private
  */
-function _cb_admin_menu_post_type() {
+function _cb_admin_menu_post_type(): void {
 	$inst = _get_instance();
-	if ( ! is_post_type( $inst::PT ) ) {
+	if ( ! \wplug\is_admin_post_type( $inst::PT ) ) {
 		return;
 	}
 	foreach ( $inst->additional_langs as $al ) {
@@ -108,16 +114,16 @@ function _cb_admin_menu_post_type() {
  *
  * @access private
  */
-function _cb_output_html_post_type() {
+function _cb_output_html_post_type(): void {
 	$inst = _get_instance();
 	wp_nonce_field( 'wplug_bimeson_item', 'wplug_bimeson_item_nonce' );
 	$post_id = get_the_ID();
 
 	// phpcs:disable
-	$date       = get_post_meta( $post_id, $inst::IT_DATE,       true );
-	$doi        = get_post_meta( $post_id, $inst::IT_DOI,        true );
-	$link_url   = get_post_meta( $post_id, $inst::IT_LINK_URL,   true );
-	$link_title = get_post_meta( $post_id, $inst::IT_LINK_TITLE, true );
+	$date       = $post_id ? get_post_meta( $post_id, $inst::IT_DATE,       true ) : '';
+	$doi        = $post_id ? get_post_meta( $post_id, $inst::IT_DOI,        true ) : '';
+	$link_url   = $post_id ? get_post_meta( $post_id, $inst::IT_LINK_URL,   true ) : '';
+	$link_title = $post_id ? get_post_meta( $post_id, $inst::IT_LINK_TITLE, true ) : '';
 	// phpcs:enable
 
 	output_input_row( __( 'Published date', 'wplug_bimeson_item' ), $inst::IT_DATE, $date );
@@ -133,7 +139,7 @@ function _cb_output_html_post_type() {
  *
  * @param int $post_id Post ID.
  */
-function _cb_save_post_post_type( $post_id ) {
+function _cb_save_post_post_type( int $post_id ): void {
 	$inst = _get_instance();
 	if ( ! isset( $_POST['wplug_bimeson_item_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['wplug_bimeson_item_nonce'] ), 'wplug_bimeson_item' ) ) {
 		return;
@@ -144,12 +150,12 @@ function _cb_save_post_post_type( $post_id ) {
 	foreach ( $inst->additional_langs as $al ) {
 		save_rich_editor_meta_box( $post_id, "_post_content_$al" );
 	}
-	$date = ( ! empty( $_POST[ $inst::IT_DATE ] ) ) ? normalize_date( wp_unslash( $_POST[ $inst::IT_DATE ] ) ) : '';  // phpcs:ignore
+	$date = ( ! empty( $_POST[ $inst::IT_DATE ] ) ) ? \wplug\normalize_date( wp_unslash( $_POST[ $inst::IT_DATE ] ) ) : '';  // phpcs:ignore
 	if ( $date ) {
-		$date_num = create_date_number( $date );
+		$date_num = \wplug\create_date_number( $date );
 		update_post_meta( $post_id, $inst::IT_DATE_NUM, $date_num );
 	}
-	save_post_meta( $post_id, $inst::IT_DATE, '\\wplug\\bimeson_item\\normalize_date' );
+	save_post_meta( $post_id, $inst::IT_DATE, '\\wplug\\normalize_date' );
 	save_post_meta( $post_id, $inst::IT_DOI );
 	save_post_meta( $post_id, $inst::IT_LINK_URL );
 	save_post_meta( $post_id, $inst::IT_LINK_TITLE );
@@ -163,9 +169,9 @@ function _cb_save_post_post_type( $post_id ) {
  * Processes an array of items.
  * Called by the importer.
  *
- * @param array  $items     Items.
- * @param string $file_name The file name of a publication list.
- * @return array Messages.
+ * @param array<string, mixed>[] $items     Items.
+ * @param string                 $file_name The file name of a publication list.
+ * @return string[] Messages.
  */
 function process_items( array &$items, string $file_name ): array {
 	$inst       = _get_instance();
@@ -177,8 +183,8 @@ function process_items( array &$items, string $file_name ): array {
 		if ( empty( $body ) ) {
 			continue;
 		}
-		$date       = ( ! empty( $item[ $inst::IT_DATE ] ) ) ? normalize_date( $item[ $inst::IT_DATE ] ) : '';
-		$date_num   = create_date_number( $date );
+		$date       = ( ! empty( $item[ $inst::IT_DATE ] ) ) ? \wplug\normalize_date( $item[ $inst::IT_DATE ] ) : '';
+		$date_num   = \wplug\create_date_number( $date );
 		$doi        = ( ! empty( $item[ $inst::IT_DOI ] ) ) ? $item[ $inst::IT_DOI ] : '';
 		$link_url   = ( ! empty( $item[ $inst::IT_LINK_URL ] ) ) ? $item[ $inst::IT_LINK_URL ] : '';
 		$link_title = ( ! empty( $item[ $inst::IT_LINK_TITLE ] ) ) ? $item[ $inst::IT_LINK_TITLE ] : '';

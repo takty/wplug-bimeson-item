@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2021-08-31
+ * @version 2023-09-08
  */
 
 namespace wplug\bimeson_item;
@@ -17,14 +17,14 @@ class ItemBuffer {
 	/**
 	 * Stored items.
 	 *
-	 * @var 1.0
+	 * @var array<string, mixed>[]
 	 */
 	private $items = array();
 
 	/**
 	 * Language.
 	 *
-	 * @var 1.0
+	 * @var string
 	 */
 	private $lang;
 
@@ -40,16 +40,16 @@ class ItemBuffer {
 	/**
 	 * Adds an item.
 	 *
-	 * @param array $item An item.
+	 * @param array<string, mixed> $item An item.
 	 */
-	public function add( array $item ) {
+	public function add( array $item ): void {
 		$this->items[] = $item;
 	}
 
 	/**
 	 * Displays stored items.
 	 */
-	public function echo() {
+	public function echo(): void {
 		if ( ! empty( $this->items ) ) {
 			_echo_list_element( $this->items, $this->lang );
 			$this->items = array();

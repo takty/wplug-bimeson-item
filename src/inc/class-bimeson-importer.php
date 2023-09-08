@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-05-18
+ * @version 2023-09-08
  */
 
 namespace wplug\bimeson_item;
@@ -20,7 +20,8 @@ if ( ! class_exists( '\WP_Importer' ) ) {
 	return;
 }
 
-require_once __DIR__ . '/../assets/class-ajax.php';
+require_once __DIR__ . '/class-ajax.php';
+require_once __DIR__ . '/taxonomy.php';
 
 /**
  * Bimeson importer
@@ -32,37 +33,30 @@ class Bimeson_Importer extends \WP_Importer {
 	 *
 	 * @param string $url_to Base URL.
 	 */
-	public static function register( string $url_to ) {
-		new Bimeson_Importer( $url_to );
+	public static function register( string $url_to ): void {
+		$instance = new Bimeson_Importer( $url_to );
 	}
 
 	/**
 	 * Base URL.
 	 *
-	 * @var 1.0
+	 * @var string
 	 */
 	private $url_to;
 
 	/**
 	 * Ajax request URL.
 	 *
-	 * @var 1.0
+	 * @var string
 	 */
 	private $ajax_request_url;
 
 	/**
 	 * Uploaded file ID.
 	 *
-	 * @var 1.0
+	 * @var int
 	 */
 	private $file_id;
-
-	/**
-	 * Uploaded file name.
-	 *
-	 * @var 1.0
-	 */
-	private $file_name;
 
 	/**
 	 * Constructor.
@@ -80,7 +74,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 *
 	 * @access private
 	 */
-	private function initialize() {
+	private function initialize(): void {
 		$GLOBALS['wplug_bimeson_import'] = $this;
 		register_importer(
 			'wplug_bimeson',
@@ -114,7 +108,7 @@ class Bimeson_Importer extends \WP_Importer {
 					Ajax::send_success( array( 'index' => 0 ) );
 				} elseif ( 'end' === $status ) {
 					wp_suspend_cache_invalidation( false );
-					wp_import_cleanup( (int) $data['file_id'] );
+					wp_import_cleanup( $data['file_id'] );
 					wp_cache_flush();
 					do_action( 'import_end' );
 				} else {
@@ -141,7 +135,7 @@ class Bimeson_Importer extends \WP_Importer {
 	/**
 	 * Dispatches the request.
 	 */
-	public function dispatch() {
+	public function dispatch(): void {
 		wp_enqueue_script( 'wplug-bimeson-item-importer', $this->url_to . '/assets/js/importer.min.js', array(), '1.0', false );
 		wp_enqueue_script( 'xlsx', $this->url_to . '/assets/js/sheetjs/xlsx.full.min.js', array(), '1.0', false );
 
@@ -169,7 +163,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 *
 	 * @access private
 	 */
-	private function header() {
+	private function header(): void {
 		echo '<div class="wrap">';
 		echo '<h2>' . esc_html__( 'Import Publication List', 'wplug_bimeson_item' ) . '</h2>';
 	}
@@ -179,7 +173,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 *
 	 * @access private
 	 */
-	private function footer() {
+	private function footer(): void {
 		echo '</div>';
 	}
 
@@ -192,7 +186,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 *
 	 * @access private
 	 */
-	private function greet() {
+	private function greet(): void {
 		echo '<div class="narrow">';
 		echo '<p>' . esc_html__( 'Upload your Bimeson-formatted Excel (xlsx) file and we&#8217;ll import the publications into this site.', 'wplug_bimeson_item' ) . '</p>';
 		echo '<p>' . esc_html__( 'Choose an Excel (.xlsx) file to upload, then click Upload file and import.', 'wplug_bimeson_item' ) . '</p>';
@@ -236,9 +230,16 @@ class Bimeson_Importer extends \WP_Importer {
 	 *
 	 * @param int $file_id File ID.
 	 */
-	private function parse_upload( int $file_id ) {
-		$url   = wp_get_attachment_url( $file_id );
-		$fname = pathinfo( get_attached_file( $file_id ), PATHINFO_FILENAME );
+	private function parse_upload( int $file_id ): void {
+		$url = wp_get_attachment_url( $file_id );
+		if ( false === $url ) {
+			return;
+		}
+		$file = get_attached_file( $file_id );
+		if ( false === $file ) {
+			return;
+		}
+		$fname = pathinfo( $file, PATHINFO_FILENAME );
 		$ajax  = $this->ajax_request_url;
 		?>
 		<input type="hidden" id="import-url" value="<?php echo esc_attr( $url ); ?>">

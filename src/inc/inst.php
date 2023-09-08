@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2022-06-15
+ * @version 2023-09-08
  */
 
 namespace wplug\bimeson_item;
@@ -30,7 +30,7 @@ function _get_instance(): object {
 		/**
 		 * The meta key of list config.
 		 *
-		 * @var 1.0
+		 * @var string
 		 */
 		public $fld_list_cfg = '_bimeson';
 
@@ -59,49 +59,49 @@ function _get_instance(): object {
 		/**
 		 * First heading level of publication lists.
 		 *
-		 * @var 1.0
+		 * @var int
 		 */
 		public $head_level = 3;
 
 		/**
 		 * Year heading format.
 		 *
-		 * @var 1.0
+		 * @var string|null
 		 */
 		public $year_format = null;
 
 		/**
 		 * Callable for getting term names.
 		 *
-		 * @var 1.0
+		 * @var callable
 		 */
 		public $term_name_getter = null;
 
 		/**
 		 * Data cache.
 		 *
-		 * @var 1.0
+		 * @var array<string, mixed>[]
 		 */
 		public $cache = array();
 
 		/**
 		 * The array of root slug to sub slug indices.
 		 *
-		 * @var 1.0
+		 * @var array<string, int[]>|null
 		 */
 		public $rs_idx = null;
 
 		/**
 		 * The array of root slug to options.
 		 *
-		 * @var 1.0
+		 * @var array<string, array<string, mixed>>|null
 		 */
 		public $rs_opts = null;
 
 		/**
 		 * Additional languages.
 		 *
-		 * @var 1.0
+		 * @var string[]
 		 */
 		public $additional_langs;
 
@@ -119,28 +119,28 @@ function _get_instance(): object {
 		/**
 		 * Root taxonomy slug.
 		 *
-		 * @var 1.0
+		 * @var string
 		 */
 		public $root_tax;
 
 		/**
 		 * Slug base of sub taxonomies.
 		 *
-		 * @var 1.0
+		 * @var string
 		 */
 		public $sub_tax_base;
 
 		/**
 		 * Class base of sub taxonomies.
 		 *
-		 * @var 1.0
+		 * @var string
 		 */
 		public $sub_tax_cls_base;
 
 		/**
 		 * Query variable name base of sub taxonomies.
 		 *
-		 * @var 1.0
+		 * @var string
 		 */
 		public $sub_tax_qvar_base;
 
@@ -150,49 +150,49 @@ function _get_instance(): object {
 		/**
 		 * Class base of year.
 		 *
-		 * @var 1.0
+		 * @var string
 		 */
 		public $year_cls_base;
 
 		/**
 		 * Query variable name of year.
 		 *
-		 * @var 1.0
+		 * @var string
 		 */
 		public $year_qvar;
 
 		/**
 		 * The sub taxonomy slugs.
 		 *
-		 * @var 1.0
+		 * @var array<string, string>
 		 */
 		public $sub_taxes = array();
 
 		/**
 		 * Previously edited taxonomy.
 		 *
-		 * @var 1.0
+		 * @var string[]|null
 		 */
 		public $old_tax = array();
 
 		/**
 		 * Previously edited terms.
 		 *
-		 * @var 1.0
+		 * @var string[]
 		 */
 		public $old_terms = array();
 
 		/**
 		 * The root terms.
 		 *
-		 * @var 1.0
+		 * @var string[]|null
 		 */
 		public $root_terms = null;
 
 		/**
 		 * The sub terms.
 		 *
-		 * @var 1.0
+		 * @var array<string, \WP_Term[]|null>
 		 */
 		public $sub_tax_to_terms = array();
 
@@ -204,14 +204,14 @@ function _get_instance(): object {
 		/**
 		 * Label of year select markup.
 		 *
-		 * @var 1.0
+		 * @var string
 		 */
 		public $year_select_label;
 
 		/**
 		 * Label of heading meaning 'uncategorized'.
 		 *
-		 * @var 1.0
+		 * @var string
 		 */
 		public $uncat_label;
 
@@ -226,7 +226,7 @@ function _get_instance(): object {
  *
  * @param string $key Key.
  */
-function _set_key( string $key ) {
+function _set_key( string $key ): void {
 	$inst = _get_instance();
 
 	$inst->fld_list_cfg = $key;

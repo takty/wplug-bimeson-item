@@ -9,10 +9,13 @@
 
 namespace wplug\bimeson_item;
 
+require_once __DIR__ . '/inst.php';
+require_once __DIR__ . '/taxonomy.php';
+
 /**
  * Initializes the filter.
  */
-function initialize_filter() {
+function initialize_filter(): void {
 	add_filter( 'query_vars', '\wplug\bimeson_item\_cb_query_vars_filter' );
 }
 
@@ -21,8 +24,8 @@ function initialize_filter() {
  *
  * @access private
  *
- * @param array $query_vars The array of allowed query variable names.
- * @return array Filtered array.
+ * @param string[] $query_vars The array of allowed query variable names.
+ * @return string[] Filtered array.
  */
 function _cb_query_vars_filter( array $query_vars ): array {
 	$inst         = _get_instance();
@@ -33,13 +36,13 @@ function _cb_query_vars_filter( array $query_vars ): array {
 /**
  * Displays the filter.
  *
- * @param array|null $filter_state Array of filter states.
- * @param array      $years_exist  Array of existing years.
- * @param string     $before       Content to prepend to the output.
- * @param string     $after        Content to append to the output.
- * @param string     $for          Attribute of 'for'.
+ * @param array<string, mixed>|null $filter_state Array of filter states.
+ * @param string[]                  $years_exist  Array of existing years.
+ * @param string                    $before       Content to prepend to the output.
+ * @param string                    $after        Content to append to the output.
+ * @param string                    $for          Attribute of 'for'.
  */
-function echo_the_filter( ?array $filter_state, array $years_exist, string $before = '<div class="wplug-bimeson-filter"%s>', string $after = '</div>', string $for = 'bml' ) {
+function echo_the_filter( ?array $filter_state, array $years_exist, string $before = '<div class="wplug-bimeson-filter" hidden%s>', string $after = '</div>', string $for = 'bml' ): void {
 	wp_enqueue_style( 'wplug-bimeson-item-filter' );
 	wp_enqueue_script( 'wplug-bimeson-item-filter' );
 
@@ -60,10 +63,10 @@ function echo_the_filter( ?array $filter_state, array $years_exist, string $befo
 /**
  * Displays a filter itself.
  *
- * @param array|null $filter_state Array of filter states.
- * @param array      $years_exist  Array of existing years.
+ * @param array<string, mixed>|null $filter_state Array of filter states.
+ * @param string[]                  $years_exist  Array of existing years.
  */
-function echo_filter( ?array $filter_state, array $years_exist ) {
+function echo_filter( ?array $filter_state, array $years_exist ): void {
 	$inst        = _get_instance();
 	$rs_to_terms = get_root_slug_to_sub_terms();
 	$vs          = get_visible_root_slugs( $filter_state );
@@ -95,10 +98,10 @@ function echo_filter( ?array $filter_state, array $years_exist ) {
  *
  * @access private
  *
- * @param array $years Array of years.
- * @param array $state Array of filter states.
+ * @param string[]             $years Array of years.
+ * @param array<string, mixed> $state Array of filter states.
  */
-function _echo_year_select( array $years, array $state ) {
+function _echo_year_select( array $years, array $state ): void {
 	$inst = _get_instance();
 	$val  = $state[ $inst::KEY_YEAR ];
 	$yf   = is_string( $inst->year_format ) ? $inst->year_format : '%d';
@@ -127,12 +130,12 @@ function _echo_year_select( array $years, array $state ) {
  *
  * @access private
  *
- * @param string     $root_slug A root slug.
- * @param array      $terms     Corresponding terms.
- * @param array      $state     Filter states.
- * @param array|null $filtered  Filtered term slugs.
+ * @param string               $root_slug A root slug.
+ * @param \WP_Term[]           $terms     Corresponding terms.
+ * @param array<string, mixed> $state     Filter states.
+ * @param string[]|null        $filtered  Filtered term slugs.
  */
-function _echo_tax_checkboxes( string $root_slug, array $terms, array $state, ?array $filtered = null ) {
+function _echo_tax_checkboxes( string $root_slug, array $terms, array $state, ?array $filtered = null ): void {
 	$inst = _get_instance();
 	$func = $inst->term_name_getter;
 	if ( ! is_callable( $func ) ) {
@@ -186,7 +189,7 @@ function _echo_tax_checkboxes( string $root_slug, array $terms, array $state, ?a
  *
  * @access private
  *
- * @return array Filter state.
+ * @return array<string, mixed> Filter state.
  */
 function _get_filter_state_from_query(): array {
 	$inst = _get_instance();
@@ -198,6 +201,6 @@ function _get_filter_state_from_query(): array {
 	}
 	$val = get_query_var( $inst->year_qvar );
 
-	$ret[ $inst::KEY_YEAR ] = $val;
+	$ret[ (string) $inst::KEY_YEAR ] = $val;
 	return $ret;
 }

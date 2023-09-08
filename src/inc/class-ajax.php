@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2022-06-15
+ * @version 2023-09-08
  */
 
 namespace wplug\bimeson_item;
@@ -19,7 +19,7 @@ class Ajax {
 	 *
 	 * @param mixed $data Data to be sent.
 	 */
-	public static function send_success( $data = null ) {
+	public static function send_success( $data = null ): void {
 		wp_send_json_success( $data );
 	}
 
@@ -28,28 +28,28 @@ class Ajax {
 	 *
 	 * @param mixed $data Data to be sent.
 	 */
-	public static function send_error( $data = null ) {
+	public static function send_error( $data = null ): void {
 		wp_send_json_error( $data );
 	}
 
 	/**
 	 * Action.
 	 *
-	 * @var 1.0
+	 * @var string
 	 */
 	private $action;
 
 	/**
 	 * Response.
 	 *
-	 * @var 1.0
+	 * @var callable
 	 */
 	private $response;
 
 	/**
 	 * Nonce
 	 *
-	 * @var 1.0
+	 * @var string
 	 */
 	private $nonce;
 
@@ -78,7 +78,7 @@ class Ajax {
 	/**
 	 * Gets the URL of this ajax.
 	 *
-	 * @param array $query Query arguments.
+	 * @param array<string, mixed> $query Query arguments.
 	 * @return string URL.
 	 */
 	public function get_url( array $query = array() ): string {
@@ -95,11 +95,17 @@ class Ajax {
 	/**
 	 * Callback function for 'wp_ajax_nopriv_{$_REQUEST[‘action’]}' action.
 	 */
-	public function cb_ajax_action() {
+	public function cb_ajax_action(): void {
 		check_ajax_referer( $this->nonce, 'nonce' );
 		nocache_headers();
 		$data = file_get_contents( 'php://input' );
+		if ( false === $data ) {
+			return;
+		}
 		$data = json_decode( $data, true );
+		if ( false === $data ) {
+			return;
+		}
 		call_user_func( $this->response, $data );
 	}
 

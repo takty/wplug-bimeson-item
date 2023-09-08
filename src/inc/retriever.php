@@ -4,20 +4,23 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2022-06-15
+ * @version 2023-09-08
  */
 
 namespace wplug\bimeson_item;
 
+require_once __DIR__ . '/inst.php';
+require_once __DIR__ . '/taxonomy.php';
+
 /**
  * Retrieves items.
  *
- * @param array      $items              All items.
- * @param int|null   $count              Count limit.
- * @param bool       $sort_by_date_first Whether to sort by date first.
- * @param bool       $dup_multi_cat      Whether to duplicate multiple category items.
- * @param array|null $filter_state       Filter states.
- * @return array Array of retrieved items and existing years.
+ * @param array<string, mixed>      $items              All items.
+ * @param int|null                  $count              Count limit.
+ * @param bool                      $sort_by_date_first Whether to sort by date first.
+ * @param bool                      $dup_multi_cat      Whether to duplicate multiple category items.
+ * @param array<string, mixed>|null $filter_state       Filter states.
+ * @return array{array<string, mixed>[], string[]} Array of retrieved items and existing years.
  */
 function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat, ?array $filter_state ): array {
 	$rs_idx = _make_rs_idx();
@@ -47,7 +50,7 @@ function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bo
  *
  * @access private
  *
- * @return array Indices.
+ * @return array<string, int[]> Indices.
  */
 function _make_rs_idx(): array {
 	$rs_idx = array();
@@ -62,9 +65,9 @@ function _make_rs_idx(): array {
  *
  * @access private
  *
- * @param array $items  Items.
- * @param array $rs_idx The array of root slug to sub slug indices.
- * @return array Items.
+ * @param array<string, mixed>[] $items  Items.
+ * @param array<string, int[]>   $rs_idx The array of root slug to sub slug indices.
+ * @return array<string, mixed>[] Items.
  */
 function _align_sub_slugs( array $items, array $rs_idx ): array {
 	$inst = _get_instance();
@@ -93,8 +96,8 @@ function _align_sub_slugs( array $items, array $rs_idx ): array {
  *
  * @access private
  *
- * @param array $items Items.
- * @return array Duplicated items.
+ * @param array<string, mixed>[] $items Items.
+ * @return array<string, mixed>[] Duplicated items.
  */
 function _duplicate_items( array $items ): array {
 	$inst = _get_instance();
@@ -132,8 +135,8 @@ function _duplicate_items( array $items ): array {
  *
  * @access private
  *
- * @param array $arrays An array of string arrays.
- * @return array The array of combinations.
+ * @param array<string[]> $arrays An array of string arrays.
+ * @return array<string[]> The array of combinations.
  */
 function _generate_combination( array $arrays ): array {
 	$counts = array_map( 'count', $arrays );
@@ -166,12 +169,12 @@ function _generate_combination( array $arrays ): array {
  *
  * @access private
  *
- * @param array      $items              Items to be sorted.
- * @param bool       $sort_by_date_first Whether to sort by date first.
- * @param array      $rs_idx             The array of root slug to sub slug indices.
- * @param array|null $visible_state      Visibility states.
+ * @param array<string, mixed> $items              Items to be sorted.
+ * @param bool                 $sort_by_date_first Whether to sort by date first.
+ * @param array<string, int[]> $rs_idx             The array of root slug to sub slug indices.
+ * @param string[]|null        $visible_state      Visibility states.
  */
-function _sort_list_items( array &$items, bool $sort_by_date_first, array $rs_idx, ?array $visible_state ) {
+function _sort_list_items( array &$items, bool $sort_by_date_first, array $rs_idx, ?array $visible_state ): void {
 	$inst = _get_instance();
 
 	if ( ! is_null( $visible_state ) ) {
@@ -195,8 +198,8 @@ function _sort_list_items( array &$items, bool $sort_by_date_first, array $rs_id
  *
  * @access private
  *
- * @param array $a An item.
- * @param array $b An item.
+ * @param array<string, mixed> $a An item.
+ * @param array<string, mixed> $b An item.
  * @return int Comparison result.
  */
 function _compare_item_by_date_cat( array $a, array $b ): int {
@@ -209,8 +212,8 @@ function _compare_item_by_date_cat( array $a, array $b ): int {
  *
  * @access private
  *
- * @param array $a An item.
- * @param array $b An item.
+ * @param array<string, mixed> $a An item.
+ * @param array<string, mixed> $b An item.
  * @return int Comparison result.
  */
 function _compare_item_by_date( array $a, array $b ): int {
@@ -228,8 +231,8 @@ function _compare_item_by_date( array $a, array $b ): int {
  *
  * @access private
  *
- * @param array $a An item.
- * @param array $b An item.
+ * @param array<string, mixed> $a An item.
+ * @param array<string, mixed> $b An item.
  * @return int Comparison result.
  */
 function _compare_item_by_cat( array $a, array $b ): int {
@@ -269,9 +272,9 @@ function _compare_item_by_cat( array $a, array $b ): int {
  *
  * @access private
  *
- * @param array  $item   An item.
- * @param string $rs     An root slug.
- * @param array  $rs_idx The array of root slug to sub slug indices.
+ * @param array<string, mixed> $item   An item.
+ * @param string               $rs     An root slug.
+ * @param array<string, int[]> $rs_idx The array of root slug to sub slug indices.
  * @return int Index.
  */
 function _get_first_sub_slug_index( array $item, string $rs, array $rs_idx ): int {
@@ -291,9 +294,9 @@ function _get_first_sub_slug_index( array $item, string $rs, array $rs_idx ): in
  *
  * @access private
  *
- * @param array      $items         Items.
- * @param array|null $visible_state Visibility states.
- * @return array Items.
+ * @param array<string, mixed> $items         Items.
+ * @param string[]|null        $visible_state Visibility states.
+ * @return array<string, mixed> Items.
  */
 function _assign_cat_key( array $items, ?array $visible_state ): array {
 	$inst = _get_instance();
@@ -320,11 +323,11 @@ function _assign_cat_key( array $items, ?array $visible_state ): array {
  *
  * @access private
  *
- * @param array $it                Item.
- * @param array $rs_to_slugs       The array of root slugs to sub slugs.
- * @param array $rs_to_depths      The array of root slugs to depths.
- * @param array $slug_to_ancestors The array of slugs to ancestors.
- * @return array Category keys.
+ * @param array<string, mixed>    $it                Item.
+ * @param array<string, string[]> $rs_to_slugs       The array of root slugs to sub slugs.
+ * @param array<string, int>      $rs_to_depths      The array of root slugs to depths.
+ * @param array<string, string[]> $slug_to_ancestors The array of slugs to ancestors.
+ * @return string[] Category keys.
  */
 function _make_cat_key( array $it, array $rs_to_slugs, array $rs_to_depths, array $slug_to_ancestors ): array {
 	$cats = array();
@@ -358,8 +361,8 @@ function _make_cat_key( array $it, array $rs_to_slugs, array $rs_to_depths, arra
  *
  * @access private
  *
- * @param array $items Items.
- * @return array Array of existing years.
+ * @param array<string, mixed> $items Items.
+ * @return string[] Array of existing years.
  */
 function _collect_existing_year( array $items ): array {
 	$inst  = _get_instance();
