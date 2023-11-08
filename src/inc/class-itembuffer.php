@@ -59,10 +59,11 @@ class ItemBuffer {
 	/**
 	 * Check whether this has any items.
 	 *
+	 * @psalm-suppress PossiblyUnusedMethod
+	 *
 	 * @return bool True if this has any items.
 	 */
 	public function has_item(): bool {
 		return ! empty( $this->items );
 	}
-
 }

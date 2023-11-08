@@ -15,19 +15,19 @@ namespace wplug\bimeson_item;
  * @param int      $post_id Post ID.
  * @param string   $key     Meta key.
  * @param callable $filter  Filter function.
- * @param mixed    $default Default value.
+ * @param mixed    $def     Default value.
  */
-function save_post_meta( int $post_id, string $key, $filter = null, $default = null ): void {
+function save_post_meta( int $post_id, string $key, $filter = null, $def = null ): void {
 	$val = isset( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : null;  // phpcs:ignore
 	if ( null !== $filter && null !== $val ) {
 		$val = $filter( $val );
 	}
 	if ( empty( $val ) ) {
-		if ( null === $default ) {
+		if ( null === $def ) {
 			delete_post_meta( $post_id, $key );
 			return;
 		}
-		$val = $default;
+		$val = $def;
 	}
 	update_post_meta( $post_id, $key, $val );
 }
@@ -38,19 +38,19 @@ function save_post_meta( int $post_id, string $key, $filter = null, $default = n
  * @param int     $post_id   Post ID.
  * @param string  $key       Meta key.
  * @param ?string $hook_name The name of the filter hook.
- * @param mixed   $default   Default value.
+ * @param mixed   $def       Default value.
  */
-function save_post_meta_with_wp_filter( int $post_id, string $key, ?string $hook_name = null, $default = null ): void {
+function save_post_meta_with_wp_filter( int $post_id, string $key, ?string $hook_name = null, $def = null ): void {
 	$val = isset( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : null;  // phpcs:ignore
 	if ( null !== $hook_name && null !== $val ) {
 		$val = apply_filters( $hook_name, $val );
 	}
 	if ( empty( $val ) ) {
-		if ( null === $default ) {
+		if ( null === $def ) {
 			delete_post_meta( $post_id, $key );
 			return;
 		}
-		$val = $default;
+		$val = $def;
 	}
 	update_post_meta( $post_id, $key, $val );
 }
@@ -65,7 +65,7 @@ function save_post_meta_with_wp_filter( int $post_id, string $key, ?string $hook
  */
 function output_input_row( string $label, string $key, $val, string $type = 'text' ): void {
 	wp_enqueue_style( 'wplug-bimeson-item-field' );
-	$val = isset( $val ) ? $val : '';
+	$val = is_string( $val ) ? $val : '';
 	?>
 	<div class="wplug-bimeson-item-field-single">
 		<label>
@@ -83,6 +83,8 @@ function output_input_row( string $label, string $key, $val, string $type = 'tex
 /**
  * Adds a rich editor meta box.
  *
+ * @psalm-suppress ArgumentTypeCoercion
+ *
  * @param string                     $key     Post meta key.
  * @param string                     $title   Title of the meta box.
  * @param string|null                $screen  The screen or screens on which to show the box.
@@ -94,14 +96,15 @@ function add_rich_editor_meta_box( string $key, string $title, ?string $screen =
 	\add_meta_box(
 		$key . '_mb',
 		$title,
-		function ( $post ) use ( $key, $opts ) {
+		function ( \WP_Post $post ) use ( $key, $opts ) {
 			wp_nonce_field( $key, "{$key}_nonce" );
-			$value = get_post_meta( $post->ID, $key, true );
-			wp_editor( $value, $key, $opts );
+			$val = get_post_meta( $post->ID, $key, true );
+			$val = is_string( $val ) ? $val : '';
+			wp_editor( $val, $key, $opts );  // @phpstan-ignore-line
 		},
 		$screen,
 		$context,
-		$priority
+		$priority  // @phpstan-ignore-line
 	);
 }
 
@@ -112,12 +115,17 @@ function add_rich_editor_meta_box( string $key, string $title, ?string $screen =
  * @param string $key     Post meta key.
  */
 function save_rich_editor_meta_box( int $post_id, string $key ): void {
-	if ( ! isset( $_POST[ "{$key}_nonce" ] ) ) {
+	$nonce = $_POST[ "{$key}_nonce" ] ?? null;  // phpcs:ignore
+	if ( ! is_string( $nonce ) ) {
 		return;
 	}
-	if ( ! wp_verify_nonce( sanitize_key( $_POST[ "{$key}_nonce" ] ), $key ) ) {
+	if ( ! wp_verify_nonce( sanitize_key( $nonce ), $key ) ) {
 		return;
 	}
+	/** phpcs:ignore
+	 *
+	 * @psalm-suppress UndefinedFunction
+	 */
 	save_post_meta_with_wp_filter( $post_id, $key, 'content_save_pre' );
 }
 
@@ -146,7 +154,7 @@ function set_admin_columns( string $post_type, array $all_columns ): void {
 
 	foreach ( $all_columns as $c ) {
 		if ( is_array( $c ) ) {
-			if ( isset( $c['name'] ) ) {
+			if ( isset( $c['name'] ) && is_string( $c['name'] ) ) {
 				if ( taxonomy_exists( $c['name'] ) ) {
 					if ( empty( $c['label'] ) ) {
 						$tx = \get_taxonomy( $c['name'] );
@@ -163,7 +171,7 @@ function set_admin_columns( string $post_type, array $all_columns ): void {
 					$cols[ $c['name'] ] = empty( $c['label'] ) ? $c['name'] : $c['label'];
 				}
 				// Column Styles.
-				if ( isset( $c['width'] ) ) {
+				if ( isset( $c['width'] ) && is_string( $c['width'] ) ) {
 					$tax      = taxonomy_exists( $c['name'] ) ? 'taxonomy-' : '';
 					$styles[] = ".column-$tax{$c['name']} {width: {$c['width']} !important;}";
 				}
@@ -172,7 +180,7 @@ function set_admin_columns( string $post_type, array $all_columns ): void {
 					$val_fns[ $c['name'] ] = $c['value'];
 				}
 			}
-		} else {
+		} else {  // phpcs:ignore
 			if ( taxonomy_exists( $c ) ) {
 				$tx = \get_taxonomy( $c );
 				if ( $tx ) {
@@ -203,7 +211,7 @@ function set_admin_columns( string $post_type, array $all_columns ): void {
 	);
 	add_action(
 		"manage_{$post_type}_posts_custom_column",
-		function ( $column_name, $post_id ) use ( $val_fns ) {
+		function ( string $column_name, int $post_id ) use ( $val_fns ) {
 			if ( isset( $val_fns[ $column_name ] ) ) {
 				$fn = $val_fns[ $column_name ];
 				echo call_user_func( $fn, get_post_meta( $post_id, $column_name, true ) );  // phpcs:ignore
@@ -224,18 +232,18 @@ function set_admin_columns_sortable( string $post_type, array $sortable_columns 
 	$names = array();
 	$types = array();
 	foreach ( $sortable_columns as $c ) {
-		if ( is_array( $c ) ) {
+		if ( is_array( $c ) && is_string( $c['name'] ) ) {
 			$names[] = $c['name'];
 			if ( isset( $c['type'] ) ) {
 				$types[ $c['name'] ] = $c['type'];
 			}
-		} else {
+		} elseif ( is_string( $c ) ) {
 			$names[] = $c;
 		}
 	}
 	add_filter(
 		"manage_edit-{$post_type}_sortable_columns",
-		function ( $cols ) use ( $names ) {
+		function ( array $cols ) use ( $names ) {
 			foreach ( $names as $name ) {
 				$tax = taxonomy_exists( $name ) ? 'taxonomy-' : '';
 

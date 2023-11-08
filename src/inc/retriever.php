@@ -9,13 +9,14 @@
 
 namespace wplug\bimeson_item;
 
+require_once __DIR__ . '/../bimeson.php';
 require_once __DIR__ . '/inst.php';
 require_once __DIR__ . '/taxonomy.php';
 
 /**
  * Retrieves items.
  *
- * @param array<string, mixed>      $items              All items.
+ * @param array<string, mixed>[]    $items              All items.
  * @param int|null                  $count              Count limit.
  * @param bool                      $sort_by_date_first Whether to sort by date first.
  * @param bool                      $dup_multi_cat      Whether to duplicate multiple category items.
@@ -70,11 +71,9 @@ function _make_rs_idx(): array {
  * @return array<string, mixed>[] Items.
  */
 function _align_sub_slugs( array $items, array $rs_idx ): array {
-	$inst = _get_instance();
-
-	foreach ( $items as $idx => &$it ) {
+	foreach ( $items as &$it ) {
 		foreach ( $rs_idx as $rs => $ss ) {
-			if ( isset( $it[ $rs ] ) ) {
+			if ( isset( $it[ $rs ] ) && is_array( $it[ $rs ] ) ) {
 				usort(
 					$it[ $rs ],
 					function ( $a, $b ) use ( $ss ) {
@@ -100,15 +99,14 @@ function _align_sub_slugs( array $items, array $rs_idx ): array {
  * @return array<string, mixed>[] Duplicated items.
  */
 function _duplicate_items( array $items ): array {
-	$inst = _get_instance();
-	$rss  = get_root_slugs();
+	$rss = get_root_slugs();
 
 	$ret = array();
 	foreach ( $items as $it ) {
 		$array = array();
 		$do    = false;
 		foreach ( $rss as $rs ) {
-			$vs = $it[ $rs ] ?? array();
+			$vs = isset( $it[ $rs ] ) && is_array( $it[ $rs ] ) ? $it[ $rs ] : array();
 			if ( 1 < count( $vs ) ) {
 				$do = true;
 			}
@@ -144,7 +142,7 @@ function _generate_combination( array $arrays ): array {
 	$cycles = array();
 
 	$c = $total;
-	foreach ( $arrays as $k => $vs ) {
+	foreach ( $arrays as $k => $_vs ) {
 		$c /= $counts[ $k ];
 
 		$cycles[ $k ] = $c;
@@ -169,23 +167,23 @@ function _generate_combination( array $arrays ): array {
  *
  * @access private
  *
- * @param array<string, mixed> $items              Items to be sorted.
- * @param bool                 $sort_by_date_first Whether to sort by date first.
- * @param array<string, int[]> $rs_idx             The array of root slug to sub slug indices.
- * @param string[]|null        $visible_state      Visibility states.
+ * @param array<string, mixed>[] $items              Items to be sorted.
+ * @param bool                   $sort_by_date_first Whether to sort by date first.
+ * @param array<string, int[]>   $rs_idx             The array of root slug to sub slug indices.
+ * @param string[]|null          $visible_state      Visibility states.
  */
 function _sort_list_items( array &$items, bool $sort_by_date_first, array $rs_idx, ?array $visible_state ): void {
 	$inst = _get_instance();
 
 	if ( ! is_null( $visible_state ) ) {
-		foreach ( $rs_idx as $rs => $v ) {
+		foreach ( $rs_idx as $rs => $_v ) {
 			if ( ! in_array( $rs, $visible_state, true ) ) {
 				unset( $rs_idx[ $rs ] );
 			}
 		}
 	}
-	$inst->rs_idx  = $rs_idx;
-	$inst->rs_opts = get_root_slug_to_options();
+	$inst->rs_idx  = $rs_idx;  // @phpstan-ignore-line
+	$inst->rs_opts = get_root_slug_to_options();  // @phpstan-ignore-line
 	if ( $sort_by_date_first ) {
 		usort( $items, '\wplug\bimeson_item\_compare_item_by_date_cat' );
 	} else {
@@ -218,9 +216,9 @@ function _compare_item_by_date_cat( array $a, array $b ): int {
  */
 function _compare_item_by_date( array $a, array $b ): int {
 	$inst = _get_instance();
-	if ( isset( $a[ $inst::IT_DATE_NUM ] ) && isset( $b[ $inst::IT_DATE_NUM ] ) ) {
-		if ( $a[ $inst::IT_DATE_NUM ] !== $b[ $inst::IT_DATE_NUM ] ) {
-			return $a[ $inst::IT_DATE_NUM ] < $b[ $inst::IT_DATE_NUM ] ? 1 : -1;
+	if ( isset( $a[ $inst::IT_DATE_NUM ] ) && isset( $b[ $inst::IT_DATE_NUM ] ) ) {  // @phpstan-ignore-line
+		if ( $a[ $inst::IT_DATE_NUM ] !== $b[ $inst::IT_DATE_NUM ] ) {  // @phpstan-ignore-line
+			return $a[ $inst::IT_DATE_NUM ] < $b[ $inst::IT_DATE_NUM ] ? 1 : -1;  // @phpstan-ignore-line
 		}
 	}
 	return 0;
@@ -240,7 +238,11 @@ function _compare_item_by_cat( array $a, array $b ): int {
 	$rs_idx  = $inst->rs_idx;
 	$rs_opts = $inst->rs_opts;
 
-	foreach ( get_root_slug_to_sub_slugs() as $rs => $slugs ) {
+	if ( ! is_array( $rs_idx ) || ! is_array( $rs_opts ) ) {
+		return 0;
+	}
+
+	foreach ( get_root_slug_to_sub_slugs() as $rs => $_slugs ) {
 		$ai = _get_first_sub_slug_index( $a, $rs, $rs_idx );
 		$bi = _get_first_sub_slug_index( $b, $rs, $rs_idx );
 
@@ -264,7 +266,7 @@ function _compare_item_by_cat( array $a, array $b ): int {
 		return $ret;
 	}
 	$inst = _get_instance();
-	return $a[ $inst::IT_INDEX ] < $b[ $inst::IT_INDEX ] ? -1 : 1;
+	return $a[ $inst::IT_INDEX ] < $b[ $inst::IT_INDEX ] ? -1 : 1;  // @phpstan-ignore-line
 }
 
 /**
@@ -278,11 +280,11 @@ function _compare_item_by_cat( array $a, array $b ): int {
  * @return int Index.
  */
 function _get_first_sub_slug_index( array $item, string $rs, array $rs_idx ): int {
-	$v0 = $item[ $rs ][0] ?? '';
-	if ( empty( $v0 ) ) {
-		return -1;
+	if ( isset( $item[ $rs ] ) && is_array( $item[ $rs ] ) && ! empty( $item[ $rs ] ) ) {
+		$v0 = $item[ $rs ][0];
+		return $rs_idx[ $rs ][ $v0 ] ?? -1;
 	}
-	return $rs_idx[ $rs ][ $v0 ] ?? -1;
+	return -1;
 }
 
 
@@ -294,9 +296,9 @@ function _get_first_sub_slug_index( array $item, string $rs, array $rs_idx ): in
  *
  * @access private
  *
- * @param array<string, mixed> $items         Items.
- * @param string[]|null        $visible_state Visibility states.
- * @return array<string, mixed> Items.
+ * @param array<string, mixed>[] $items         Items.
+ * @param string[]|null          $visible_state Visibility states.
+ * @return array<string, mixed>[] Items.
  */
 function _assign_cat_key( array $items, ?array $visible_state ): array {
 	$inst = _get_instance();
@@ -306,14 +308,14 @@ function _assign_cat_key( array $items, ?array $visible_state ): array {
 	$slug_to_ancestors = get_sub_slug_to_ancestors();
 
 	if ( ! is_null( $visible_state ) ) {
-		foreach ( $rs_to_depths as $rs => $d ) {
+		foreach ( $rs_to_depths as $rs => $_d ) {
 			if ( ! in_array( $rs, $visible_state, true ) ) {
 				unset( $rs_to_depths[ $rs ] );
 			}
 		}
 	}
 	foreach ( $items as &$it ) {
-		$it[ $inst::IT_CAT_KEY ] = _make_cat_key( $it, $rs_to_slugs, $rs_to_depths, $slug_to_ancestors );
+		$it[ $inst::IT_CAT_KEY ] = _make_cat_key( $it, $rs_to_slugs, $rs_to_depths, $slug_to_ancestors );  // @phpstan-ignore-line
 	}
 	return $items;
 }
@@ -331,14 +333,14 @@ function _assign_cat_key( array $items, ?array $visible_state ): array {
  */
 function _make_cat_key( array $it, array $rs_to_slugs, array $rs_to_depths, array $slug_to_ancestors ): array {
 	$cats = array();
-	foreach ( $rs_to_slugs as $rs => $slugs ) {
+	foreach ( $rs_to_slugs as $rs => $_slugs ) {
 		if ( ! isset( $rs_to_depths[ $rs ] ) ) {
 			continue;
 		}
 		$depth = $rs_to_depths[ $rs ];
 
-		$s = $it[ $rs ][0] ?? null;
-		if ( $s ) {
+		if ( isset( $it[ $rs ] ) && is_array( $it[ $rs ] ) && ! empty( $it[ $rs ] ) ) {
+			$s = $it[ $rs ][0];
 			if ( isset( $slug_to_ancestors[ $s ] ) ) {
 				$cats = array_merge( $cats, $slug_to_ancestors[ $s ] );
 			}
@@ -361,7 +363,7 @@ function _make_cat_key( array $it, array $rs_to_slugs, array $rs_to_depths, arra
  *
  * @access private
  *
- * @param array<string, mixed> $items Items.
+ * @param array<string, mixed>[] $items Items.
  * @return string[] Array of existing years.
  */
 function _collect_existing_year( array $items ): array {
@@ -369,10 +371,10 @@ function _collect_existing_year( array $items ): array {
 	$years = array();
 
 	foreach ( $items as $it ) {
-		if ( ! isset( $it[ $inst::IT_DATE_NUM ] ) ) {
+		if ( ! isset( $it[ $inst::IT_DATE_NUM ] ) ) {  // @phpstan-ignore-line
 			continue;
 		}
-		$years[ substr( $it[ $inst::IT_DATE_NUM ], 0, 4 ) ] = 1;
+		$years[ substr( $it[ $inst::IT_DATE_NUM ], 0, 4 ) ] = 1;  // @phpstan-ignore-line
 	}
 	$years = array_keys( $years );
 	rsort( $years );

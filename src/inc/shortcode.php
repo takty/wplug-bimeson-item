@@ -28,7 +28,13 @@ function register_shortcode( string $lang ): void {
 
 	\add_shortcode(
 		'publication',
-		function ( $atts, ?string $content = null ) use ( $lang, $serial ): string {
+		/**
+		 * Callback function.
+		 *
+		 * @param array<string, string>|string $atts    Attributes.
+		 * @param string|null                  $content The shortcode content.
+		 */
+		function ( $atts, ?string $content ) use ( $lang, $serial ): string {
 			if ( is_string( $atts ) ) {
 				$atts = array();
 			}
@@ -37,13 +43,13 @@ function register_shortcode( string $lang ): void {
 			$id = "bml-sc$serial";
 
 			ob_start();
-			if ( $d && $d['show_filter'] ) {
+			if ( is_array( $d ) && $d['show_filter'] ) {
 				echo_the_filter( $d['filter_state'], $d['years_exist'], '<div class="wplug-bimeson-filter"%s>', '</div>', $id );
 			}
-			if ( ! is_null( $content ) ) {
+			if ( is_string( $content ) && ! empty( $content ) ) {
 				echo str_replace( '<p></p>', '', balanceTags( $content, true ) );  // phpcs:ignore
 			}
-			if ( $d ) {
+			if ( is_array( $d ) ) {
 				echo_the_list( $d, $lang, '<div class="wplug-bimeson-list"%s>', '</div>', $id );
 			}
 			$ret = (string) ob_get_contents();
@@ -60,12 +66,20 @@ function register_shortcode( string $lang ): void {
  *
  * @param array<string, mixed> $atts Attributes.
  * @param string               $lang Language.
- * @return array<string, mixed> Data.
+ * @return array{
+ *     count             : int|null,
+ *     sort_by_date_first: bool,
+ *     omit_single_cat   : bool,
+ *     filter_state      : array<string, mixed>|null,
+ *     items             : array<string, mixed>[],
+ *     years_exist       : string[],
+ *     show_filter       : bool,
+ * }|null Data.
  */
-function _get_data_shortcode( array $atts, string $lang ): array {
+function _get_data_shortcode( array $atts, string $lang ): ?array {
 	list( $date_bgn, $date_end ) = _extract_date_atts( $atts );
 
-	$count              = isset( $atts['count'] ) ? ( (int) $atts['count'] ) : null;
+	$count              = isset( $atts['count'] ) && is_numeric( $atts['count'] ) ? ( (int) $atts['count'] ) : null;
 	$sort_by_date_first = in_array( 'date-sort', $atts, true ) || (bool) ( $atts['date-sort'] ?? false );
 	$dup_multi_cat      = in_array( 'dup-item', $atts, true ) || (bool) ( $atts['dup-item'] ?? false );
 	$omit_single_cat    = in_array( 'omit-single', $atts, true ) || (bool) ( $atts['omit-single'] ?? false );
@@ -82,7 +96,7 @@ function _get_data_shortcode( array $atts, string $lang ): array {
 	$d['items']       = $items;
 	$d['years_exist'] = $years_exist;
 	$d['show_filter'] = isset( $atts['show-filter'] );
-	return $d;
+	return empty( $items ) ? null : $d;
 }
 
 /**
@@ -96,14 +110,14 @@ function _get_data_shortcode( array $atts, string $lang ): array {
 function _extract_date_atts( array $atts ): array {
 	$ds = array();
 	foreach ( array( 'date', 'date-start', 'date-end' ) as $key ) {
-		if ( ! empty( $atts[ $key ] ) ) {
+		if ( isset( $atts[ $key ] ) && is_string( $atts[ $key ] ) && ! empty( $atts[ $key ] ) ) {
 			if ( is_numeric( $atts[ $key ] ) ) {
-				$ds[] = (string) $atts[ $key ];
+				$ds[] = $atts[ $key ];
 			} else {
 				$vs = array_map( '\trim', explode( '-', $atts[ $key ] ) );
 				foreach ( $vs as $v ) {
 					if ( is_numeric( $v ) ) {
-						$ds[] = (string) $v;
+						$ds[] = $v;
 					}
 				}
 			}
@@ -123,14 +137,14 @@ function _extract_date_atts( array $atts ): array {
  * @access private
  *
  * @param array<string, mixed> $atts Attributes.
- * @return array<string, mixed>|null Filter states.
+ * @return array<string, string[]> Filter states.
  */
-function _extract_filter_state( array $atts ): ?array {
+function _extract_filter_state( array $atts ): array {
 	$fs = array();
 	foreach ( get_root_slugs() as $rs ) {
-		if ( isset( $atts[ $rs ] ) ) {
+		if ( isset( $atts[ $rs ] ) && is_string( $atts[ $rs ] ) ) {
 			$fs[ $rs ] = array_map( '\trim', explode( ',', $atts[ $rs ] ) );
 		}
 	}
-	return count( $fs ) ? $fs : null;
+	return count( $fs ) ? $fs : array();
 }

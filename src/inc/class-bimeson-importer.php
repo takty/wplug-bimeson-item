@@ -9,10 +9,18 @@
 
 namespace wplug\bimeson_item;
 
+/** phpcs:ignore
+ *
+ * @psalm-suppress MissingFile
+ */
 require_once ABSPATH . 'wp-admin/includes/import.php';
 if ( ! class_exists( '\WP_Importer' ) ) {
 	$class_wp_importer = ABSPATH . 'wp-admin/includes/class-wp-importer.php';
 	if ( file_exists( $class_wp_importer ) ) {
+		/** phpcs:ignore
+		 *
+		 * @psalm-suppress MissingFile
+		 */
 		require $class_wp_importer;
 	}
 }
@@ -25,11 +33,15 @@ require_once __DIR__ . '/taxonomy.php';
 
 /**
  * Bimeson importer
+ *
+ * @api
  */
 class Bimeson_Importer extends \WP_Importer {
 
 	/**
 	 * Registers the importer.
+	 *
+	 * @psalm-suppress PossiblyUnusedParam
 	 *
 	 * @param string $url_to Base URL.
 	 */
@@ -40,12 +52,16 @@ class Bimeson_Importer extends \WP_Importer {
 	/**
 	 * Base URL.
 	 *
+	 * @psalm-suppress UnusedProperty
+	 *
 	 * @var string
 	 */
 	private $url_to;
 
 	/**
 	 * Ajax request URL.
+	 *
+	 * @psalm-suppress UnusedProperty
 	 *
 	 * @var string
 	 */
@@ -54,12 +70,16 @@ class Bimeson_Importer extends \WP_Importer {
 	/**
 	 * Uploaded file ID.
 	 *
+	 * @psalm-suppress UnusedProperty
+	 *
 	 * @var int
 	 */
 	private $file_id;
 
 	/**
 	 * Constructor.
+	 *
+	 * @psalm-suppress PossiblyUnusedMethod
 	 *
 	 * @param string $url_to Base URL.
 	 */
@@ -73,6 +93,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 * Initializes the importer.
 	 *
 	 * @access private
+	 * @psalm-suppress UnusedMethod
 	 */
 	private function initialize(): void {
 		$GLOBALS['wplug_bimeson_import'] = $this;
@@ -88,6 +109,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 * Initializes Ajax.
 	 *
 	 * @access private
+	 * @psalm-suppress UnusedMethod
 	 *
 	 * @return string Ajax URL.
 	 */
@@ -134,6 +156,8 @@ class Bimeson_Importer extends \WP_Importer {
 
 	/**
 	 * Dispatches the request.
+	 *
+	 * @psalm-suppress UnusedMethod
 	 */
 	public function dispatch(): void {
 		wp_enqueue_script( 'wplug-bimeson-item-importer', $this->url_to . '/assets/js/importer.min.js', array(), '1.0', false );
@@ -162,6 +186,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 * Outputs the header.
 	 *
 	 * @access private
+	 * @psalm-suppress UnusedMethod
 	 */
 	private function header(): void {
 		echo '<div class="wrap">';
@@ -172,6 +197,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 * Outputs the footer.
 	 *
 	 * @access private
+	 * @psalm-suppress UnusedMethod
 	 */
 	private function footer(): void {
 		echo '</div>';
@@ -185,6 +211,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 * Outputs the greet message.
 	 *
 	 * @access private
+	 * @psalm-suppress UnusedMethod
 	 */
 	private function greet(): void {
 		echo '<div class="narrow">';
@@ -202,6 +229,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 * Handles uploading.
 	 *
 	 * @access private
+	 * @psalm-suppress UnusedMethod
 	 *
 	 * @return ?int File ID.
 	 */
@@ -227,6 +255,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 * Parses uploaded file.
 	 *
 	 * @access private
+	 * @psalm-suppress UnusedMethod
 	 *
 	 * @param int $file_id File ID.
 	 */
@@ -275,5 +304,4 @@ class Bimeson_Importer extends \WP_Importer {
 		<p id="msg-failure" hidden><strong><?php esc_html_e( 'Sorry, failed to read the file.', 'wplug_bimeson_item' ); ?></strong></p>
 		<?php
 	}
-
 }

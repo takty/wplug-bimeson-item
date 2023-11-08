@@ -9,6 +9,7 @@
 
 namespace wplug\bimeson_item;
 
+require_once __DIR__ . '/../bimeson.php';
 require_once __DIR__ . '/inst.php';
 require_once __DIR__ . '/taxonomy.php';
 
@@ -40,16 +41,16 @@ function _cb_query_vars_filter( array $query_vars ): array {
  * @param string[]                  $years_exist  Array of existing years.
  * @param string                    $before       Content to prepend to the output.
  * @param string                    $after        Content to append to the output.
- * @param string                    $for          Attribute of 'for'.
+ * @param string                    $for_at       Attribute of 'for'.
  */
-function echo_the_filter( ?array $filter_state, array $years_exist, string $before = '<div class="wplug-bimeson-filter" hidden%s>', string $after = '</div>', string $for = 'bml' ): void {
+function echo_the_filter( ?array $filter_state, array $years_exist, string $before = '<div class="wplug-bimeson-filter" hidden%s>', string $after = '</div>', string $for_at = 'bml' ): void {
 	wp_enqueue_style( 'wplug-bimeson-item-filter' );
 	wp_enqueue_script( 'wplug-bimeson-item-filter' );
 
-	if ( ! empty( $for ) ) {
-		$for = " for=\"$for\"";
+	if ( ! empty( $for_at ) ) {
+		$for_at = " for=\"$for_at\"";
 	}
-	$before = sprintf( $before, $for );
+	$before = sprintf( $before, $for_at );
 
 	echo $before;  // phpcs:ignore
 	echo_filter( $filter_state, $years_exist );
@@ -81,7 +82,7 @@ function echo_filter( ?array $filter_state, array $years_exist ): void {
 		}
 	} else {
 		foreach ( $rs_to_terms as $rs => $terms ) {
-			$fs = $filter_state[ $rs ] ?? array();
+			$fs = isset( $filter_state[ $rs ] ) && is_array( $filter_state[ $rs ] ) ? $filter_state[ $rs ] : array();
 			if ( 1 !== count( $fs ) && in_array( $rs, $vs, true ) ) {
 				_echo_tax_checkboxes( $rs, $terms, $state, empty( $fs ) ? null : $fs );
 			}
@@ -103,19 +104,22 @@ function echo_filter( ?array $filter_state, array $years_exist ): void {
  */
 function _echo_year_select( array $years, array $state ): void {
 	$inst = _get_instance();
-	$val  = $state[ $inst::KEY_YEAR ];
+	$val  = $state[ $inst::KEY_YEAR ];  // @phpstan-ignore-line
+	$val  = is_numeric( $val ) ? (int) $val : 0;
 	$yf   = is_string( $inst->year_format ) ? $inst->year_format : '%d';
 	?>
-	<div class="wplug-bimeson-filter-key" data-key="<?php echo esc_attr( $inst::KEY_YEAR ); ?>">
+	<div class="wplug-bimeson-filter-key" data-key="<?php echo esc_attr( $inst::KEY_YEAR );  // @phpstan-ignore-line ?>">
 		<div class="wplug-bimeson-filter-key-inner">
 			<label class="select">
-				<select name="<?php echo esc_attr( $inst::KEY_YEAR ); ?>" class="wplug-bimeson-filter-select">
-					<option value="<?php echo esc_attr( $inst::VAL_YEAR_ALL ); ?>"><?php echo esc_html( $inst->year_select_label ); ?></option>
+				<select name="<?php echo esc_attr( $inst::KEY_YEAR );  // @phpstan-ignore-line ?>" class="wplug-bimeson-filter-select">
+					<option value="<?php echo esc_attr( $inst::VAL_YEAR_ALL );  // @phpstan-ignore-line ?>"><?php echo esc_html( $inst->year_select_label ); ?></option>
 	<?php
 	foreach ( $years as $y ) {
-		$_label   = esc_html( sprintf( $yf, (int) $y ) );
-		$selected = ( (int) $y === (int) $val ) ? ' selected' : '';
-		echo "<option value=\"$y\"" . $selected . ">$_label</option>";  // phpcs:ignore
+		if ( is_numeric( $y ) ) {
+			$_label   = esc_html( sprintf( $yf, (int) $y ) );
+			$selected = ( (int) $y === $val ) ? ' selected' : '';
+			echo "<option value=\"$y\"" . $selected . ">$_label</option>";  // phpcs:ignore
+		}
 	}
 	?>
 				</select>
@@ -139,14 +143,14 @@ function _echo_tax_checkboxes( string $root_slug, array $terms, array $state, ?a
 	$inst = _get_instance();
 	$func = $inst->term_name_getter;
 	if ( ! is_callable( $func ) ) {
-		$func = function ( $t ) {
+		$func = function ( \WP_Term $t ): string {
 			return $t->name;
 		};
 	}
 	$t         = get_term_by( 'slug', $root_slug, $inst->root_tax );
-	$cat_label = $func( $t );
+	$cat_label = ( $t instanceof \WP_Term ) ? $func( $t ) : '';
 	$slug      = $root_slug;
-	$qvs       = $state[ $root_slug ];
+	$qvs       = isset( $state[ $root_slug ] ) && is_array( $state[ $root_slug ] ) ? $state[ $root_slug ] : array();
 	$checked   = ( ! empty( $qvs ) ) ? ' checked' : '';
 	?>
 	<div class="wplug-bimeson-filter-key" data-key="<?php echo esc_attr( $slug ); ?>">
@@ -197,10 +201,10 @@ function _get_filter_state_from_query(): array {
 
 	foreach ( get_root_slugs() as $rs ) {
 		$val        = get_query_var( get_query_var_name( $rs ) );
-		$ret[ $rs ] = empty( $val ) ? array() : explode( ',', $val );
+		$ret[ $rs ] = is_string( $val ) ? explode( ',', $val ) : array();
 	}
 	$val = get_query_var( $inst->year_qvar );
 
-	$ret[ (string) $inst::KEY_YEAR ] = $val;
+	$ret[ (string) $inst::KEY_YEAR ] = $val;  // @phpstan-ignore-line
 	return $ret;
 }

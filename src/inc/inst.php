@@ -14,7 +14,29 @@ namespace wplug\bimeson_item;
  *
  * @access private
  *
- * @return object Instance.
+ * @return object{
+ *     fld_list_cfg     : string,
+ *     additional_langs : string[],
+ *     head_level       : int,
+ *     year_format      : string|null,
+ *     term_name_getter : callable|null,
+ *     year_select_label: string,
+ *     uncat_label      : string,
+ *     root_tax         : string,
+ *     sub_tax_base     : string,
+ *     sub_tax_cls_base : string,
+ *     sub_tax_qvar_base: string,
+ *     year_cls_base    : string,
+ *     year_qvar        : string,
+ *     cache            : array<string, mixed>[],
+ *     rs_idx           : array<string, int[]>|null,
+ *     rs_opts          : array<string, array<string, mixed>>|null,
+ *     sub_taxes        : array<string, string>,
+ *     old_tax          : string,
+ *     old_terms        : array{ slug: string, name: string, term_id: int }[],
+ *     root_terms       : \WP_Term[],
+ *     sub_tax_to_terms : array<string, \WP_Term[]|null>,
+ * } Instance.
  */
 function _get_instance(): object {
 	static $values = null;
@@ -22,9 +44,11 @@ function _get_instance(): object {
 		return $values;
 	}
 	$values = new class() {
-
-		// Template Admin.
-
+		/**
+		 * Template Admin.
+		 *
+		 * @var string
+		 */
 		const KEY_VISIBLE = '_visible';
 
 		/**
@@ -34,9 +58,19 @@ function _get_instance(): object {
 		 */
 		public $fld_list_cfg = '_bimeson';
 
-		// Post Type.
-
+		/**
+		 * Post Type.
+		 *
+		 * @var string
+		 */
 		const PT = 'bimeson';  // Each post means publication (bimeson).
+
+		/**
+		 * Additional language slugs.
+		 *
+		 * @var string[]
+		 */
+		public $additional_langs = array();
 
 		// Item.
 
@@ -70,10 +104,29 @@ function _get_instance(): object {
 		 */
 		public $year_format = null;
 
+		// Filter.
+
+		const KEY_YEAR     = '_year';
+		const VAL_YEAR_ALL = 'all';
+
+		/**
+		 * Label of year select markup.
+		 *
+		 * @var string
+		 */
+		public $year_select_label = '';
+
+		/**
+		 * Label of heading meaning 'uncategorized'.
+		 *
+		 * @var string
+		 */
+		public $uncat_label = '';
+
 		/**
 		 * Callable for getting term names.
 		 *
-		 * @var callable
+		 * @var callable|null
 		 */
 		public $term_name_getter = null;
 
@@ -98,13 +151,6 @@ function _get_instance(): object {
 		 */
 		public $rs_opts = null;
 
-		/**
-		 * Additional languages.
-		 *
-		 * @var string[]
-		 */
-		public $additional_langs;
-
 		// Taxonomy.
 
 		const KEY_IS_HIDDEN           = '_bimeson_is_hidden';
@@ -121,28 +167,28 @@ function _get_instance(): object {
 		 *
 		 * @var string
 		 */
-		public $root_tax;
+		public $root_tax = '';
 
 		/**
 		 * Slug base of sub taxonomies.
 		 *
 		 * @var string
 		 */
-		public $sub_tax_base;
+		public $sub_tax_base = '';
 
 		/**
 		 * Class base of sub taxonomies.
 		 *
 		 * @var string
 		 */
-		public $sub_tax_cls_base;
+		public $sub_tax_cls_base = '';
 
 		/**
 		 * Query variable name base of sub taxonomies.
 		 *
 		 * @var string
 		 */
-		public $sub_tax_qvar_base;
+		public $sub_tax_qvar_base = '';
 
 		const DEFAULT_YEAR_CLS_BASE = 'bm-year-';
 		const DEFAULT_YEAR_QVAR     = 'bm_year';
@@ -152,14 +198,14 @@ function _get_instance(): object {
 		 *
 		 * @var string
 		 */
-		public $year_cls_base;
+		public $year_cls_base = '';
 
 		/**
 		 * Query variable name of year.
 		 *
 		 * @var string
 		 */
-		public $year_qvar;
+		public $year_qvar = '';
 
 		/**
 		 * The sub taxonomy slugs.
@@ -171,23 +217,23 @@ function _get_instance(): object {
 		/**
 		 * Previously edited taxonomy.
 		 *
-		 * @var string[]|null
+		 * @var string
 		 */
-		public $old_tax = array();
+		public $old_tax = '';
 
 		/**
 		 * Previously edited terms.
 		 *
-		 * @var string[]
+		 * @var array{ slug: string, name: string, term_id: int }[]
 		 */
 		public $old_terms = array();
 
 		/**
 		 * The root terms.
 		 *
-		 * @var string[]|null
+		 * @var \WP_Term[]
 		 */
-		public $root_terms = null;
+		public $root_terms = array();
 
 		/**
 		 * The sub terms.
@@ -195,26 +241,6 @@ function _get_instance(): object {
 		 * @var array<string, \WP_Term[]|null>
 		 */
 		public $sub_tax_to_terms = array();
-
-		// Filter.
-
-		const KEY_YEAR     = '_year';
-		const VAL_YEAR_ALL = 'all';
-
-		/**
-		 * Label of year select markup.
-		 *
-		 * @var string
-		 */
-		public $year_select_label;
-
-		/**
-		 * Label of heading meaning 'uncategorized'.
-		 *
-		 * @var string
-		 */
-		public $uncat_label;
-
 	};
 	return $values;
 }
@@ -229,5 +255,5 @@ function _get_instance(): object {
 function _set_key( string $key ): void {
 	$inst = _get_instance();
 
-	$inst->fld_list_cfg = $key;
+	$inst->fld_list_cfg = $key;  // @phpstan-ignore-line
 }

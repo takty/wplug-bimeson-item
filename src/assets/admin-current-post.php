@@ -4,8 +4,10 @@
  *
  * @package Wplug
  * @author Takuto Yanagida
- * @version 2023-09-08
+ * @version 2023-11-07
  */
+
+declare(strict_types=1);
 
 namespace wplug;
 
@@ -19,8 +21,11 @@ if ( ! function_exists( '\wplug\get_admin_post_id' ) ) {
 		$id_g = $_GET['post']     ?? null;  // phpcs:ignore
 		$id_p = $_POST['post_ID'] ?? null;  // phpcs:ignore
 
-		if ( $id_g || $id_p ) {
-			return (int) ( $id_g ? $id_g : $id_p );
+		if ( is_numeric( $id_g ) ) {
+			return (int) $id_g;
+		}
+		if ( is_numeric( $id_p ) ) {
+			return (int) $id_p;
 		}
 		return 0;
 	}
@@ -38,12 +43,15 @@ if ( ! function_exists( '\wplug\get_admin_post_type' ) ) {
 		$id = get_admin_post_id();
 		if ( $id ) {
 			$p = get_post( $id );
-			if ( $p ) {
+			if ( $p instanceof \WP_Post ) {
 				$pt = $p->post_type;
 			}
 		}
 		if ( ! $pt ) {
-			$pt = $_GET['post_type'] ?? null;  // phpcs:ignore
+			$val = $_GET['post_type'] ?? null;  // phpcs:ignore
+			if ( is_string( $val ) ) {
+				$pt = $val;
+			}
 		}
 		return $pt;
 	}

@@ -11,6 +11,8 @@ namespace wplug\bimeson_item;
 
 /**
  * Ajax.
+ *
+ * @psalm-suppress UnusedClass
  */
 class Ajax {
 
