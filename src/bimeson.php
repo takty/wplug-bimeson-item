@@ -460,6 +460,22 @@ function _convert_post_to_item( \WP_Post $p, int $idx ): array {
 function _make_content( string $c ): string {
 	$c = apply_filters( 'the_content', $c );  // Shortcodes are expanded here.
 	$c = str_replace( ']]>', ']]&gt;', $c );
+	$c = wp_kses(
+		$c,
+		array(
+			'strong' => array(),
+			'b'      => array(),
+			'em'     => array(),
+			'i'      => array(),
+			'ins'    => array(),
+			'u'      => array(),
+			'del'    => array(),
+			's'      => array(),
+			'sub'    => array(),
+			'sup'    => array(),
+			'mark'   => array(),
+		)
+	);
 	return $c;
 }
 
