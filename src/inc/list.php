@@ -325,22 +325,43 @@ function _echo_list_item( array $it, string $lang ): void {
 		}
 	}
 
-	// phpcs:disable
-	$url   = $it[ $inst::IT_LINK_URL ]   ?? '';  // @phpstan-ignore-line
-	$title = $it[ $inst::IT_LINK_TITLE ] ?? '';  // @phpstan-ignore-line
-	// phpcs:enable
-
+	$links = _get_links( $it );
 	$_link = '';
-	if ( is_string( $url ) && is_string( $title ) && ! empty( $url ) ) {
+	foreach ( $links as $link ) {
+		list( $url, $title ) = $link;
+
 		$_url   = esc_url( $url );
 		$_title = empty( $title ) ? $_url : esc_html( $title );
-		$_link  = "<span class=\"link\"><a href=\"$_url\">$_title</a></span>";
+		$_link .= "<span class=\"link\"><a href=\"$_url\">$_title</a></span>";
 	}
 	$_cls = esc_attr( _make_cls( $it ) );
 
 	echo "<li class=\"$_cls\"><div>\n";  // phpcs:ignore
 	echo "<span class=\"body\">$body</span>$_link$_doi\n";  // phpcs:ignore
 	echo "</div></li>\n";  // phpcs:ignore
+}
+
+/**
+ * Gets link arrays (Bimeson Item).
+ *
+ * @access private
+ *
+ * @param array<string, mixed> $it The item.
+ * @return array{ string, string }[] Links.
+ */
+function _get_links( array $it ): array {
+	$inst = _get_instance();
+
+	$links = array();
+	// phpcs:disable
+	$url   = $it[ $inst::IT_LINK_URL ]   ?? '';  // @phpstan-ignore-line
+	$title = $it[ $inst::IT_LINK_TITLE ] ?? '';  // @phpstan-ignore-line
+	// phpcs:enable
+
+	if ( is_string( $url ) && is_string( $title ) && ! empty( $url ) ) {
+		$links[] = array( $url, $title );
+	}
+	return $links;
 }
 
 /**

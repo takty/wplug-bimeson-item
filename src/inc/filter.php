@@ -1,10 +1,10 @@
 <?php
 /**
- * Bimeson (Filter)
+ * Filter (Common)
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2022-07-05
+ * @version 2023-11-09
  */
 
 namespace wplug\bimeson_item;
@@ -44,8 +44,8 @@ function _cb_query_vars_filter( array $query_vars ): array {
  * @param string                    $for_at       Attribute of 'for'.
  */
 function echo_the_filter( ?array $filter_state, array $years_exist, string $before = '<div class="wplug-bimeson-filter" hidden%s>', string $after = '</div>', string $for_at = 'bml' ): void {
-	wp_enqueue_style( 'wplug-bimeson-item-filter' );
-	wp_enqueue_script( 'wplug-bimeson-item-filter' );
+	wp_enqueue_style( 'wplug-bimeson-filter' );
+	wp_enqueue_script( 'wplug-bimeson-filter' );
 
 	if ( ! empty( $for_at ) ) {
 		$for_at = " for=\"$for_at\"";
@@ -104,7 +104,7 @@ function echo_filter( ?array $filter_state, array $years_exist ): void {
  */
 function _echo_year_select( array $years, array $state ): void {
 	$inst = _get_instance();
-	$val  = $state[ $inst::KEY_YEAR ];  // @phpstan-ignore-line
+	$val  = $state[ $inst::KEY_YEAR ] ?? null;  // @phpstan-ignore-line
 	$val  = is_numeric( $val ) ? (int) $val : 0;
 	$yf   = is_string( $inst->year_format ) ? $inst->year_format : '%d';
 	?>
@@ -134,12 +134,12 @@ function _echo_year_select( array $years, array $state ): void {
  *
  * @access private
  *
- * @param string               $root_slug A root slug.
- * @param \WP_Term[]           $terms     Corresponding terms.
- * @param array<string, mixed> $state     Filter states.
- * @param string[]|null        $filtered  Filtered term slugs.
+ * @param string               $slug     A root slug.
+ * @param \WP_Term[]           $terms    Corresponding terms.
+ * @param array<string, mixed> $state    Filter states.
+ * @param string[]|null        $filtered Filtered term slugs.
  */
-function _echo_tax_checkboxes( string $root_slug, array $terms, array $state, ?array $filtered = null ): void {
+function _echo_tax_checkboxes( string $slug, array $terms, array $state, ?array $filtered = null ): void {
 	$inst = _get_instance();
 	$func = $inst->term_name_getter;
 	if ( ! is_callable( $func ) ) {
@@ -147,18 +147,33 @@ function _echo_tax_checkboxes( string $root_slug, array $terms, array $state, ?a
 			return $t->name;
 		};
 	}
-	$t         = get_term_by( 'slug', $root_slug, $inst->root_tax );
+	$t         = get_term_by( 'slug', $slug, $inst->root_tax );
 	$cat_label = ( $t instanceof \WP_Term ) ? $func( $t ) : '';
-	$slug      = $root_slug;
-	$qvs       = isset( $state[ $root_slug ] ) && is_array( $state[ $root_slug ] ) ? $state[ $root_slug ] : array();
-	$checked   = ( ! empty( $qvs ) ) ? ' checked' : '';
+
+	if ( isset( $state[ $slug ] ) && is_array( $state[ $slug ] ) ) {
+		list( $qvs, $oa ) = $state[ $slug ];
+		$chk_ena          = count( $qvs ) ? ' checked' : '';
+		$chk_rel          = 'and' === $oa ? ' checked' : '';
+	} else {
+		$qvs     = array();
+		$chk_ena = '';
+		$chk_rel = '';
+	}
 	?>
 	<div class="wplug-bimeson-filter-key" data-key="<?php echo esc_attr( $slug ); ?>">
 		<div class="wplug-bimeson-filter-key-inner">
-			<div>
-				<input type="checkbox" class="wplug-bimeson-filter-switch tgl tgl-light" id="<?php echo esc_attr( $slug ); ?>" name="<?php echo esc_attr( $slug ); ?>"<?php echo $checked; // phpcs:ignore ?>>
-				<label class="tgl-btn" for="<?php echo esc_attr( $slug ); ?>"></label>
-				<div class="wplug-bimeson-filter-cat"><label for="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $cat_label ); ?></label></div>
+			<div class="wplug-bimeson-filter-sws">
+				<div>
+					<input type="checkbox" class="wplug-bimeson-filter-enabled tgl" id="<?php echo esc_attr( $slug ); ?>-enabled"<?php echo $chk_ena; // phpcs:ignore ?>>
+					<label class="tgl-btn tgl-light" for="<?php echo esc_attr( $slug ); ?>-enabled"></label>
+					<label for="<?php echo esc_attr( $slug ); ?>-enabled"><?php echo esc_html( $cat_label ); ?></label>
+				</div>
+	<?php if ( $inst->do_show_relation_switch ) : ?>
+				<div>
+					<input type="checkbox" class="wplug-bimeson-filter-relation swc" id="<?php echo esc_attr( $slug ); ?>-relation"<?php echo $chk_rel; // phpcs:ignore ?>>
+					<label class="swc-btn swc-light" for="<?php echo esc_attr( $slug ); ?>-relation"><span>OR</span><span>AND</span></label>
+				</div>
+	<?php endif; ?>
 			</div>
 			<div class="wplug-bimeson-filter-cbs">
 	<?php
@@ -193,18 +208,28 @@ function _echo_tax_checkboxes( string $root_slug, array $terms, array $state, ?a
  *
  * @access private
  *
- * @return array<string, mixed> Filter state.
+ * @return array<string, array{ string[], string }|string> Filter state.
  */
 function _get_filter_state_from_query(): array {
 	$inst = _get_instance();
 	$ret  = array();
 
 	foreach ( get_root_slugs() as $rs ) {
-		$val        = get_query_var( get_query_var_name( $rs ) );
-		$ret[ $rs ] = is_string( $val ) ? explode( ',', $val ) : array();
+		$val = get_query_var( get_query_var_name( $rs ) );
+		if ( is_string( $val ) && ! empty( $val ) ) {
+			$oa = 'or';
+			if ( '.' === $val[0] ) {
+				$oa  = 'and';
+				$val = substr( $val, 1 );
+			}
+			$ret[ $rs ] = array( explode( ',', $val ), $oa );
+		} else {
+			$ret[ $rs ] = array( array(), 'or' );
+		}
 	}
 	$val = get_query_var( $inst->year_qvar );
-
-	$ret[ (string) $inst::KEY_YEAR ] = $val;  // @phpstan-ignore-line
+	if ( is_string( $val ) ) {
+		$ret[ (string) $inst::KEY_YEAR ] = $val;  // @phpstan-ignore-line
+	}
 	return $ret;
 }

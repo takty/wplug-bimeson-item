@@ -1,6 +1,6 @@
 <?php
 /**
- * Bimeson (Template Admin)
+ * Template Admin
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
@@ -17,8 +17,8 @@ require_once __DIR__ . '/taxonomy.php';
  *
  * @param int $post_id Post ID.
  * @return array{
- *     year_bgn          : int,
- *     year_end          : int,
+ *     year_bgn          : string,
+ *     year_end          : string,
  *     count             : int,
  *     filter_state      : array<string, string[]>,
  *     sort_by_date_first: bool,
@@ -39,9 +39,9 @@ function get_template_admin_config( int $post_id ): array {
 		}
 	}
 	// phpcs:disable
-	$cfg['year_bgn'] = isset( $cfg['year_bgn'] ) && is_numeric( $cfg['year_bgn'] ) ? (int) $cfg['year_bgn'] : 0;
-	$cfg['year_end'] = isset( $cfg['year_end'] ) && is_numeric( $cfg['year_end'] ) ? (int) $cfg['year_end'] : 0;
-	$cfg['count']    = isset( $cfg['count'] )    && is_numeric( $cfg['count'] )    ? (int) $cfg['count']    : 0;
+	$cfg['year_bgn'] = isset( $cfg['year_bgn'] ) && is_numeric( $cfg['year_bgn'] ) ? (string) $cfg['year_bgn'] : '';
+	$cfg['year_end'] = isset( $cfg['year_end'] ) && is_numeric( $cfg['year_end'] ) ? (string) $cfg['year_end'] : '';
+	$cfg['count']    = isset( $cfg['count'] )    && is_numeric( $cfg['count'] )    ? (int) $cfg['count']       : 0;
 
 	$cfg['filter_state'] = isset( $cfg['filter_state'] ) ? $cfg['filter_state'] : array();
 
@@ -127,9 +127,9 @@ function _cb_output_html_template_admin( \WP_Post $post ): void {
 	$cfg = get_template_admin_config( $post->ID );
 
 	// phpcs:disable
-	$year_bgn           = $cfg['year_bgn'] ? (string) $cfg['year_bgn'] : '';
-	$year_end           = $cfg['year_end'] ? (string) $cfg['year_end'] : '';
-	$count              = $cfg['count']    ? (string) $cfg['count']    : '';
+	$year_bgn           = $cfg['year_bgn'];
+	$year_end           = $cfg['year_end'];
+	$count              = $cfg['count'] ? (string) $cfg['count'] : '';
 	$sort_by_date_first = $cfg['sort_by_date_first'];
 	$dup_multi_cat      = $cfg['dup_multi_cat'];
 	$show_filter        = $cfg['show_filter'];
@@ -217,9 +217,13 @@ function _echo_tax_checkboxes_admin( string $root_slug, array $terms, array $sta
 	$qvs       = isset( $state[ $root_slug ] ) && is_array( $state[ $root_slug ] ) ? $state[ $root_slug ] : array();
 	$checked   = ( ! empty( $qvs ) ) ? ' checked' : '';
 
-	$visible = empty( $state[ $inst::KEY_VISIBLE ] ) ? true : in_array( $root_slug, $state[ $inst::KEY_VISIBLE ], true );  // @phpstan-ignore-line
-	$vc      = $visible ? ' checked' : '';
-
+	$vc = ' checked';
+	if ( isset( $state[ $inst::KEY_VISIBLE ] ) && is_array( $state[ $inst::KEY_VISIBLE ] ) ) {
+		$visible = in_array( $root_slug, $state[ (string) $inst::KEY_VISIBLE ], true );
+		if ( ! $visible ) {
+			$vc = '';
+		}
+	}
 	$ih_attr = $is_hidden ? ' disabled' : '';
 	?>
 	<div class="wplug-bimeson-admin-filter-key" data-key="<?php echo esc_attr( $slug ); ?>">
@@ -278,7 +282,7 @@ function _get_filter_state_from_env(): array {
 		}
 	}
 	$inst = _get_instance();
-	$vs   = $_POST['wplug_bimeson_visible'] ?? null;  // phpcs:ignore
+	$vs   = $_POST['wplug_bimeson_visible'] ?? array();  // phpcs:ignore
 	if ( is_array( $vs ) ) {
 		$ret[ (string) $inst::KEY_VISIBLE ] = array_values( array_intersect( get_root_slugs(), wp_unslash( $vs ) ) );  // @phpstan-ignore-line
 	}

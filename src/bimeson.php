@@ -26,40 +26,42 @@ require_once __DIR__ . '/inc/template-admin.php';
  *
  * phpcs:ignore
  * @param array{
- *     key?                : string,
- *     url_to?             : string,
- *     lang?               : string,
- *     heading_level?      : int,
- *     year_format?        : string|null,
- *     term_name_getter?   : callable|null,
- *     year_select_label?  : string,
- *     uncategorized_label?: string,
- *     taxonomy?           : string,
- *     sub_tax_base?       : string,
- *     sub_tax_cls_base?   : string,
- *     sub_tax_qvar_base?  : string,
- *     year_cls_base?      : string,
- *     year_qvar?          : string,
- *     additional_langs?   : string[],
+ *     key?                    : string,
+ *     url_to?                 : string,
+ *     lang?                   : string,
+ *     heading_level?          : int,
+ *     year_format?            : string|null,
+ *     term_name_getter?       : callable|null,
+ *     year_select_label?      : string,
+ *     uncategorized_label?    : string,
+ *     taxonomy?               : string,
+ *     sub_tax_base?           : string,
+ *     sub_tax_cls_base?       : string,
+ *     sub_tax_qvar_base?      : string,
+ *     year_cls_base?          : string,
+ *     year_qvar?              : string,
+ *     do_show_relation_switch?: bool,
+ *     additional_langs?       : string[],
  * } $args (Optional) Array of arguments.
  * $args {
  *     (Optional) Array of arguments.
  *
- *     @type string   'key'                 Post meta key for config data. Default '_bimeson'.
- *     @type string   'url_to'              URL to the plugin directory.
- *     @type string   'lang'                Language. Default ''.
- *     @type int      'heading_level'       First heading level of publication lists. Default 3.
- *     @type string   'year_format'         Year heading format. Default null.
- *     @type callable 'term_name_getter'    Callable for getting term names. Default null.
- *     @type string   'year_select_label'   Label of year select markup. Default __( 'Select Year' ).
- *     @type string   'uncategorized_label' Label of year select markup. Default __( 'Uncategorized' ).
- *     @type string   'taxonomy'            Root taxonomy slug.
- *     @type string   'sub_tax_base'        Slug base of sub taxonomies.
- *     @type string   'sub_tax_cls_base'    Class base of sub taxonomies.
- *     @type string   'sub_tax_qvar_base'   Query variable name base of sub taxonomies.
- *     @type string   'year_cls_base'       Class base of year.
- *     @type string   'year_qvar'           Query variable name of year.
- *     @type string[] 'additional_langs'    Additional language slugs.
+ *     @type string   'key'                     Post meta key for config data. Default '_bimeson'.
+ *     @type string   'url_to'                  URL to the plugin directory.
+ *     @type string   'lang'                    Language. Default ''.
+ *     @type int      'heading_level'           First heading level of publication lists. Default 3.
+ *     @type string   'year_format'             Year heading format. Default null.
+ *     @type callable 'term_name_getter'        Callable for getting term names. Default null.
+ *     @type string   'year_select_label'       Label of year select markup. Default __( 'Select Year' ).
+ *     @type string   'uncategorized_label'     Label of year select markup. Default __( 'Uncategorized' ).
+ *     @type string   'taxonomy'                Root taxonomy slug.
+ *     @type string   'sub_tax_base'            Slug base of sub taxonomies.
+ *     @type string   'sub_tax_cls_base'        Class base of sub taxonomies.
+ *     @type string   'sub_tax_qvar_base'       Query variable name base of sub taxonomies.
+ *     @type string   'year_cls_base'           Class base of year.
+ *     @type string   'year_qvar'               Query variable name of year.
+ *     @type bool     'do_show_relation_switch' Whether to show relation switches.
+ *     @type string[] 'additional_langs'        Additional language slugs.
  * }
  */
 function initialize( array $args = array() ): void {
@@ -84,9 +86,10 @@ function initialize( array $args = array() ): void {
 
 	$inst->year_cls_base = $args['year_cls_base'] ?? $inst::DEFAULT_YEAR_CLS_BASE;  // @phpstan-ignore-line
 	$inst->year_qvar     = $args['year_qvar']     ?? $inst::DEFAULT_YEAR_QVAR;  // @phpstan-ignore-line
-	// phpcs:enable
 
-	$inst->additional_langs = $args['additional_langs'] ?? array();  // @phpstan-ignore-line
+	$inst->do_show_relation_switch = $args['do_show_relation_switch'] ?? false;  // @phpstan-ignore-line
+	$inst->additional_langs        = $args['additional_langs'] ?? array();  // @phpstan-ignore-line
+	// phpcs:enable
 
 	initialize_post_type( $url_to );  // Do before initializing taxonomies.
 	initialize_taxonomy();
@@ -111,8 +114,8 @@ function _register_script( string $url_to ): void {
 			add_action(
 				'admin_enqueue_scripts',
 				function () use ( $url_to ) {
-					wp_enqueue_style( 'wplug-bimeson-item-template-admin', \wplug\abs_url( $url_to, './assets/css/template-admin.min.css' ), array(), '1.0' );
-					wp_enqueue_script( 'wplug-bimeson-item-template-admin', \wplug\abs_url( $url_to, './assets/js/template-admin.min.js' ), array(), '1.0', false );
+					wp_enqueue_style( 'wplug-bimeson-template-admin', \wplug\abs_url( $url_to, './assets/css/template-admin.min.css' ), array(), '1.0' );
+					wp_enqueue_script( 'wplug-bimeson-template-admin', \wplug\abs_url( $url_to, './assets/js/template-admin.min.js' ), array(), '1.0', false );
 				}
 			);
 		}
@@ -120,8 +123,8 @@ function _register_script( string $url_to ): void {
 		add_action(
 			'wp_enqueue_scripts',
 			function () use ( $url_to ) {
-				wp_register_style( 'wplug-bimeson-item-filter', \wplug\abs_url( $url_to, './assets/css/filter.min.css' ), array(), '1.0' );
-				wp_register_script( 'wplug-bimeson-item-filter', \wplug\abs_url( $url_to, './assets/js/filter.min.js' ), array(), '1.0', false );
+				wp_register_style( 'wplug-bimeson-filter', \wplug\abs_url( $url_to, './assets/css/filter.min.css' ), array(), '1.0' );
+				wp_register_script( 'wplug-bimeson-filter', \wplug\abs_url( $url_to, './assets/js/filter.min.js' ), array(), '1.0', false );
 			}
 		);
 	}
@@ -188,6 +191,32 @@ function save_meta_box( int $post_id ): void {
 
 
 /**
+ * Gets visible root slugs.
+ *
+ * @param array<string, mixed>|null $filter_state Filter states.
+ * @return string[]|null Visible root slugs.
+ */
+function get_visible_root_slugs( ?array $filter_state ): ?array {
+	$vs = $filter_state[ _get_instance()::KEY_VISIBLE ] ?? null;  // @phpstan-ignore-line
+
+	$ro  = get_root_slug_to_options();
+	$vst = array();
+	foreach ( $ro as $rs => $opts ) {
+		if ( ! $opts['is_hidden'] ) {
+			$vst[] = $rs;
+		}
+	}
+	if ( ! is_array( $vs ) ) {
+		return count( $vst ) === count( $ro ) ? null : $vst;
+	}
+	return array_values( array_intersect( $vs, $vst ) );
+}
+
+
+// -----------------------------------------------------------------------------
+
+
+/**
  * Display the filter.
  *
  * @param int|null $post_id Post ID.
@@ -240,8 +269,8 @@ function the_list( ?int $post_id = null, string $lang = '', string $before = '<d
  * @param int    $post_id Post ID.
  * @param string $lang    Language.
  * @return array{
- *     year_bgn          : int,
- *     year_end          : int,
+ *     year_bgn          : string,
+ *     year_end          : string,
  *     count             : int,
  *     filter_state      : array<string, string[]>,
  *     sort_by_date_first: bool,
@@ -260,7 +289,7 @@ function _get_data( int $post_id, string $lang ): ?array {
 	$d = get_template_admin_config( $post_id );
 
 	// Bimeson Item.
-	$items = get_filtered_items( $lang, (string) $d['year_bgn'], (string) $d['year_end'], $d['filter_state'] );
+	$items = get_filtered_items( $lang, $d['year_bgn'], $d['year_end'], $d['filter_state'] );
 
 	list( $items, $years_exist ) = retrieve_items( $items, $d['count'], $d['sort_by_date_first'], $d['dup_multi_cat'], $d['filter_state'] );
 
@@ -282,12 +311,12 @@ function _get_data( int $post_id, string $lang ): ?array {
  * Retrieves filtered items.
  *
  * @param string                  $lang         Language.
- * @param string|null             $date_bgn     Date from.
- * @param string|null             $date_end     Date to.
+ * @param string                  $date_bgn     Date from.
+ * @param string                  $date_end     Date to.
  * @param array<string, string[]> $filter_state Filter states.
  * @return array<string, mixed>[] Items.
  */
-function get_filtered_items( string $lang, ?string $date_bgn, ?string $date_end, array $filter_state ): array {
+function get_filtered_items( string $lang, string $date_bgn, string $date_end, array $filter_state ): array {
 	$inst = _get_instance();
 	if ( isset( $filter_state[ $inst::KEY_VISIBLE ] ) ) {  // @phpstan-ignore-line
 		unset( $filter_state[ $inst::KEY_VISIBLE ] );  // @phpstan-ignore-line
@@ -445,30 +474,4 @@ function _make_edit_url( \WP_Post $p ): string {
 		return admin_url( "post.php?post={$p->ID}&action=edit" );
 	}
 	return '';
-}
-
-
-// -----------------------------------------------------------------------------
-
-
-/**
- * Gets visible root slugs.
- *
- * @param array<string, mixed>|null $filter_state Filter states.
- * @return string[]|null Visible root slugs.
- */
-function get_visible_root_slugs( ?array $filter_state ): ?array {
-	$vs = $filter_state[ _get_instance()::KEY_VISIBLE ] ?? null;  // @phpstan-ignore-line
-
-	$ro  = get_root_slug_to_options();
-	$vst = array();
-	foreach ( $ro as $rs => $opts ) {
-		if ( ! $opts['is_hidden'] ) {
-			$vst[] = $rs;
-		}
-	}
-	if ( ! is_array( $vs ) ) {
-		return count( $vst ) === count( $ro ) ? null : $vst;
-	}
-	return array_values( array_intersect( $vs, $vst ) );
 }

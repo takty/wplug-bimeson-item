@@ -1,6 +1,6 @@
 <?php
 /**
- * Bimeson (Instance)
+ * Instance
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
@@ -15,27 +15,28 @@ namespace wplug\bimeson_item;
  * @access private
  *
  * @return object{
- *     fld_list_cfg     : string,
- *     additional_langs : string[],
- *     head_level       : int,
- *     year_format      : string|null,
- *     term_name_getter : callable|null,
- *     year_select_label: string,
- *     uncat_label      : string,
- *     root_tax         : string,
- *     sub_tax_base     : string,
- *     sub_tax_cls_base : string,
- *     sub_tax_qvar_base: string,
- *     year_cls_base    : string,
- *     year_qvar        : string,
- *     cache            : array<string, mixed>[],
- *     rs_idx           : array<string, int[]>|null,
- *     rs_opts          : array<string, array<string, mixed>>|null,
- *     sub_taxes        : array<string, string>,
- *     old_tax          : string,
- *     old_terms        : array{ slug: string, name: string, term_id: int }[],
- *     root_terms       : \WP_Term[],
- *     sub_tax_to_terms : array<string, \WP_Term[]|null>,
+ *     fld_list_cfg           : string,
+ *     additional_langs       : string[],
+ *     head_level             : int,
+ *     year_format            : string|null,
+ *     term_name_getter       : callable|null,
+ *     year_select_label      : string,
+ *     uncat_label            : string,
+ *     root_tax               : string,
+ *     sub_tax_base           : string,
+ *     sub_tax_cls_base       : string,
+ *     sub_tax_qvar_base      : string,
+ *     year_cls_base          : string,
+ *     year_qvar              : string,
+ *     do_show_relation_switch: bool,
+ *     cache                  : array<string, mixed>[],
+ *     rs_idx                 : array<string, int[]>|null,
+ *     rs_opts                : array<string, array<string, mixed>>|null,
+ *     sub_taxes              : array<string, string>,
+ *     old_tax                : string,
+ *     old_terms              : array{ slug: string, name: string, term_id: int }[],
+ *     root_terms             : \WP_Term[],
+ *     sub_tax_to_terms       : array<string, \WP_Term[]|null>,
  * } Instance.
  */
 function _get_instance(): object {
@@ -206,6 +207,13 @@ function _get_instance(): object {
 		 * @var string
 		 */
 		public $year_qvar = '';
+
+		/**
+		 * Whether to show relation switches.
+		 *
+		 * @var bool
+		 */
+		public $do_show_relation_switch = false;
 
 		/**
 		 * The sub taxonomy slugs.

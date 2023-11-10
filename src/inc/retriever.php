@@ -1,6 +1,6 @@
 <?php
 /**
- * Bimeson Item (Retriever)
+ * Retriever (Common)
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
@@ -21,7 +21,7 @@ require_once __DIR__ . '/taxonomy.php';
  * @param bool                      $sort_by_date_first Whether to sort by date first.
  * @param bool                      $dup_multi_cat      Whether to duplicate multiple category items.
  * @param array<string, mixed>|null $filter_state       Filter states.
- * @return array{array<string, mixed>[], string[]} Array of retrieved items and existing years.
+ * @return array{ array<string, mixed>[], string[] } Array of retrieved items and existing years.
  */
 function retrieve_items( array $items, ?int $count, bool $sort_by_date_first, bool $dup_multi_cat, ?array $filter_state ): array {
 	$rs_idx = _make_rs_idx();
