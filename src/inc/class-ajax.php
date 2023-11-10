@@ -4,8 +4,10 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-09-08
+ * @version 2023-11-10
  */
+
+declare(strict_types=1);
 
 namespace wplug\bimeson_item;
 
@@ -60,10 +62,10 @@ class Ajax {
 	 *
 	 * @param string      $action   Ajax action.
 	 * @param callable    $response Function called when receive message.
-	 * @param bool        $public   Whether this ajax is public.
+	 * @param bool        $pub      Whether this ajax is public.
 	 * @param string|null $nonce    Nonce.
 	 */
-	public function __construct( string $action, $response, bool $public = false, ?string $nonce = null ) {
+	public function __construct( string $action, $response, bool $pub = false, ?string $nonce = null ) {
 		if ( ! preg_match( '/^[a-zA-Z0-9_\-]+$/', $action ) ) {
 			wp_die( 'Invalid string for ' . esc_html( $action ) . '.' );
 		}
@@ -72,7 +74,7 @@ class Ajax {
 		$this->nonce    = ( null === $nonce ) ? $action : $nonce;
 
 		add_action( "wp_ajax_$action", array( $this, 'cb_ajax_action' ) );
-		if ( $public ) {
+		if ( $pub ) {
 			add_action( "wp_ajax_nopriv_$action", array( $this, 'cb_ajax_action' ) );
 		}
 	}
@@ -110,5 +112,4 @@ class Ajax {
 		}
 		call_user_func( $this->response, $data );
 	}
-
 }

@@ -2,7 +2,7 @@
  * Template Admin (Common)
  *
  * @author Takuto Yanagida
- * @version 2022-10-14
+ * @version 2023-11-10
  */
 
 document.addEventListener('DOMContentLoaded', function () {

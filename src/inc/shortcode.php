@@ -4,10 +4,12 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-09-08
+ * @version 2023-11-10
  *
  * [publication list="<slug or post ID>" count="10" date-sort omit-single dup-item date="2020-2021" taxonomy="slug1, slug2, ..."]
  */
+
+declare(strict_types=1);
 
 namespace wplug\bimeson_item;
 

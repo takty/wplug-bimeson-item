@@ -1,12 +1,9 @@
 /**
- *
  * Bimeson File Importer
  *
  * @author Takuto Yanagida
- * @version 2021-07-21
- *
+ * @version 2023-11-10
  */
-
 
 document.addEventListener('DOMContentLoaded', () => {
 

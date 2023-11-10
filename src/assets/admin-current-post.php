@@ -4,7 +4,7 @@
  *
  * @package Wplug
  * @author Takuto Yanagida
- * @version 2023-11-07
+ * @version 2023-11-10
  */
 
 declare(strict_types=1);

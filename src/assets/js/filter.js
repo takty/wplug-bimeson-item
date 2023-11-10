@@ -2,7 +2,7 @@
  * Filter (Common)
  *
  * @author Takuto Yanagida
- * @version 2023-11-09
+ * @version 2023-11-10
  */
 
 document.addEventListener('DOMContentLoaded', () => {

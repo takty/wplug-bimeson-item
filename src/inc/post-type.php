@@ -1,11 +1,13 @@
 <?php
 /**
- * Bimeson (Post Type)
+ * Post Type
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-09-08
+ * @version 2023-11-10
  */
+
+declare(strict_types=1);
 
 namespace wplug\bimeson_item;
 
