@@ -339,7 +339,7 @@ function _echo_list_item( array $it, string $lang ): void {
 	$_cls = esc_attr( _make_cls( $it ) );
 
 	echo "<li class=\"$_cls\"><div>\n";  // phpcs:ignore
-	echo "<span class=\"body\">$body</span>$_link$_doi\n";  // phpcs:ignore
+	echo "<span class=\"body\">$body</span> $_link $_doi\n";  // phpcs:ignore
 	echo "</div></li>\n";  // phpcs:ignore
 }
 
