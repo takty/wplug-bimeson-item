@@ -151,16 +151,18 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function normalizeKey(str, isKey) {
-		str = str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function (s) { return String.fromCharCode(s.charCodeAt(0) - 0xFEE0); });
+		str = str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
 		str = str.replace(/[_＿]/g, '_');
 		str = str.replace(/[\-‐―ー]/g, '-');
-		str = str.replace(/[^A-Za-z0-9\-\_]/g, '');
-		str = str.toLowerCase();
-		str = str.trim();
+		str = str.replace(/[^A-Za-z0-9_\- ]/g, '');
+		str = str.toLowerCase().trim();
 		if (0 < str.length) {
-			if (!isKey && (str[0] === '_' || str[0] === '-')) str = str.replace(/^[_\-]+/, '');
-			if (str[0] !== '_') str = str.replace('_', '-');
-			if (str[0] === '_') str = str.replace('-', '_');
+			if (isKey && str[0] === '_') {  // Underscore separation
+				str = str.replace(/[_\- ]+/g, '_');
+			} else {  // Hyphen separation
+				str = str.replace(/[_\- ]+/g, '-');
+				str = str.replace(/^[_\-]+/, '');
+			}
 		}
 		return str;
 	}
