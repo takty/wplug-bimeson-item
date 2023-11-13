@@ -1,7 +1,7 @@
 # Translation of Bimeson Item - Development in Japanese
 # @package Bimeson Item
 # @author Takuto Yanagida
-# @version 2022-06-15
+# @version 2023-11-13
 
 # Post Type --------------------------------------------------------------------
 
@@ -94,8 +94,8 @@ msgstr "項目が1つしかない分類の見出しを省略"
 
 # Importer ---------------------------------------------------------------------
 
-msgid "Import publications from an Excel file."
-msgstr "Excelファイルから業績をインポートします。"
+msgid "Import <strong>publications</strong> from an Excel file."
+msgstr "Excelファイルから<strong>業績</strong>をインポートします。"
 
 msgid "Import Publication List"
 msgstr "業績リストのインポート"

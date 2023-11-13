@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2023-11-13
  */
 
 declare(strict_types=1);
@@ -102,7 +102,7 @@ class Bimeson_Importer extends \WP_Importer {
 		register_importer(
 			'wplug_bimeson',
 			'Bimeson',
-			__( 'Import <strong>publications</strong> from a Excel file.', 'wplug_bimeson_item' ),
+			__( 'Import <strong>publications</strong> from an Excel file.', 'wplug_bimeson_item' ),
 			array( $GLOBALS['wplug_bimeson_import'], 'dispatch' )
 		);
 	}
@@ -299,7 +299,7 @@ class Bimeson_Importer extends \WP_Importer {
 			</p>
 		</div>
 		<p class="submit">
-			<button type="button" id="btn-start-import" class="button"><?php esc_html_e( 'Start Import' ); ?></button>
+			<button type="button" id="btn-start-import" class="button"><?php esc_html_e( 'Start Import', 'wplug_bimeson_item' ); ?></button>
 		</p>
 		<div id="msg-response" style="margin-top:1rem;max-height:50vh;overflow:auto;"></div>
 		<p id="msg-success" hidden><strong><?php esc_html_e( 'All done.', 'wplug_bimeson_item' ); ?></strong></p>
