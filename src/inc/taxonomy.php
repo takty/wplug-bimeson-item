@@ -129,7 +129,7 @@ function _register_sub_tax( string $tax, string $label ): void {
 					'parent_item'              => sprintf( __( 'Parent Category (%s)', 'wplug_bimeson_item' ), $label ),
 					/* translators: 1: label. */
 					'update_item'              => sprintf( __( 'Update Category (%s)', 'wplug_bimeson_item' ), $label ),
-					'name_field_description'   => '',
+					'name_field_description'   => __( 'The name is how it appears on your site.', 'wplug_bimeson_item' ),
 					'slug_field_description'   => __( 'The &#8220;slug&#8221; is the URL-friendly version of the name. It is all lowercase and contains only letters, numbers, and hyphens.', 'wplug_bimeson_item' ),
 					'parent_field_description' => '',
 					'desc_field_description'   => '',
