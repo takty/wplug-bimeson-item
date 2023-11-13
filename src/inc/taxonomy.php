@@ -32,7 +32,7 @@ function initialize_taxonomy(): void {
 					'search_items'             => __( 'Search Category Groups', 'wplug_bimeson_item' ),
 					'parent_item'              => __( 'Parent Category Group', 'wplug_bimeson_item' ),
 					'update_item'              => __( 'Update Category Group', 'wplug_bimeson_item' ),
-					'name_field_description'   => '',
+					'name_field_description'   => __( 'The name is how it appears on your site.', 'wplug_bimeson_item' ),
 					'slug_field_description'   => __( 'The &#8220;slug&#8221; is the URL-friendly version of the name. It is all lowercase and contains only letters, numbers, and hyphens.', 'wplug_bimeson_item' ),
 					'parent_field_description' => '',
 					'desc_field_description'   => '',
