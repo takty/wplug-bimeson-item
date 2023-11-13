@@ -5,6 +5,15 @@
 
 # Post Type --------------------------------------------------------------------
 
+msgid "Publication"
+msgstr "業績"
+
+msgid "Add New Publication"
+msgstr "新規業績を追加"
+
+msgid "Publication data"
+msgstr "業績情報"
+
 msgid "Import from"
 msgstr "インポート元"
 
@@ -17,14 +26,13 @@ msgstr "リンクURL"
 msgid "Link title"
 msgstr "リンク表題"
 
-msgid "Publication data"
-msgstr "業績情報"
-
-# 'Import from',      'ja', 'インポート元'
-# 'Published date',   'ja', '公開日付'
-# 'Link URL',         'ja', 'リンクURL'
-# 'Link title',       'ja', 'リンク表題'
-# 'Publication data', 'ja', '業績情報'
+# 'Publication',         'ja', '業績'
+# 'Add New Publication', 'ja', '新規業績を追加'
+# 'Publication data',    'ja', '業績情報'
+# 'Import from',         'ja', 'インポート元'
+# 'Published date',      'ja', '公開日付'
+# 'Link URL',            'ja', 'リンクURL'
+# 'Link title',          'ja', 'リンク表題'
 
 # Taxonomy ---------------------------------------------------------------------
 

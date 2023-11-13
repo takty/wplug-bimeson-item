@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2023-11-13
  */
 
 declare(strict_types=1);
@@ -31,7 +31,10 @@ function initialize_post_type( string $url_to ): void {
 		$inst::PT,  // @phpstan-ignore-line
 		array(
 			'label'         => __( 'Publication', 'wplug_bimeson_item' ),
-			'labels'        => array(),
+			'labels'        => array(
+				'add_new'      => __( 'Add New Publication', 'wplug_bimeson_item' ),
+				'add_new_item' => __( 'Add New Publication', 'wplug_bimeson_item' ),
+			),
 			'public'        => true,
 			'show_ui'       => true,
 			'menu_position' => 5,
@@ -76,7 +79,7 @@ function _cb_wp_loaded(): void {
 	$cs[] = array(
 		'label' => __( 'Published date', 'wplug_bimeson_item' ),
 		'name'  => $inst::IT_DATE,  // @phpstan-ignore-line
-		'width' => '10%',
+		'width' => '12%',
 		'value' => 'esc_html',
 	);
 	foreach ( get_root_slugs() as $taxonomy ) {
@@ -89,7 +92,7 @@ function _cb_wp_loaded(): void {
 	$cs[] = array(
 		'label' => __( 'Import from', 'wplug_bimeson_item' ),
 		'name'  => $inst::IT_IMPORT_FROM,  // @phpstan-ignore-line
-		'width' => '10%',
+		'width' => '14%',
 		'value' => 'esc_html',
 	);
 	set_admin_columns( $inst::PT, $cs );  // @phpstan-ignore-line
