@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2023-11-13
  */
 
 declare(strict_types=1);
@@ -473,7 +473,7 @@ function _make_content( string $c ): string {
 			's'      => array(),
 			'sub'    => array(),
 			'sup'    => array(),
-			'mark'   => array(),
+			'span'   => array( 'style' => array() ),
 		)
 	);
 	return $c;
