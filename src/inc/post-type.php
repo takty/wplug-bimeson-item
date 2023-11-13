@@ -34,6 +34,7 @@ function initialize_post_type( string $url_to ): void {
 			'labels'        => array(
 				'add_new'      => __( 'Add New Publication', 'wplug_bimeson_item' ),
 				'add_new_item' => __( 'Add New Publication', 'wplug_bimeson_item' ),
+				'search_items' => __( 'Search Publications', 'wplug_bimeson_item' ),
 			),
 			'public'        => true,
 			'show_ui'       => true,
