@@ -2,7 +2,7 @@
  * Bimeson File Importer
  *
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2023-11-13
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		try {
 			const book      = XLSX.read(bstr, {type:'binary'});
-			const sheetName = book.SheetNames[0];
+			const sheetName = retrieveSheetName(book);
 			const sheet     = book.Sheets[sheetName];
 			if (sheet) {
 				processSheet(sheet, items);
@@ -83,6 +83,16 @@ document.addEventListener('DOMContentLoaded', () => {
 			msgFailure.removeAttribute('hidden');
 		}
 	}
+
+	function retrieveSheetName(book) {
+		for (const name of book.SheetNames) {
+			const nn = name.trim().toLowerCase();
+			if ('_list' === nn) {
+				return name;
+			}
+		}
+		return book.SheetNames[0];
+}
 
 
 	// -------------------------------------------------------------------------
