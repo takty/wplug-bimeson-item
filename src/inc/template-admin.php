@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2023-11-15
  */
 
 declare(strict_types=1);
@@ -220,8 +220,8 @@ function _echo_tax_checkboxes_admin( string $root_slug, array $terms, array $sta
 	$checked   = ( ! empty( $qvs ) ) ? ' checked' : '';
 
 	$vc = ' checked';
-	if ( isset( $state[ $inst::KEY_VISIBLE ] ) && is_array( $state[ $inst::KEY_VISIBLE ] ) ) {
-		$visible = in_array( $root_slug, $state[ (string) $inst::KEY_VISIBLE ], true );
+	if ( isset( $state[ $inst::KEY_VISIBLE ] ) && is_array( $state[ $inst::KEY_VISIBLE ] ) ) {  // @phpstan-ignore-line
+		$visible = in_array( $root_slug, $state[ (string) $inst::KEY_VISIBLE ], true );  // @phpstan-ignore-line
 		if ( ! $visible ) {
 			$vc = '';
 		}

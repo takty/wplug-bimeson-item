@@ -4,7 +4,8 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-13
+ * @version 2023-11-15
+ * @psalm-suppress UndefinedFunction
  */
 
 declare(strict_types=1);
