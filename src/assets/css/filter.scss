@@ -2,13 +2,18 @@
  * Publication List Filter (Common)
  *
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2023-11-17
  */
 
  @media (min-width: 900px) {
 	.wplug-bimeson-filter {
 		column-count: 2;
+		column-gap  : 2rem;
 	}
+}
+
+.wplug-bimeson-filter-key-inner {
+	width: 100%;
 }
 
 .wplug-bimeson-filter-key {
@@ -31,10 +36,18 @@
 	align-items    : center;
 	justify-content: space-between;
 
+	width            : fit-content;
+	min-width        : 75%;
+	margin-inline-end: auto;
+
 	> div {
 		margin     : 0;
 		display    : flex;
 		align-items: center;
+
+		&:nth-child(2) {
+			margin-inline-start: 1rem;
+		}
 	}
 	label {
 		font-weight: bold;
