@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-13
+ * @version 2024-01-26
  */
 
 declare(strict_types=1);
@@ -85,7 +85,7 @@ function _register_sub_tax_all(): void {
  */
 function get_query_var_name( string $slug ): string {
 	$inst = _get_instance();
-	$name = "{$inst->sub_tax_qvar_base}{$slug}";
+	$name = str_replace( '%key%', $slug, $inst->filter_qvar_base );
 	return str_replace( '-', '_', $name );
 }
 

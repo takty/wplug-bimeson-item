@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2024-01-26
  */
 
 declare(strict_types=1);
@@ -32,7 +32,7 @@ function initialize_filter(): void {
  */
 function _cb_query_vars_filter( array $query_vars ): array {
 	$inst         = _get_instance();
-	$query_vars[] = $inst->year_qvar;
+	$query_vars[] = get_query_var_name( $inst::KEY_YEAR );
 	return $query_vars;
 }
 
@@ -90,10 +90,8 @@ function echo_filter( ?array $filter_state, array $years_exist ): void {
 			}
 		}
 	}
-	echo '<input type="hidden" value="' . esc_attr( $inst->sub_tax_cls_base ) . '" id="wplug-bimeson-sub-tax-cls-base">';
-	echo '<input type="hidden" value="' . esc_attr( $inst->sub_tax_qvar_base ) . '" id="wplug-bimeson-sub-tax-qvar-base">';
-	echo '<input type="hidden" value="' . esc_attr( $inst->year_cls_base ) . '" id="wplug-bimeson-year-cls-base">';
-	echo '<input type="hidden" value="' . esc_attr( $inst->year_qvar ) . '" id="wplug-bimeson-year-qvar">';
+	echo '<input type="hidden" value="' . esc_attr( $inst->filter_qvar_base ) . '" id="wplug-bimeson-filter-qvar-base">';
+	echo '<input type="hidden" value="' . esc_attr( $inst->filter_cls_base ) . '" id="wplug-bimeson-filter-cls-base">';
 }
 
 /**
@@ -111,10 +109,9 @@ function _echo_year_select( array $years, array $state ): void {
 	$yf   = is_string( $inst->year_format ) ? $inst->year_format : '%d';
 	?>
 	<div class="wplug-bimeson-filter-key" data-key="<?php echo esc_attr( $inst::KEY_YEAR );  // @phpstan-ignore-line ?>">
-		<div class="wplug-bimeson-filter-key-inner">
-			<label class="select">
-				<select name="<?php echo esc_attr( $inst::KEY_YEAR );  // @phpstan-ignore-line ?>" class="wplug-bimeson-filter-select">
-					<option value="<?php echo esc_attr( $inst::VAL_YEAR_ALL );  // @phpstan-ignore-line ?>"><?php echo esc_html( $inst->year_select_label ); ?></option>
+		<label class="select">
+			<select name="<?php echo esc_attr( $inst::KEY_YEAR );  // @phpstan-ignore-line ?>" class="wplug-bimeson-filter-select">
+				<option value=""><?php echo esc_html( $inst->year_select_label ); ?></option>
 	<?php
 	foreach ( $years as $y ) {
 		if ( is_numeric( $y ) ) {
@@ -124,9 +121,8 @@ function _echo_year_select( array $years, array $state ): void {
 		}
 	}
 	?>
-				</select>
-			</label>
-		</div>
+			</select>
+		</label>
 	</div>
 	<?php
 }
@@ -163,21 +159,16 @@ function _echo_tax_checkboxes( string $slug, array $terms, array $state, ?array 
 	}
 	?>
 	<div class="wplug-bimeson-filter-key" data-key="<?php echo esc_attr( $slug ); ?>">
-		<div class="wplug-bimeson-filter-key-inner">
-			<div class="wplug-bimeson-filter-sws">
-				<div>
-					<input type="checkbox" class="wplug-bimeson-filter-enabled tgl" id="<?php echo esc_attr( $slug ); ?>-enabled"<?php echo $chk_ena; // phpcs:ignore ?>>
-					<label class="tgl-btn tgl-light" for="<?php echo esc_attr( $slug ); ?>-enabled"></label>
-					<label for="<?php echo esc_attr( $slug ); ?>-enabled"><?php echo esc_html( $cat_label ); ?></label>
-				</div>
+		<div>
+			<input type="checkbox" class="wplug-bimeson-filter-enabled"<?php echo $chk_ena; // phpcs:ignore ?>>
+			<label></label>
+			<label><?php echo esc_html( $cat_label ); ?></label>
 	<?php if ( $inst->do_show_relation_switch ) : ?>
-				<div>
-					<input type="checkbox" class="wplug-bimeson-filter-relation swc" id="<?php echo esc_attr( $slug ); ?>-relation"<?php echo $chk_rel; // phpcs:ignore ?>>
-					<label class="swc-btn swc-light" for="<?php echo esc_attr( $slug ); ?>-relation"><span>OR</span><span>AND</span></label>
-				</div>
+			<input type="checkbox" class="wplug-bimeson-filter-relation"<?php echo $chk_rel; // phpcs:ignore ?>>
+			<label><span>OR</span><span>AND</span></label>
 	<?php endif; ?>
-			</div>
-			<div class="wplug-bimeson-filter-cbs">
+		</div>
+		<div class="wplug-bimeson-filter-values">
 	<?php
 	foreach ( $terms as $t ) :
 		if ( ! is_null( $filtered ) && ! in_array( $t->slug, $filtered, true ) ) {
@@ -188,14 +179,13 @@ function _echo_tax_checkboxes( string $slug, array $terms, array $state, ?array 
 		$label   = $func( $t );
 		$checked = in_array( $t->slug, $qvs, true ) ? ' checked' : '';
 		?>
-				<label class="checkbox">
-					<input type="checkbox" name="<?php echo esc_attr( $name ); ?>"<?php echo $checked; // phpcs:ignore ?> value="<?php echo esc_attr( $val ); ?>">
-					<?php echo esc_html( $label ); ?>
-				</label>
+			<label>
+				<input type="checkbox" value="<?php echo esc_attr( $val ); ?>"<?php echo $checked; // phpcs:ignore ?>>
+				<?php echo esc_html( $label ); ?>
+			</label>
 		<?php
 	endforeach;
 	?>
-			</div>
 		</div>
 	</div>
 	<?php
@@ -229,7 +219,7 @@ function _get_filter_state_from_query(): array {
 			$ret[ $rs ] = array( array(), 'or' );
 		}
 	}
-	$val = get_query_var( $inst->year_qvar );
+	$val = get_query_var( get_query_var_name( $inst::KEY_YEAR ) );
 	if ( is_string( $val ) ) {
 		$ret[ (string) $inst::KEY_YEAR ] = $val;  // @phpstan-ignore-line
 	}

@@ -2,7 +2,7 @@
  * Bimeson File Importer
  *
  * @author Takuto Yanagida
- * @version 2023-11-13
+ * @version 2024-01-26
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const bstr = arr.join('');
 
 		try {
-			const book      = XLSX.read(bstr, {type:'binary'});
+			const book      = XLSX.read(bstr, { type: 'binary', cellNF: false });
 			const sheetName = retrieveSheetName(book);
 			const sheet     = book.Sheets[sheetName];
 			if (sheet) {
@@ -107,10 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		let colCount = 0;
 		const colToKey = {};
+
 		for (let x = x0; x < x1; x += 1) {
-			const cell = sheet[XLSX.utils.encode_cell({c: x, r: y0})];
+			const cell = sheet[XLSX.utils.encode_cell({ c: x, r: y0 })];
 			if (!cell || cell.w === '') {
-				colToKey[x] = false;
+				colToKey[x] = null;
 			} else {
 				colToKey[x] = normalizeKey(cell.w + '', true);
 			}
@@ -120,33 +121,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		for (let y = y0 + 1; y < y1; y += 1) {  // skip header
 			const item = {};
+			const bs   = new Map();
 			let count = 0;
+
 			for (let x = x0; x < x1; x += 1) {
-				const cell = sheet[XLSX.utils.encode_cell({c: x, r: y})];
+				const cell = sheet[XLSX.utils.encode_cell({ c: x, r: y })];
 				const key = colToKey[x];
-				if (key === false) continue;
-				if (key === KEY_BODY || key.indexOf(KEY_BODY + '_') === 0) {
+
+				if (key === null) continue;
+				if (key.startsWith(KEY_BODY)) {
 					if (cell && cell.h && cell.h.length > 0) {
-						let text = stripUnnecessarySpan(cell.h);  // remove automatically inserted 'span' tag.
-						text = text.replace(/<br\/>/g, '<br />');
-						text = text.replace(/&#x000d;&#x000a;/g, '<br />');
-						item[key] = text;
 						count += 1;
+						const text = prepareBodyText(cell.h);
+						extractBodyText(bs, key, text);
 					}
 				} else if (key[0] === '_') {
 					if (cell && cell.w && cell.w.length > 0) {
-						item[key] = cell.w;
 						count += 1;
+						item[key] = cell.w;
 					}
 				} else {
 					if (cell && cell.w && cell.w.length > 0) {
+						count += 1;
 						const vals = cell.w.split(/\s*,\s*/);
 						item[key] = vals.map(function (x) { return normalizeKey(x, false); });
-						count += 1;
 					}
 				}
 			}
-			if (0 < count) retItems.push(item);
+			if (0 < count) {
+				storeBodyText(bs, item);
+				retItems.push(item);
+			}
+		}
+	}
+
+	function extractBodyText(bs, key, text) {
+		const k = key.replace(/\[[0-9]\]$/, '');
+		if (!bs.has(k)) {
+			bs.set(k, { s: '', a: {} });
+		}
+		const b = bs.get(k);
+		const m = key.match(/\[([0-9])\]$/);
+		if (m) {
+			const i = parseInt(m[1], 10);
+			if (!isNaN(i)) b.a[i] = text;
+		} else {
+			b.s = text;
+		}
+	}
+
+	function storeBodyText(bs, item) {
+		for (const k of bs.keys()) {
+			const b = bs.get(k);
+			if (b.s) {
+				item[k] = b.s;
+			}
+			if (b.a) {
+				let text = '';
+				for (let i = 0; i < 10; ++i) {
+					text += b.a?.[i] ?? '';
+				}
+				item[k] = text;
+			}
 		}
 	}
 
@@ -167,6 +203,19 @@ document.addEventListener('DOMContentLoaded', () => {
 		return str;
 	}
 
+
+	// -------------------------------------------------------------------------
+
+
+	function prepareBodyText(str) {
+		str = stripUnnecessarySpan(str);  // remove automatically inserted 'span' tag.
+		str = str.replace(/<br\/>/g, '<br>');
+		str = str.replace(/&#x000d;&#x000a;/g, '<br>');
+		str = restoreEscapedTag(str);
+		str = stripEmptyTag(str);
+		return str;
+	}
+
 	function stripUnnecessarySpan(str) {
 		str = str.replace(/<span +([^>]*)>/gi, (m, p1) => {
 			const as = p1.trim().toLowerCase().match(/style *= *"([^"]*)"/);
@@ -181,6 +230,36 @@ document.addEventListener('DOMContentLoaded', () => {
 		str = str.replace(/< +\/ +span +>/gi, '</span>');
 		str = str.replace(/<span>(.+?)<\/span>/gi, (m, p1) => { return p1; });
 		return str;
+	}
+
+	function restoreEscapedTag(str) {
+		for (const t of ['b', 'i', 'sub', 'sup']) {
+			str = str.replace(new RegExp(`&lt;${t}&gt;`, 'g'), `<${t}>`);
+			str = str.replace(new RegExp(`&lt;\/${t}&gt;`, 'g'), `</${t}>`);
+		}
+		str = str.replace(/&lt;u&gt;/g, '<span style="text-decoration:underline;">');
+		str = str.replace(/&lt;\/u&gt;/g, '</span>');
+		str = str.replace(/&lt;br&gt;/g, '<br>');
+
+		str = str.replace(/&lt;span +((?!&gt;).*?)&gt;/gi, (m, p1) => {
+			const mc = p1.trim().toLowerCase().replaceAll('&quot;', '"').match(/class *= *"([^"]*)"/);
+			if (mc && mc.length === 2) {
+				const cls = mc[1].trim();
+				return `<span class="${cls}">`;
+			}
+			return '<span>';
+		});
+		str = str.replace(/&lt;\/span&gt;/g, '</span>');
+		return str;
+	}
+
+	function stripEmptyTag(str) {
+		for (const t of ['b', 'i', 'sub', 'sup', 'span']) {
+			str = str.replace(new RegExp(`<${t}><\/${t}>`, 'g'), '');  // Remove empty tag
+		}
+		str = str.replace(/<span +[^>]*><\/span>/gi, '');
+		str = str.replace(/, , /g, ', ');
+		return str.trim();
 	}
 
 

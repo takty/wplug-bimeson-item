@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2024-01-26
  */
 
 declare(strict_types=1);
@@ -79,7 +79,10 @@ function _align_sub_slugs( array $items, array $rs_idx ): array {
 				usort(
 					$it[ $rs ],
 					function ( $a, $b ) use ( $ss ) {
-						return $ss[ $a ] <=> $ss[ $b ];
+						if ( isset( $ss[ $a ] ) && isset( $ss[ $b ] ) ) {
+							return $ss[ $a ] <=> $ss[ $b ];
+						}
+						return 0;
 					}
 				);
 			}

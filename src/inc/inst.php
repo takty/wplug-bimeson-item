@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2024-01-26
  */
 
 declare(strict_types=1);
@@ -26,10 +26,8 @@ namespace wplug\bimeson_item;
  *     uncat_label            : string,
  *     root_tax               : string,
  *     sub_tax_base           : string,
- *     sub_tax_cls_base       : string,
- *     sub_tax_qvar_base      : string,
- *     year_cls_base          : string,
- *     year_qvar              : string,
+ *     filter_qvar_base       : string,
+ *     filter_cls_base        : string,
  *     do_show_relation_switch: bool,
  *     cache                  : array<string, mixed>[],
  *     rs_idx                 : array<string, int[]>|null,
@@ -109,8 +107,7 @@ function _get_instance(): object {
 
 		// Filter.
 
-		const KEY_YEAR     = '_year';
-		const VAL_YEAR_ALL = 'all';
+		const KEY_YEAR = 'year';
 
 		/**
 		 * Label of year select markup.
@@ -160,10 +157,11 @@ function _get_instance(): object {
 		const KEY_SORT_UNCAT_LAST     = '_bimeson_sort_uncat_last';
 		const KEY_OMIT_LAST_CAT_GROUP = '_bimeson_omit_last_cat_group';
 
-		const DEFAULT_TAXONOMY          = 'bm_cat';
-		const DEFAULT_SUB_TAX_BASE      = 'bm_cat_';
-		const DEFAULT_SUB_TAX_CLS_BASE  = 'bm-cat-';
-		const DEFAULT_SUB_TAX_QVAR_BASE = 'bm_';
+		const DEFAULT_TAXONOMY     = 'bm_cat';
+		const DEFAULT_SUB_TAX_BASE = 'bm_cat_';
+
+		const DEFAULT_FILTER_QVAR_BASE = 'bm_%key%';
+		const DEFAULT_FILTER_CLS_BASE  = 'bm-%key%-%value%';
 
 		/**
 		 * Root taxonomy slug.
@@ -180,35 +178,18 @@ function _get_instance(): object {
 		public $sub_tax_base = '';
 
 		/**
-		 * Class base of sub taxonomies.
-		 *
-		 * @var string
-		 */
-		public $sub_tax_cls_base = '';
-
-		/**
 		 * Query variable name base of sub taxonomies.
 		 *
 		 * @var string
 		 */
-		public $sub_tax_qvar_base = '';
-
-		const DEFAULT_YEAR_CLS_BASE = 'bm-year-';
-		const DEFAULT_YEAR_QVAR     = 'bm_year';
+		public $filter_qvar_base = '';
 
 		/**
-		 * Class base of year.
+		 * Class base of sub taxonomies.
 		 *
 		 * @var string
 		 */
-		public $year_cls_base = '';
-
-		/**
-		 * Query variable name of year.
-		 *
-		 * @var string
-		 */
-		public $year_qvar = '';
+		public $filter_cls_base = '';
 
 		/**
 		 * Whether to show relation switches.

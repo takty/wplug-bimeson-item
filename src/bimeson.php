@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-13
+ * @version 2024-01-26
  */
 
 declare(strict_types=1);
@@ -38,10 +38,8 @@ require_once __DIR__ . '/inc/template-admin.php';
  *     uncategorized_label?    : string,
  *     taxonomy?               : string,
  *     sub_tax_base?           : string,
- *     sub_tax_cls_base?       : string,
- *     sub_tax_qvar_base?      : string,
- *     year_cls_base?          : string,
- *     year_qvar?              : string,
+ *     filter_qvar_base?       : string,
+ *     filter_cls_base?        : string,
  *     do_show_relation_switch?: bool,
  *     additional_langs?       : string[],
  * } $args (Optional) Array of arguments.
@@ -58,10 +56,8 @@ require_once __DIR__ . '/inc/template-admin.php';
  *     @type string   'uncategorized_label'     Label of year select markup. Default __( 'Uncategorized' ).
  *     @type string   'taxonomy'                Root taxonomy slug.
  *     @type string   'sub_tax_base'            Slug base of sub taxonomies.
- *     @type string   'sub_tax_cls_base'        Class base of sub taxonomies.
- *     @type string   'sub_tax_qvar_base'       Query variable name base of sub taxonomies.
- *     @type string   'year_cls_base'           Class base of year.
- *     @type string   'year_qvar'               Query variable name of year.
+ *     @type string   'filter_qvar_base'        Query variable name base of sub taxonomies.
+ *     @type string   'filter_cls_base'         Class base of sub taxonomies.
  *     @type bool     'do_show_relation_switch' Whether to show relation switches.
  *     @type string[] 'additional_langs'        Additional language slugs.
  * }
@@ -81,13 +77,10 @@ function initialize( array $args = array() ): void {
 	$inst->year_select_label = $args['year_select_label']   ?? __( 'Select Year' );  // @phpstan-ignore-line
 	$inst->uncat_label       = $args['uncategorized_label'] ?? __( 'Uncategorized' );  // @phpstan-ignore-line
 
-	$inst->root_tax          = $args['taxonomy']          ?? $inst::DEFAULT_TAXONOMY;  // @phpstan-ignore-line
-	$inst->sub_tax_base      = $args['sub_tax_base']      ?? $inst::DEFAULT_SUB_TAX_BASE;  // @phpstan-ignore-line
-	$inst->sub_tax_cls_base  = $args['sub_tax_cls_base']  ?? $inst::DEFAULT_SUB_TAX_CLS_BASE;  // @phpstan-ignore-line
-	$inst->sub_tax_qvar_base = $args['sub_tax_qvar_base'] ?? $inst::DEFAULT_SUB_TAX_QVAR_BASE;  // @phpstan-ignore-line
-
-	$inst->year_cls_base = $args['year_cls_base'] ?? $inst::DEFAULT_YEAR_CLS_BASE;  // @phpstan-ignore-line
-	$inst->year_qvar     = $args['year_qvar']     ?? $inst::DEFAULT_YEAR_QVAR;  // @phpstan-ignore-line
+	$inst->root_tax         = $args['taxonomy']         ?? $inst::DEFAULT_TAXONOMY;  // @phpstan-ignore-line
+	$inst->sub_tax_base     = $args['sub_tax_base']     ?? $inst::DEFAULT_SUB_TAX_BASE;  // @phpstan-ignore-line
+	$inst->filter_qvar_base = $args['filter_qvar_base'] ?? $inst::DEFAULT_FILTER_QVAR_BASE;  // @phpstan-ignore-line
+	$inst->filter_cls_base  = $args['filter_cls_base']  ?? $inst::DEFAULT_FILTER_CLS_BASE;  // @phpstan-ignore-line
 
 	$inst->do_show_relation_switch = $args['do_show_relation_switch'] ?? false;  // @phpstan-ignore-line
 	$inst->additional_langs        = $args['additional_langs'] ?? array();  // @phpstan-ignore-line
@@ -128,6 +121,20 @@ function _register_script( string $url_to ): void {
 				wp_register_style( 'wplug-bimeson-filter', \wplug\abs_url( $url_to, './assets/css/filter.min.css' ), array(), '1.0' );
 				wp_register_script( 'wplug-bimeson-filter', \wplug\abs_url( $url_to, './assets/js/filter.min.js' ), array(), '1.0', false );
 			}
+		);
+		add_filter(
+			'script_loader_tag',
+			function ( $tag, $handle ) {
+				if ( 'wplug-bimeson-filter' === $handle ) {
+					if ( current_theme_supports( 'html5', 'script' ) ) {
+						return str_replace( '<script ', '<script type="module" ', $tag );
+					} else {
+						return str_replace( 'text/javascript', 'module', $tag );
+					}
+				}
+			},
+			10,
+			2
 		);
 	}
 }

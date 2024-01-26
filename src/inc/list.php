@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2024-01-26
  */
 
 declare(strict_types=1);
@@ -355,13 +355,25 @@ function _get_links( array $it ): array {
 	$inst = _get_instance();
 
 	$links = array();
-	// phpcs:disable
-	$url   = $it[ $inst::IT_LINK_URL ]   ?? '';  // @phpstan-ignore-line
-	$title = $it[ $inst::IT_LINK_TITLE ] ?? '';  // @phpstan-ignore-line
-	// phpcs:enable
+	for ( $i = 0; $i <= 10; ++$i ) {
+		$sf = ( 0 === $i ) ? '' : "_$i";
+		// phpcs:disable
+		$url   = $it[ $inst::IT_LINK_URL   . $sf ] ?? '';  // @phpstan-ignore-line
+		$title = $it[ $inst::IT_LINK_TITLE . $sf ] ?? '';  // @phpstan-ignore-line
+		// phpcs:enable
 
-	if ( is_string( $url ) && is_string( $title ) && ! empty( $url ) ) {
-		$links[] = array( $url, $title );
+		if ( is_string( $url ) && is_string( $title ) && ! empty( $url ) ) {
+			$links[] = array( $url, $title );
+		} elseif ( 0 !== $i ) {
+			// phpcs:disable
+			$url   = $it[ $inst::IT_LINK_URL   . $i ] ?? '';  // @phpstan-ignore-line
+			$title = $it[ $inst::IT_LINK_TITLE . $i ] ?? '';  // @phpstan-ignore-line
+			// phpcs:enable
+
+			if ( is_string( $url ) && is_string( $title ) && ! empty( $url ) ) {
+				$links[] = array( $url, $title );
+			}
+		}
 	}
 	return $links;
 }
@@ -380,13 +392,17 @@ function _make_cls( array $it ): string {
 
 	$year = $it[ $inst::IT_DATE_NUM ] ?? '';  // @phpstan-ignore-line
 	if ( ! empty( $year ) ) {
-		$cs[] = $inst->year_cls_base . substr( '' . $year, 0, 4 );
+		$c    = str_replace( '%key%', $inst::KEY_YEAR, $inst->filter_cls_base );
+		$c    = str_replace( '%value%', substr( '' . $year, 0, 4 ), $c );
+		$cs[] = $c;
 	}
 	foreach ( $inst->sub_taxes as $rs => $_sub_tax ) {
 		$ss = isset( $it[ $rs ] ) && is_array( $it[ $rs ] ) ? $it[ $rs ] : array();
 		foreach ( $ss as $s ) {
 			if ( is_string( $s ) ) {
-				$cs[] = $inst->sub_tax_cls_base . "$rs-$s";
+				$c    = str_replace( '%key%', $rs, $inst->filter_cls_base );
+				$c    = str_replace( '%value%', $s, $c );
+				$cs[] = $c;
 			}
 		}
 	}

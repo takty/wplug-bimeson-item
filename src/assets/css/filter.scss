@@ -2,60 +2,48 @@
  * Publication List Filter (Common)
  *
  * @author Takuto Yanagida
- * @version 2023-11-17
+ * @version 2024-01-26
  */
 
- @media (min-width: 900px) {
-	.wplug-bimeson-filter {
+ .wplug-bimeson-filter {
+	margin-block-end: -1rem;
+
+	@media (min-width: 900px) {
 		column-count: 2;
 		column-gap  : 2rem;
 	}
 }
 
-.wplug-bimeson-filter-key-inner {
-	width: 100%;
-}
-
 .wplug-bimeson-filter-key {
 	margin: 0;
 
-	display    : inline-flex;
-	align-items: flex-start;
+	display       : inline-flex;
+	flex-direction: column;
+	align-items   : flex-start;
 
-	width             : 100%;
-	margin-block-start: 0.5rem;
+	width: 100%;
 
-	& + .wplug-bimeson-filter-key {
-		margin-block-start: 1rem;
-	}
+	margin-block-end: 1rem;
 }
 
-.wplug-bimeson-filter-sws {
-	margin         : 0;
-	display        : flex;
-	align-items    : center;
-	justify-content: space-between;
+.wplug-bimeson-filter-key > div:nth-child(1) {
+	margin: 0.25rem auto 0 0;
 
-	width            : fit-content;
-	min-width        : 75%;
-	margin-inline-end: auto;
+	display              : grid;
+	grid-template-columns: auto 1fr auto;
+	align-items          : center;
+	gap                  : 0 0.75rem;
 
-	> div {
-		margin     : 0;
-		display    : flex;
-		align-items: center;
+	width    : fit-content;
+	min-width: 75%;
 
-		&:nth-child(2) {
-			margin-inline-start: 1rem;
-		}
-	}
-	label {
+	& label {
 		font-weight: bold;
 		user-select: none;
 	}
 }
 
-.wplug-bimeson-filter-cbs {
+.wplug-bimeson-filter-values {
 	margin: 0;
 
 	display            : flex;
@@ -69,7 +57,10 @@
 		user-select: none;
 
 		line-height: 1;
-		input { margin-inline-end: 0.5rem; }
+
+		& input {
+			margin-inline-end: 0.5rem;
+		}
 	}
 }
 
@@ -81,10 +72,12 @@
 	*[data-count='0'] {
 		display: none;
 	}
-	ol, ul {
+	:is(ol, ul) {
 		li[hidden] {
 			display: none;
 		}
+
+		min-height: var(--height, unset);
 	}
 }
 
@@ -92,11 +85,11 @@
 // -----------------------------------------------------------------------------
 
 
-input[type='checkbox']:is(.tgl, .swc) {
+input[type='checkbox']:is(.wplug-bimeson-filter-enabled, .wplug-bimeson-filter-relation) {
 	display: none;
 }
 
-.tgl + .tgl-btn {
+.wplug-bimeson-filter-enabled + label {
 	box-sizing: content-box;
 
 	display  : inline-block;
@@ -104,8 +97,6 @@ input[type='checkbox']:is(.tgl, .swc) {
 	width    : calc(3em - 12px);
 	min-width: calc(3em - 12px);
 	height   : calc(1.5em - 6px);
-
-	margin-inline-end: 0.75rem;
 
 	outline    : 0;
 	cursor     : pointer;
@@ -117,35 +108,33 @@ input[type='checkbox']:is(.tgl, .swc) {
 	box-shadow   : inset 0 1px 3px 1px rgba(0, 0, 0, 0.35);
 
 	transition: all .4s ease;
+
+	&::after {
+		box-sizing: border-box;
+
+		display : block;
+		content : '';
+		position: relative;
+		width   : 50%;
+		height  : 100%;
+		left    : 0;
+
+		background   : #f7f7f7;
+		border-radius: 50%;
+		box-shadow   : 0 1px 3px 1px rgba(0, 0, 0, 0.35);
+
+		transition: all 0.2s ease;
+	}
 }
 
-.tgl + .tgl-btn:after {
-	box-sizing: border-box;
-
-	display : block;
-	content : '';
-	position: relative;
-	width   : 50%;
-	height  : 100%;
-	left    : 0;
-
-	background   : #f7f7f7;
-	border-radius: 50%;
-	box-shadow   : 0 1px 3px 1px rgba(0, 0, 0, 0.35);
-
-	transition: all 0.2s ease;
-}
-
-.tgl:checked + .tgl-btn {
+.wplug-bimeson-filter-enabled:checked + label {
 	&::after {
 		left: 50%;
 	}
-	&.tgl-light {
-		background-color:rgba(53, 130, 196, 0.8);
-	}
+	background-color:rgba(53, 130, 196, 0.8);
 }
 
-.swc + .swc-btn {
+.wplug-bimeson-filter-relation + label {
 	box-sizing: border-box;
 
 	display              : inline-grid;
@@ -167,36 +156,36 @@ input[type='checkbox']:is(.tgl, .swc) {
 
 	transition: all .4s ease;
 
-	span {
+	& span {
 		display    : inline-grid;
 		place-items: center;
 		font-size  : 65%;
 		line-height: 1;
 		color      : #aaa;
 	}
+
+	&::after {
+		content    : 'OR';
+		display    : grid;
+		place-items: center;
+		font-size  : 65%;
+		line-height: 1;
+
+		position: absolute;
+		width   : calc(50% - 3px);
+		height  : calc(100% - 6px);
+		inset   : 3px auto auto 3px;
+
+		background-color: rgba(53, 130, 196, 0.8);
+		border-radius   : 2px;
+		box-shadow      : 0 1px 2px 1px rgba(0, 0, 0, 0.35);
+		color           : #fff;
+
+		transition: all 0.2s ease;
+	}
 }
 
-.swc + .swc-btn:after {
-	content    : 'OR';
-	display    : grid;
-	place-items: center;
-	font-size  : 65%;
-	line-height: 1;
-
-	position: absolute;
-	width   : calc(50% - 3px);
-	height  : calc(100% - 6px);
-	inset   : 3px auto auto 3px;
-
-	background-color: rgba(53, 130, 196, 0.8);
-	border-radius   : 2px;
-	box-shadow      : 0 1px 2px 1px rgba(0, 0, 0, 0.35);
-	color           : #fff;
-
-	transition: all 0.2s ease;
-}
-
-.swc:checked + .swc-btn::after {
+.wplug-bimeson-filter-relation:checked + label::after {
 	content: 'AND';
 	left   : 50%;
 }
