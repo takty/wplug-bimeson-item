@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-01-26
+ * @version 2024-01-29
  */
 
 declare(strict_types=1);
@@ -87,17 +87,6 @@ function get_query_var_name( string $slug ): string {
 	$inst = _get_instance();
 	$name = str_replace( '%key%', $slug, $inst->filter_qvar_base );
 	return str_replace( '-', '_', $name );
-}
-
-/**
- * Converts a sub term to its input name.
- *
- * @param \WP_Term $sub_term A sub term.
- * @return string Name.
- */
-function sub_term_to_name( \WP_Term $sub_term ): string {
-	$id = "{$sub_term->taxonomy}_{$sub_term->slug}";
-	return str_replace( '-', '_', $id );
 }
 
 /**

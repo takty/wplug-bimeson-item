@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2024-01-29
  *
  * [publication list="<slug or post ID>" count="10" date-sort omit-single dup-item date="2020-2021" taxonomy="slug1, slug2, ..."]
  */
@@ -68,7 +68,7 @@ function register_shortcode( string $lang ): void {
  *
  * @param array<string, mixed> $atts Attributes.
  * @param string               $lang Language.
- * @return array{
+ * @return null|array{
  *     count             : int|null,
  *     sort_by_date_first: bool,
  *     omit_single_cat   : bool,
@@ -76,7 +76,7 @@ function register_shortcode( string $lang ): void {
  *     items             : array<string, mixed>[],
  *     years_exist       : string[],
  *     show_filter       : bool,
- * }|null Data.
+ * } Data.
  */
 function _get_data_shortcode( array $atts, string $lang ): ?array {
 	// phpcs:disable

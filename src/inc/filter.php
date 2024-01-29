@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-01-26
+ * @version 2024-01-29
  */
 
 declare(strict_types=1);
@@ -32,7 +32,7 @@ function initialize_filter(): void {
  */
 function _cb_query_vars_filter( array $query_vars ): array {
 	$inst         = _get_instance();
-	$query_vars[] = get_query_var_name( $inst::KEY_YEAR );
+	$query_vars[] = get_query_var_name( $inst::KEY_YEAR );  // @phpstan-ignore-line
 	return $query_vars;
 }
 
@@ -174,15 +174,11 @@ function _echo_tax_checkboxes( string $slug, array $terms, array $state, ?array 
 		if ( ! is_null( $filtered ) && ! in_array( $t->slug, $filtered, true ) ) {
 			continue;
 		}
-		$name    = sub_term_to_name( $t );
 		$val     = $t->slug;
 		$label   = $func( $t );
 		$checked = in_array( $t->slug, $qvs, true ) ? ' checked' : '';
 		?>
-			<label>
-				<input type="checkbox" value="<?php echo esc_attr( $val ); ?>"<?php echo $checked; // phpcs:ignore ?>>
-				<?php echo esc_html( $label ); ?>
-			</label>
+			<label><input type="checkbox" value="<?php echo esc_attr( $val ); ?>"<?php echo esc_html( $checked ); ?>><?php echo esc_html( $label ); ?></label>
 		<?php
 	endforeach;
 	?>
@@ -219,7 +215,7 @@ function _get_filter_state_from_query(): array {
 			$ret[ $rs ] = array( array(), 'or' );
 		}
 	}
-	$val = get_query_var( get_query_var_name( $inst::KEY_YEAR ) );
+	$val = get_query_var( get_query_var_name( $inst::KEY_YEAR ) );  // @phpstan-ignore-line
 	if ( is_string( $val ) ) {
 		$ret[ (string) $inst::KEY_YEAR ] = $val;  // @phpstan-ignore-line
 	}

@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version s
  */
 
 declare(strict_types=1);
@@ -50,10 +50,12 @@ class ItemBuffer {
 
 	/**
 	 * Displays stored items.
+	 *
+	 * @param array<string[]> $blocks Destination.
 	 */
-	public function echo(): void {
+	public function echo( array &$blocks ): void {
 		if ( ! empty( $this->items ) ) {
-			_echo_list_element( $this->items, $this->lang );
+			_echo_list_element( $blocks, $this->items, $this->lang );
 			$this->items = array();
 		}
 	}

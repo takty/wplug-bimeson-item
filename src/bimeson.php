@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-01-26
+ * @version 2024-01-29
  */
 
 declare(strict_types=1);
@@ -277,7 +277,7 @@ function the_list( ?int $post_id = null, string $lang = '', string $before = '<d
  *
  * @param int    $post_id Post ID.
  * @param string $lang    Language.
- * @return array{
+ * @return null|array{
  *     year_bgn          : string,
  *     year_end          : string,
  *     count             : int,
@@ -288,7 +288,7 @@ function the_list( ?int $post_id = null, string $lang = '', string $before = '<d
  *     omit_single_cat   : bool,
  *     items             : array<string, mixed>[],
  *     years_exist       : string[],
- * }|null Data.
+ * } Data.
  */
 function _get_data( int $post_id, string $lang ): ?array {
 	$inst = _get_instance();
