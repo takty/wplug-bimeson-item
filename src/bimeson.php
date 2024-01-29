@@ -128,10 +128,10 @@ function _register_script( string $url_to ): void {
 				if ( 'wplug-bimeson-filter' === $handle ) {
 					if ( current_theme_supports( 'html5', 'script' ) ) {
 						return str_replace( '<script ', '<script type="module" ', $tag );
-					} else {
-						return str_replace( 'text/javascript', 'module', $tag );
 					}
+					return str_replace( 'text/javascript', 'module', $tag );
 				}
+				return $tag;
 			},
 			10,
 			2
