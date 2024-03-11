@@ -2,7 +2,7 @@
  * Bimeson File Importer
  *
  * @author Takuto Yanagida
- * @version 2024-01-26
+ * @version 2024-03-11
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			for (let x = x0; x < x1; x += 1) {
 				const cell = sheet[XLSX.utils.encode_cell({ c: x, r: y })];
-				const key = colToKey[x];
+				const key  = colToKey[x];
 
 				if (key === null) continue;
 				if (key.startsWith(KEY_BODY)) {
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						const text = prepareBodyText(cell.h);
 						extractBodyText(bs, key, text);
 					}
-				} else if (key[0] === '_') {
+				} else if (key.startsWith('_')) {
 					if (cell && cell.w && cell.w.length > 0) {
 						count += 1;
 						item[key] = cell.w;
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					if (cell && cell.w && cell.w.length > 0) {
 						count += 1;
 						const vals = cell.w.split(/\s*,\s*/);
-						item[key] = vals.map(function (x) { return normalizeKey(x, false); });
+						item[key] = vals.map( x => normalizeKey(x, false) );
 					}
 				}
 			}
@@ -158,13 +158,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	function extractBodyText(bs, key, text) {
 		const k = key.replace(/\[[0-9]\]$/, '');
 		if (!bs.has(k)) {
-			bs.set(k, { s: '', a: {} });
+			bs.set(k, { s: null, a: new Map() });
 		}
 		const b = bs.get(k);
 		const m = key.match(/\[([0-9])\]$/);
 		if (m) {
 			const i = parseInt(m[1], 10);
-			if (!isNaN(i)) b.a[i] = text;
+			if (!isNaN(i)) b.a.set(i, text);
 		} else {
 			b.s = text;
 		}
@@ -175,11 +175,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			const b = bs.get(k);
 			if (b.s) {
 				item[k] = b.s;
-			}
-			if (b.a) {
+			} else {
 				let text = '';
 				for (let i = 0; i < 10; ++i) {
-					text += b.a?.[i] ?? '';
+					text += b.a.get(i) ?? '';
 				}
 				item[k] = text;
 			}
@@ -190,7 +189,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		str = str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
 		str = str.replace(/[_＿]/g, '_');
 		str = str.replace(/[\-‐―ー]/g, '-');
-		str = str.replace(/[^A-Za-z0-9_\- ]/g, '');
+		if (isKey) {
+			str = str.replace(/[^A-Za-z0-9_\- \[\]]/g, '');
+		} else {
+			str = str.replace(/[^A-Za-z0-9_\- ]/g, '');
+		}
 		str = str.toLowerCase().trim();
 		if (0 < str.length) {
 			if (isKey && str[0] === '_') {  // Underscore separation
