@@ -51,7 +51,7 @@ if ( ! function_exists( '\wplug\abs_url' ) ) {
 	 */
 	function abs_url( string $base, string $rel ): string {
 		$scheme = wp_parse_url( $rel, PHP_URL_SCHEME );
-		if ( false === $scheme || null !== $scheme ) {
+		if ( false === $scheme || is_string( $scheme ) ) {
 			return $rel;
 		}
 		$base = trailingslashit( $base );

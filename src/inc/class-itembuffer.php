@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version s
+ * @version 2024-03-26
  */
 
 declare(strict_types=1);
@@ -13,6 +13,8 @@ namespace wplug\bimeson_item;
 
 /**
  * Item buffer
+ *
+ * @psalm-suppress UnusedClass
  */
 class ItemBuffer {
 
@@ -50,6 +52,8 @@ class ItemBuffer {
 
 	/**
 	 * Displays stored items.
+	 *
+	 * @psalm-suppress UndefinedFunction
 	 *
 	 * @param array<string[]> $blocks Destination.
 	 */

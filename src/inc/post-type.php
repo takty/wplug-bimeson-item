@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-03-22
+ * @version 2024-03-26
  * @psalm-suppress UndefinedFunction
  */
 
@@ -61,7 +61,7 @@ function initialize_post_type( string $url_to ): void {
 			);
 		}
 		if ( class_exists( '\wplug\bimeson_item\Bimeson_Importer' ) ) {
-			\wplug\bimeson_item\Bimeson_Importer::register( $url_to );
+			new \wplug\bimeson_item\Bimeson_Importer( $url_to );
 		}
 	}
 }

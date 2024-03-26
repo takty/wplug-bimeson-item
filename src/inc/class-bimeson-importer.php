@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-13
+ * @version 2024-03-26
  */
 
 declare(strict_types=1);
@@ -31,6 +31,7 @@ if ( ! class_exists( '\WP_Importer' ) ) {
 }
 
 require_once __DIR__ . '/class-ajax.php';
+require_once __DIR__ . '/post-type.php';
 require_once __DIR__ . '/taxonomy.php';
 
 /**
@@ -39,17 +40,6 @@ require_once __DIR__ . '/taxonomy.php';
  * @api
  */
 class Bimeson_Importer extends \WP_Importer {
-
-	/**
-	 * Registers the importer.
-	 *
-	 * @psalm-suppress PossiblyUnusedParam
-	 *
-	 * @param string $url_to Base URL.
-	 */
-	public static function register( string $url_to ): void {
-		$instance = new Bimeson_Importer( $url_to );
-	}
 
 	/**
 	 * Base URL.
@@ -76,7 +66,7 @@ class Bimeson_Importer extends \WP_Importer {
 	 *
 	 * @var int
 	 */
-	private $file_id;
+	private $file_id = 0;
 
 	/**
 	 * Constructor.
@@ -118,7 +108,7 @@ class Bimeson_Importer extends \WP_Importer {
 	private function initialize_ajax(): string {
 		$ajax = new Ajax(
 			'wplug_bimeson_import',
-			function ( $data ) {
+			function ( array $data ) {
 				$status = $data['status'] ?? '';
 				if ( 'start' === $status ) {
 					add_filter(
@@ -167,7 +157,7 @@ class Bimeson_Importer extends \WP_Importer {
 
 		$this->header();
 
-		$step = isset( $_GET['step'] ) ? ( (int) sanitize_text_field( wp_unslash( $_GET['step'] ) ) ) : 0;
+		$step = ( isset( $_GET['step'] ) && is_numeric( $_GET['step'] ) ) ? ( (int) sanitize_text_field( wp_unslash( $_GET['step'] ) ) ) : 0;
 		switch ( $step ) {
 			case 0:
 				$this->greet();

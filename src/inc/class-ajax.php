@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2024-03-26
  */
 
 declare(strict_types=1);
@@ -29,6 +29,8 @@ class Ajax {
 
 	/**
 	 * Sends a message of error.
+	 *
+	 * @psalm-suppress PossiblyUnusedMethod
 	 *
 	 * @param mixed $data Data to be sent.
 	 */
@@ -73,9 +75,11 @@ class Ajax {
 		$this->response = $response;
 		$this->nonce    = ( null === $nonce ) ? $action : $nonce;
 
-		add_action( "wp_ajax_$action", array( $this, 'cb_ajax_action' ) );
+		/** @psalm-suppress HookNotFound */  // phpcs:ignore
+		add_action( "wp_ajax_$action", array( $this, 'cb_ajax_action' ), 10, 0 );
 		if ( $pub ) {
-			add_action( "wp_ajax_nopriv_$action", array( $this, 'cb_ajax_action' ) );
+			/** @psalm-suppress HookNotFound */  // phpcs:ignore
+			add_action( "wp_ajax_nopriv_$action", array( $this, 'cb_ajax_action' ), 10, 0 );
 		}
 	}
 
