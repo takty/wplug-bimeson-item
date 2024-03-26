@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-01-29
+ * @version 2024-03-22
  */
 
 declare(strict_types=1);
@@ -544,7 +544,7 @@ function _bool_field( \WP_Term $term, string $key, string $heading, string $labe
 		<th style="padding-bottom: 20px;"><label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $heading ); ?></label></th>
 		<td style="padding-bottom: 20px;">
 			<label>
-				<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" <?php checked( $val, 1 ); ?>>
+				<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>"<?php echo '' !== $val ? ' checked' : ''; // phpcs:ignore ?>>
 				<?php echo esc_html( $label ); ?>
 			</label>
 		</td>
@@ -564,7 +564,7 @@ function _update_term_meta_by_post( int $term_id, string $key ): void {
 	if ( empty( $_POST[ sanitize_key( $key ) ] ) ) {  // phpcs:ignore
 		delete_term_meta( $term_id, $key );
 	} else {
-		update_term_meta( $term_id, $key, 1 );
+		update_term_meta( $term_id, $key, '1' );
 	}
 }
 

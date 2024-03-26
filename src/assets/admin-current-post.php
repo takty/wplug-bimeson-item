@@ -4,7 +4,7 @@
  *
  * @package Wplug
  * @author Takuto Yanagida
- * @version 2023-11-10
+ * @version 2024-03-22
  */
 
 declare(strict_types=1);
@@ -42,12 +42,12 @@ if ( ! function_exists( '\wplug\get_admin_post_type' ) ) {
 
 		$id = get_admin_post_id();
 		if ( $id ) {
-			$p = get_post( $id );
-			if ( $p instanceof \WP_Post ) {
-				$pt = $p->post_type;
+			$pt_ = get_post_type( $id );
+			if ( is_string( $pt_ ) ) {
+				$pt = $pt_;
 			}
 		}
-		if ( ! $pt ) {
+		if ( null === $pt ) {
 			$val = $_GET['post_type'] ?? null;  // phpcs:ignore
 			if ( is_string( $val ) ) {
 				$pt = $val;

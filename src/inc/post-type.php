@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-15
+ * @version 2024-03-22
  * @psalm-suppress UndefinedFunction
  */
 
@@ -152,7 +152,7 @@ function _cb_save_post_post_type( int $post_id ): void {
 	if ( ! is_string( $nonce ) ) {
 		return;
 	}
-	if ( ! wp_verify_nonce( sanitize_key( $nonce ), 'wplug_bimeson_item' ) ) {
+	if ( false === wp_verify_nonce( sanitize_key( $nonce ), 'wplug_bimeson_item' ) ) {
 		return;
 	}
 	if ( ! current_user_can( 'edit_post', $post_id ) ) {

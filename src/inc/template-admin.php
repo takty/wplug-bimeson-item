@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2023-11-15
+ * @version 2024-03-22
  */
 
 declare(strict_types=1);
@@ -79,7 +79,7 @@ function save_meta_box_template_admin( int $post_id ): void {
 	if ( ! is_string( $nonce ) ) {
 		return;
 	}
-	if ( ! wp_verify_nonce( sanitize_key( $nonce ), 'wplug_bimeson_admin' ) ) {
+	if ( false === wp_verify_nonce( sanitize_key( $nonce ), 'wplug_bimeson_admin' ) ) {
 		return;
 	}
 	$inst = _get_instance();
@@ -111,7 +111,7 @@ function save_meta_box_template_admin( int $post_id ): void {
 	$cfg['filter_state'] = _get_filter_state_from_env();
 
 	$json = wp_json_encode( $cfg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-	if ( false !== $json ) {
+	if ( is_string( $json ) ) {
 		// Because the meta value is passed through the stripslashes() function upon being stored.
 		update_post_meta( $post_id, $inst->fld_list_cfg, addslashes( $json ) );
 	}
@@ -231,7 +231,7 @@ function _echo_tax_checkboxes_admin( string $root_slug, array $terms, array $sta
 	<div class="wplug-bimeson-admin-filter-key" data-key="<?php echo esc_attr( $slug ); ?>">
 		<div class="wplug-bimeson-admin-filter-key-inner">
 			<div>
-				<input type="checkbox" class="wplug-bimeson-admin-filter-switch tgl tgl-light" id="<?php echo esc_attr( $slug ); ?>" name="<?php echo esc_attr( $sub_tax ); ?>"<?php echo $checked; // phpcs:ignore ?> value="1">
+				<input type="checkbox" class="wplug-bimeson-admin-filter-switch tgl tgl-light" id="<?php echo esc_attr( $slug ); ?>" name="<?php echo esc_attr( $sub_tax ); ?>"<?php echo $checked; // phpcs:ignore ?>>
 				<label class="tgl-btn" for="<?php echo esc_attr( $slug ); ?>"></label>
 				<span class="wplug-bimeson-admin-filter-cat"><label for="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $cat_label ); ?></label></span>
 				<label<?php echo esc_attr( $ih_attr ); ?>>
