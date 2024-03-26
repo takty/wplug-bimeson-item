@@ -157,7 +157,7 @@ class Bimeson_Importer extends \WP_Importer {
 
 		$this->header();
 
-		$step = ( isset( $_GET['step'] ) && is_numeric( $_GET['step'] ) ) ? ( (int) sanitize_text_field( wp_unslash( $_GET['step'] ) ) ) : 0;
+		$step = ( isset( $_GET['step'] ) && is_string( $_GET['step'] ) ) ? ( (int) sanitize_text_field( wp_unslash( $_GET['step'] ) ) ) : 0;
 		switch ( $step ) {
 			case 0:
 				$this->greet();
