@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-03-26
+ * @version 2024-05-26
  * @psalm-suppress UndefinedFunction
  */
 
@@ -50,6 +50,11 @@ function initialize_post_type( string $url_to ): void {
 	if ( is_admin() ) {
 		add_action( 'wp_loaded', '\wplug\bimeson_item\_cb_wp_loaded', 10, 0 );
 		add_action( 'admin_menu', '\wplug\bimeson_item\_cb_admin_menu_post_type', 10, 0 );
+		/**
+		 * 'save_post_' . $inst::PT is non-empty-string.
+		 *
+		 * @psalm-suppress ArgumentTypeCoercion
+		 */
 		add_action( 'save_post_' . $inst::PT, '\wplug\bimeson_item\_cb_save_post_post_type', 10, 1 );  // @phpstan-ignore-line
 
 		if ( _is_the_post_type() ) {
@@ -128,10 +133,10 @@ function _cb_output_html_post_type(): void {
 	$post_id = get_the_ID();
 
 	// phpcs:disable
-	$date       = $post_id ? get_post_meta( $post_id, $inst::IT_DATE,       true ) : '';  // @phpstan-ignore-line
-	$doi        = $post_id ? get_post_meta( $post_id, $inst::IT_DOI,        true ) : '';  // @phpstan-ignore-line
-	$link_url   = $post_id ? get_post_meta( $post_id, $inst::IT_LINK_URL,   true ) : '';  // @phpstan-ignore-line
-	$link_title = $post_id ? get_post_meta( $post_id, $inst::IT_LINK_TITLE, true ) : '';  // @phpstan-ignore-line
+	$date       = false !== $post_id ? get_post_meta( $post_id, $inst::IT_DATE,       true ) : '';  // @phpstan-ignore-line
+	$doi        = false !== $post_id ? get_post_meta( $post_id, $inst::IT_DOI,        true ) : '';  // @phpstan-ignore-line
+	$link_url   = false !== $post_id ? get_post_meta( $post_id, $inst::IT_LINK_URL,   true ) : '';  // @phpstan-ignore-line
+	$link_title = false !== $post_id ? get_post_meta( $post_id, $inst::IT_LINK_TITLE, true ) : '';  // @phpstan-ignore-line
 	// phpcs:enable
 
 	output_input_row( __( 'Published date', 'wplug_bimeson_item' ), $inst::IT_DATE, $date );  // @phpstan-ignore-line
@@ -206,7 +211,7 @@ function process_items( array &$items, string $file_name ): array {
 		$a_bodies = array();
 		foreach ( $inst->additional_langs as $al ) {
 			$b = ( ! empty( $item[ $inst::IT_BODY . "_$al" ] ) ) ? $item[ $inst::IT_BODY . "_$al" ] : '';  // @phpstan-ignore-line
-			if ( ! empty( $b ) ) {
+			if ( is_string( $b ) && '' !== $b ) {  // Check for non-empty-string.
 				$a_bodies[ $al ] = $b;
 			}
 		}
@@ -260,7 +265,7 @@ function process_items( array &$items, string $file_name ): array {
 		// phpcs:enable
 
 		foreach ( $a_bodies as $l => $cont ) {
-			add_post_meta( $post_id, "_post_content_$l", wp_kses_post( is_string( $cont ) ? $cont : '' ) );
+			add_post_meta( $post_id, "_post_content_$l", wp_kses_post( $cont ) );
 		}
 		foreach ( $item as $key => $vals ) {
 			if ( '_' === $key[0] ) {

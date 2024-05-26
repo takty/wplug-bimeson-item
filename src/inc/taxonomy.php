@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-03-26
+ * @version 2024-05-26
  */
 
 declare(strict_types=1);
@@ -562,14 +562,14 @@ function _bool_field( \WP_Term $term, string $key, string $heading, string $labe
  */
 function _update_term_meta_by_post( int $term_id, string $key ): void {
 	$key = sanitize_key( $key );
-	if ( ! isset( $_POST[ $key ] ) ) {  // phpcs:ignore
+	if ( '' === $key ) {
 		return;
 	}
-	$val = $_POST[ $key ];  // phpcs:ignore
-	if ( '' === $val ) {
-		delete_term_meta( $term_id, $key );
-	} else {
+	$val = is_string( $_POST[ $key ] ?? null ) && '' !== $_POST[ $key ];  // phpcs:ignore
+	if ( $val ) {
 		update_term_meta( $term_id, $key, '1' );
+	} else {
+		delete_term_meta( $term_id, $key );
 	}
 }
 

@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-03-26
+ * @version 2024-05-26
  */
 
 declare(strict_types=1);
@@ -16,7 +16,7 @@ namespace wplug\bimeson_item;
  * @psalm-suppress MissingFile
  */
 require_once ABSPATH . 'wp-admin/includes/import.php';
-if ( ! class_exists( '\WP_Importer' ) ) {
+if ( false === class_exists( '\WP_Importer' ) ) {
 	$class_wp_importer = ABSPATH . 'wp-admin/includes/class-wp-importer.php';
 	if ( file_exists( $class_wp_importer ) ) {
 		/** phpcs:ignore

@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-03-22
+ * @version 2024-05-26
  */
 
 declare(strict_types=1);
@@ -24,7 +24,7 @@ function save_post_meta( int $post_id, string $key, $filter = null, $def = null 
 	if ( null !== $filter && null !== $val ) {
 		$val = $filter( $val );
 	}
-	if ( empty( $val ) ) {
+	if ( null === $val || '' === $val ) {
 		if ( null === $def ) {
 			delete_post_meta( $post_id, $key );
 			return;
@@ -44,10 +44,10 @@ function save_post_meta( int $post_id, string $key, $filter = null, $def = null 
  */
 function save_post_meta_with_wp_filter( int $post_id, string $key, ?string $hook_name = null, $def = null ): void {
 	$val = isset( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : null;  // phpcs:ignore
-	if ( null !== $hook_name && null !== $val ) {
+	if ( is_string( $hook_name ) && '' !== $hook_name && null !== $val ) {  // Check for non-empty-string.
 		$val = apply_filters( $hook_name, $val );
 	}
-	if ( empty( $val ) ) {
+	if ( null === $val || '' === $val ) {
 		if ( null === $def ) {
 			delete_post_meta( $post_id, $key );
 			return;
@@ -193,11 +193,18 @@ function set_admin_columns( string $post_type, array $all_columns ): void {
 			}
 		}
 	}
+	/**
+	 * Hook "manage_edit-{$post_type}_columns" not found.
+	 *
+	 * @psalm-suppress HookNotFound
+	 */
 	add_filter(
 		"manage_edit-{$post_type}_columns",
 		function () use ( $cols ) {
 			return $cols;
-		}
+		},
+		10,
+		0
 	);
 	add_action(
 		'admin_head',
@@ -209,8 +216,15 @@ function set_admin_columns( string $post_type, array $all_columns ): void {
 				</style>
 				<?php
 			}
-		}
+		},
+		10,
+		0
 	);
+	/**
+	 * Hook "manage_{$post_type}_posts_custom_column" not found.
+	 *
+	 * @psalm-suppress HookNotFound
+	 */
 	add_action(
 		"manage_{$post_type}_posts_custom_column",
 		function ( string $column_name, int $post_id ) use ( $val_fns ) {
@@ -243,6 +257,11 @@ function set_admin_columns_sortable( string $post_type, array $sortable_columns 
 			$names[] = $c;
 		}
 	}
+	/**
+	 * Hook "manage_edit-{$post_type}_sortable_columns" not found.
+	 *
+	 * @psalm-suppress HookNotFound
+	 */
 	add_filter(
 		"manage_edit-{$post_type}_sortable_columns",
 		function ( array $cols ) use ( $names ) {
@@ -252,7 +271,9 @@ function set_admin_columns_sortable( string $post_type, array $sortable_columns 
 				$cols[ $tax . $name ] = $name;
 			}
 			return $cols;
-		}
+		},
+		10,
+		1
 	);
 	add_filter(
 		'request',
@@ -272,6 +293,8 @@ function set_admin_columns_sortable( string $post_type, array $sortable_columns 
 				$vars = array_merge( $vars, $orderby );
 			}
 			return $vars;
-		}
+		},
+		10,
+		1
 	);
 }

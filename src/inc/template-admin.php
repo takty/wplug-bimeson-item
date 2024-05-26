@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-03-26
+ * @version 2024-05-26
  */
 
 declare(strict_types=1);
@@ -19,8 +19,8 @@ require_once __DIR__ . '/taxonomy.php';
  *
  * @param int $post_id Post ID.
  * @return array{
- *     year_bgn          : string,
- *     year_end          : string,
+ *     year_bgn          : int,
+ *     year_end          : int,
  *     count             : int,
  *     filter_state      : array<string, string[]>,
  *     sort_by_date_first: bool,
@@ -42,19 +42,19 @@ function get_template_admin_config( int $post_id ): array {
 		}
 	}
 	// phpcs:disable
-	$cfg['year_bgn'] = isset( $temp['year_bgn'] ) && is_numeric( $temp['year_bgn'] ) ? (string) $temp['year_bgn'] : '';
-	$cfg['year_end'] = isset( $temp['year_end'] ) && is_numeric( $temp['year_end'] ) ? (string) $temp['year_end'] : '';
-	$cfg['count']    = isset( $temp['count'] )    && is_numeric( $temp['count'] )    ?    (int) $temp['count']    : 0;
+	$cfg['year_bgn'] = isset( $temp['year_bgn'] ) && is_numeric( $temp['year_bgn'] ) ? (int) $temp['year_bgn'] : 0;
+	$cfg['year_end'] = isset( $temp['year_end'] ) && is_numeric( $temp['year_end'] ) ? (int) $temp['year_end'] : 0;
+	$cfg['count']    = isset( $temp['count'] )    && is_numeric( $temp['count'] )    ? (int) $temp['count']    : 0;
 	/**
 	 * @var array<string, string[]> $filter_state
 	 */
 	$filter_state = isset( $temp['filter_state'] ) && is_array( $temp['filter_state'] ) ? $temp['filter_state'] : array();
 	$cfg['filter_state'] = $filter_state;
 
-	$cfg['sort_by_date_first'] = isset( $temp['sort_by_date_first'] ) && '' !== $temp['sort_by_date_first'];
-	$cfg['dup_multi_cat']      = isset( $temp['dup_multi_cat'] )      && '' !== $temp['dup_multi_cat'];
-	$cfg['show_filter']        = isset( $temp['show_filter'] )        && '' !== $temp['show_filter'];
-	$cfg['omit_single_cat']    = isset( $temp['omit_single_cat'] )    && '' !== $temp['omit_single_cat'];
+	$cfg['sort_by_date_first'] = isset( $temp['sort_by_date_first'] ) && false !== $temp['sort_by_date_first'];
+	$cfg['dup_multi_cat']      = isset( $temp['dup_multi_cat'] )      && false !== $temp['dup_multi_cat'];
+	$cfg['show_filter']        = isset( $temp['show_filter'] )        && false !== $temp['show_filter'];
+	$cfg['omit_single_cat']    = isset( $temp['omit_single_cat'] )    && false !== $temp['omit_single_cat'];
 	// phpcs: enable
 	return $cfg;
 }
@@ -96,13 +96,13 @@ function save_meta_box_template_admin( int $post_id ): void {
 	// phpcs:enable
 
 	if ( is_int( $cfg['year_bgn'] ) ) {
-		$cfg['year_bgn'] = max( 1970, min( 3000, $cfg['year_bgn'] ) );
+		$cfg['year_bgn'] = ( 1970 <= $cfg['year_bgn'] && $cfg['year_bgn'] <= 3000 ) ? $cfg['year_bgn'] : 0;
 	}
 	if ( is_int( $cfg['year_end'] ) ) {
-		$cfg['year_end'] = max( 1970, min( 3000, $cfg['year_end'] ) );
+		$cfg['year_end'] = ( 1970 <= $cfg['year_end'] && $cfg['year_end'] <= 3000 ) ? $cfg['year_end'] : 0;
 	}
 	if ( is_int( $cfg['count'] ) ) {
-		$cfg['count'] = max( 1, min( 9999, $cfg['count'] ) );
+		$cfg['count'] = max( 0, min( 9999, $cfg['count'] ) );
 	}
 	if ( is_int( $cfg['year_bgn'] ) && is_int( $cfg['year_end'] ) && $cfg['year_end'] < $cfg['year_bgn'] ) {
 		list( $cfg['year_bgn'], $cfg['year_end'] ) = array( $cfg['year_end'], $cfg['year_bgn'] );
@@ -135,9 +135,9 @@ function _cb_output_html_template_admin( \WP_Post $post ): void {
 	$cfg = get_template_admin_config( $post->ID );
 
 	// phpcs:disable
-	$year_bgn           = $cfg['year_bgn'];
-	$year_end           = $cfg['year_end'];
-	$count              = $cfg['count'] ? (string) $cfg['count'] : '';
+	$year_bgn           = $cfg['year_bgn'] ? (string) $cfg['year_bgn'] : '';
+	$year_end           = $cfg['year_end'] ? (string) $cfg['year_end'] : '';
+	$count              = $cfg['count']    ? (string) $cfg['count']    : '';
 	$sort_by_date_first = $cfg['sort_by_date_first'];
 	$dup_multi_cat      = $cfg['dup_multi_cat'];
 	$show_filter        = $cfg['show_filter'];

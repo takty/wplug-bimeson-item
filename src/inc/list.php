@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-01-29
+ * @version 2024-05-26
  */
 
 declare(strict_types=1);
@@ -126,8 +126,9 @@ function _echo_heading_list_element( array &$blocks, array $its, string $lang, b
 		if ( -1 !== $hr && $hr < $hr_size ) {
 			$is_cat_exist = false;
 			for ( $h = $hr; $h < $hr_size; $h++ ) {
-				if ( ! empty( $cat_slugs[ $h ] ) ) {
-					$is_cat_exist = _is_cat_exist( $hr_to_sub_tax[ $h ], $cat_slugs[ $h ] );
+				$key = $cat_slugs[ $h ];
+				if ( '' !== $key ) {
+					$is_cat_exist = _is_cat_exist( $hr_to_sub_tax[ $h ], $key );
 					if ( $is_cat_exist ) {
 						break;
 					}
@@ -137,9 +138,10 @@ function _echo_heading_list_element( array &$blocks, array $its, string $lang, b
 				$buf->echo( $blocks );
 			}
 			for ( $h = $hr; $h < $hr_size; $h++ ) {
-				if ( ! empty( $cat_slugs[ $h ] ) || ( $hr_to_uncat_last[ $h ] && $h === $hr ) ) {
+				$key = $cat_slugs[ $h ];
+				if ( '' !== $key || ( $hr_to_uncat_last[ $h ] && $h === $hr ) ) {
 					if ( is_null( $omitted_heading ) || ! $omitted_heading[ $hr_to_sub_tax[ $h ] ] ) {
-						_echo_heading( $blocks, $h, $sort_by_date_first, $hr_to_sub_tax[ $h ], $cat_slugs[ $h ] );
+						_echo_heading( $blocks, $h, $sort_by_date_first, $hr_to_sub_tax[ $h ], $key );
 					}
 				}
 			}
@@ -324,16 +326,16 @@ function _echo_list_item( array &$dest, array $it, string $lang ): void {
 	if ( ! empty( $lang ) ) {
 		$body = $it[ $inst::IT_BODY . "_$lang" ] ?? '';  // @phpstan-ignore-line
 	}
-	if ( empty( $body ) ) {
+	if ( ! is_string( $body ) || '' === $body ) {  // Check for non-empty-string.
 		$body = $it[ $inst::IT_BODY ] ?? '';  // @phpstan-ignore-line
 	}
-	if ( ! is_string( $body ) || empty( $body ) ) {
+	if ( ! is_string( $body ) || '' === $body ) {  // Check for non-empty-string.
 		return;
 	}
 
 	$doi  = isset( $it[ $inst::IT_DOI ] ) && is_string( $it[ $inst::IT_DOI ] ) ? $it[ $inst::IT_DOI ] : '';  // @phpstan-ignore-line
 	$_doi = '';
-	if ( ! empty( $doi ) ) {
+	if ( is_string( $doi ) && '' !== $doi ) {  // Check for non-empty-string.
 		$doi = preg_replace( '/^https?:\/\/doi\.org\//i', '', $doi );
 		if ( is_string( $doi ) ) {
 			$doi = trim( ltrim( $doi, '/' ) );
@@ -409,7 +411,7 @@ function _make_cls( array $it ): string {
 	$cs   = array();
 
 	$year = $it[ $inst::IT_DATE_NUM ] ?? '';  // @phpstan-ignore-line
-	if ( ! empty( $year ) ) {
+	if ( is_string( $year ) && '' !== $year ) {  // Check for non-empty-string.
 		$c    = str_replace( '%key%', $inst::KEY_YEAR, $inst->filter_cls_base );  // @phpstan-ignore-line
 		$c    = str_replace( '%value%', substr( '' . $year, 0, 4 ), $c );
 		$cs[] = $c;
