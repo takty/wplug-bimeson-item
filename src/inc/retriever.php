@@ -4,7 +4,7 @@
  *
  * @package Wplug Bimeson Item
  * @author Takuto Yanagida
- * @version 2024-01-26
+ * @version 2024-05-28
  */
 
 declare(strict_types=1);
@@ -122,7 +122,9 @@ function _duplicate_items( array $items ): array {
 			foreach ( $comb as $c ) {
 				$it_new = $it;
 				foreach ( $c as $rs => $v ) {
-					$it_new[ $rs ] = array( $v );
+					if ( null !== $v ) {
+						$it_new[ $rs ] = array( $v );
+					}
 				}
 				$ret[] = $it_new;
 			}
@@ -143,20 +145,29 @@ function _duplicate_items( array $items ): array {
  */
 function _generate_combination( array $arrays ): array {
 	$counts = array_map( 'count', $arrays );
-	$total  = array_product( $counts );
+	$total  = 1;
+	foreach ( $counts as $c ) {
+		$total *= ( 0 < $c ) ? $c : 1;
+	}
 	$cycles = array();
 
 	$c = $total;
 	foreach ( $arrays as $k => $_vs ) {
-		$c /= $counts[ $k ];
+		if ( 0 < $counts[ $k ] ) {
+			$c /= $counts[ $k ];
 
-		$cycles[ $k ] = $c;
+			$cycles[ $k ] = $c;
+		}
 	}
 	$res = array();
 	for ( $i = 0; $i < $total; ++$i ) {
 		$temp = array();
 		foreach ( $arrays as $k => $vs ) {
-			$temp[ $k ] = $vs[ ( $i / $cycles[ $k ] ) % $counts[ $k ] ];
+			if ( 0 < $counts[ $k ] ) {
+				$temp[ $k ] = $vs[ ( $i / $cycles[ $k ] ) % $counts[ $k ] ];
+			} else {
+				$temp[ $k ] = null;
+			}
 		}
 		$res[] = $temp;
 	}
